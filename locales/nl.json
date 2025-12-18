@@ -1,0 +1,206 @@
+{
+  "metadata": {
+    "title": "Formation AI Act | Certification Conformité IA Europe",
+    "description": "Formation certifiante AI Act pour mettre votre entreprise en conformité avec le règlement européen sur l'Intelligence Artificielle. Certification reconnue.",
+    "keywords": "formation AI Act, certification IA, conformité AI Act, règlement IA Europe, formation intelligence artificielle"
+  },
+  "nav": {
+    "home": "Accueil",
+    "formation": "Formation",
+    "modules": "Modules",
+    "pricing": "Tarifs",
+    "contact": "Contact",
+    "login": "Connexion",
+    "start": "Commencer"
+  },
+  "hero": {
+    "badge": "🇪🇺 Conforme au Règlement UE 2024/1689",
+    "title": "Certifiez vos équipes à l'AI Act",
+    "titleHighlight": "avant qu'il ne soit trop tard",
+    "subtitle": "La formation complète pour mettre votre entreprise en conformité avec le règlement européen sur l'Intelligence Artificielle. Évitez jusqu'à 35M€ d'amendes.",
+    "cta": "Démarrer la formation",
+    "ctaSecondary": "Voir le programme",
+    "stats": {
+      "companies": "500+ entreprises formées",
+      "satisfaction": "98% de satisfaction",
+      "certification": "Certification reconnue"
+    }
+  },
+  "urgency": {
+    "title": "Calendrier d'application",
+    "deadline1": {
+      "date": "Février 2025",
+      "title": "Pratiques interdites",
+      "description": "Les IA à risque inacceptable sont interdites"
+    },
+    "deadline2": {
+      "date": "Août 2025",
+      "title": "Obligation de formation",
+      "description": "Article 4 : Formation obligatoire des équipes"
+    },
+    "deadline3": {
+      "date": "Août 2026",
+      "title": "Application complète",
+      "description": "Toutes les obligations entrent en vigueur"
+    }
+  },
+  "modules": {
+    "title": "Programme de formation",
+    "subtitle": "6 modules complets pour maîtriser l'AI Act",
+    "duration": "Durée totale : 6 heures",
+    "module1": {
+      "title": "Comprendre l'AI Act",
+      "description": "Origines, objectifs et calendrier d'application du règlement européen",
+      "lessons": ["Origines et objectifs de l'AI Act", "Calendrier d'application", "Acteurs concernés", "Articulation avec le RGPD"],
+      "duration": "1h"
+    },
+    "module2": {
+      "title": "Identifier les risques IA",
+      "description": "Classification des systèmes IA selon les 4 niveaux de risque",
+      "lessons": ["Les 4 niveaux de risque", "IA interdites", "IA à haut risque", "IA à risque limité"],
+      "duration": "1h"
+    },
+    "module3": {
+      "title": "Cartographier vos usages",
+      "description": "Méthodologie d'audit et registre des systèmes IA",
+      "lessons": ["Méthodologie d'audit interne", "Registre des systèmes IA", "Évaluation d'impact algorithmique", "Quick wins"],
+      "duration": "1h"
+    },
+    "module4": {
+      "title": "Mettre en place la gouvernance",
+      "description": "Organisation et politique IA d'entreprise",
+      "lessons": ["Rôles et responsabilités", "Politique IA d'entreprise", "Comité de pilotage IA", "Intégration SMSI"],
+      "duration": "1h"
+    },
+    "module5": {
+      "title": "Documentation & traçabilité",
+      "description": "Documentation technique et marquage CE",
+      "lessons": ["Documentation technique", "Conservation des logs", "Marquage CE", "Déclaration de conformité UE"],
+      "duration": "1h"
+    },
+    "module6": {
+      "title": "Audit & amélioration continue",
+      "description": "Audits internes et amélioration continue",
+      "lessons": ["Audits internes", "Indicateurs de performance", "Amélioration continue", "Préparation aux contrôles"],
+      "duration": "1h"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Choisissez la formule adaptée à votre organisation",
+    "perPerson": "par personne",
+    "features": {
+      "access": "Accès à tous les modules",
+      "videos": "Vidéos de formation",
+      "quiz": "Quiz de validation",
+      "certificate": "Certificat de conformité",
+      "support": "Support prioritaire",
+      "dashboard": "Dashboard administrateur",
+      "custom": "Formation sur-mesure",
+      "audit": "Audit personnalisé"
+    },
+    "solo": {
+      "name": "Solo",
+      "price": "499",
+      "period": "€",
+      "description": "Idéal pour les TPE et indépendants",
+      "seats": "Jusqu'à 10 collaborateurs",
+      "pricePerSeat": "49,90€ / personne",
+      "features": ["Accès à tous les modules", "Vidéos de formation", "Quiz de validation", "Certificat de conformité", "Support par email"]
+    },
+    "pme": {
+      "name": "PME",
+      "price": "999",
+      "period": "€",
+      "description": "Pour les PME en croissance",
+      "seats": "Jusqu'à 50 collaborateurs",
+      "pricePerSeat": "19,98€ / personne",
+      "popular": "Le plus populaire",
+      "features": ["Tout Solo +", "Dashboard administrateur", "Suivi progression équipe", "Certificats personnalisés", "Support prioritaire"]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "8 999",
+      "period": "€",
+      "description": "Pour les grandes organisations",
+      "seats": "Jusqu'à 500 collaborateurs",
+      "pricePerSeat": "18€ / personne",
+      "features": ["Tout PME +", "Formation sur-mesure", "Audit personnalisé", "Intégration SSO", "Account manager dédié", "SLA garanti"]
+    },
+    "cta": "Démarrer maintenant"
+  },
+  "testimonials": {
+    "title": "Ils nous font confiance",
+    "subtitle": "Plus de 500 entreprises formées"
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "q1": {
+      "question": "Qu'est-ce que l'AI Act ?",
+      "answer": "L'AI Act (Règlement UE 2024/1689) est le premier cadre juridique mondial régissant l'intelligence artificielle. Il impose des obligations aux entreprises utilisant des systèmes IA, avec des sanctions pouvant atteindre 35 millions d'euros."
+    },
+    "q2": {
+      "question": "Qui est concerné par l'AI Act ?",
+      "answer": "Toute entreprise qui développe, déploie ou utilise des systèmes d'IA dans l'Union Européenne est concernée. Cela inclut les entreprises hors UE qui proposent des services IA aux citoyens européens."
+    },
+    "q3": {
+      "question": "La formation est-elle obligatoire ?",
+      "answer": "Oui, l'Article 4 de l'AI Act impose une obligation de 'AI literacy' : les entreprises doivent s'assurer que leur personnel possède un niveau suffisant de compétences en matière d'IA."
+    },
+    "q4": {
+      "question": "Le certificat est-il reconnu ?",
+      "answer": "Notre certificat atteste de la formation de vos équipes conformément aux exigences de l'Article 4 de l'AI Act. Il constitue une preuve de votre démarche de mise en conformité."
+    },
+    "q5": {
+      "question": "Combien de temps dure la formation ?",
+      "answer": "La formation complète dure environ 6 heures, réparties en 6 modules. Chaque collaborateur peut avancer à son rythme et reprendre là où il s'est arrêté."
+    }
+  },
+  "footer": {
+    "description": "Formation certifiante pour la conformité AI Act en Europe",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "terms": "CGV",
+    "contact": "Contact",
+    "copyright": "© 2025 Formation IA Act. Tous droits réservés."
+  },
+  "app": {
+    "welcome": "Bienvenue",
+    "progress": "Progression",
+    "continue": "Continuer",
+    "start": "Commencer",
+    "completed": "Terminé",
+    "locked": "Verrouillé",
+    "nextModule": "Module suivant",
+    "certificate": "Certificat",
+    "downloadCertificate": "Télécharger le certificat",
+    "quiz": {
+      "title": "Quiz de validation",
+      "question": "Question",
+      "submit": "Valider",
+      "correct": "Bonne réponse !",
+      "incorrect": "Mauvaise réponse",
+      "tryAgain": "Réessayer",
+      "passed": "Quiz réussi !",
+      "failed": "Quiz échoué"
+    },
+    "team": {
+      "title": "Mon équipe",
+      "invite": "Inviter",
+      "inviteCode": "Code d'invitation",
+      "copyLink": "Copier le lien",
+      "members": "Collaborateurs",
+      "certified": "Certifiés",
+      "inProgress": "En cours",
+      "avgProgress": "Progression moyenne",
+      "addMember": "Ajouter un collaborateur",
+      "removeMember": "Retirer",
+      "seats": "Places disponibles"
+    }
+  },
+  "cta": {
+    "title": "Prêt à certifier vos équipes ?",
+    "subtitle": "Rejoignez les 500+ entreprises déjà en conformité avec l'AI Act",
+    "button": "Démarrer maintenant"
+  }
+}
