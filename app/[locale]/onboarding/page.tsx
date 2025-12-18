@@ -1,492 +1,547 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  User, Building2, Users, Mail, ChevronRight, ChevronLeft,
-  Check, Plus, X, Trash2, Shield, Sparkles, ArrowRight,
-  CheckCircle, Send, SkipForward, Loader2
-} from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-type PlanType = 'solo' | 'equipe' | 'enterprise';
-
-interface InviteEmail {
-  id: string;
-  email: string;
-  valid: boolean;
-}
-
-const PLANS = {
-  solo: { name: 'Solo', seats: 1, price: 500 },
-  equipe: { name: 'Équipe', seats: 5, price: 2000 },
-  enterprise: { name: 'Enterprise', seats: 50, price: 18000 },
+// Icons
+const Icons = {
+  Shield: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  Check: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full"><polyline points="20 6 9 17 4 12"/></svg>,
+  ArrowRight: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+  ArrowLeft: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+  User: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  Users: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  Building: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>,
+  Mail: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+  Plus: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  Trash: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+  Zap: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  Award: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>,
+  Rocket: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>,
+  Sparkles: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3zM5 16l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/></svg>,
 };
+
+// Neural Background
+const NeuralBackground = () => {
+  const [particles, setParticles] = useState<{x: number, y: number, size: number, speed: number}[]>([]);
+  
+  useEffect(() => {
+    setParticles(Array.from({ length: 40 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      speed: Math.random() * 20 + 10,
+    })));
+  }, []);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 bg-[#0a0f1a]" />
+      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#00F5FF]/5 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-[#8B5CF6]/5 blur-[100px] rounded-full" />
+      <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] bg-[#00FF88]/3 blur-[80px] rounded-full" />
+      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(rgba(0, 245, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.3) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-[#00F5FF]"
+          style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%`, opacity: 0.3 }}
+          animate={{ y: [0, -20, 0], opacity: [0.2, 0.5, 0.2] }}
+          transition={{ duration: p.speed, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Glow Card
+const GlowCard = ({ children, glow = '#00F5FF', className = '' }: { children: React.ReactNode, glow?: string, className?: string }) => (
+  <div className={`relative group ${className}`}>
+    <div className="absolute -inset-[1px] rounded-2xl opacity-30" style={{ background: `linear-gradient(135deg, ${glow}40, transparent 50%, ${glow}40)` }} />
+    <div className="relative bg-[#111827]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+      {children}
+    </div>
+  </div>
+);
+
+// Step indicator
+const StepIndicator = ({ currentStep, totalSteps }: { currentStep: number, totalSteps: number }) => (
+  <div className="flex items-center justify-center gap-2">
+    {Array.from({ length: totalSteps }).map((_, i) => (
+      <div key={i} className="flex items-center">
+        <div 
+          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+            i + 1 < currentStep 
+              ? 'bg-[#00FF88] text-black' 
+              : i + 1 === currentStep 
+                ? 'bg-[#00F5FF] text-black' 
+                : 'bg-white/10 text-white/40'
+          }`}
+        >
+          {i + 1 < currentStep ? (
+            <div className="w-5 h-5"><Icons.Check /></div>
+          ) : (
+            i + 1
+          )}
+        </div>
+        {i < totalSteps - 1 && (
+          <div className={`w-12 h-1 mx-1 rounded-full transition-all ${
+            i + 1 < currentStep ? 'bg-[#00FF88]' : 'bg-white/10'
+          }`} />
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+// Steps content
+const steps = [
+  { 
+    title: "Bienvenue !",
+    subtitle: "Commençons la configuration de votre espace",
+    icon: Icons.Sparkles,
+    color: '#FFB800'
+  },
+  { 
+    title: "Votre profil",
+    subtitle: "Quelques informations sur vous",
+    icon: Icons.User,
+    color: '#00F5FF'
+  },
+  { 
+    title: "Votre entreprise",
+    subtitle: "Informations sur votre organisation",
+    icon: Icons.Building,
+    color: '#8B5CF6'
+  },
+  { 
+    title: "Invitez votre équipe",
+    subtitle: "Ajoutez vos collaborateurs",
+    icon: Icons.Users,
+    color: '#00FF88'
+  },
+  { 
+    title: "C'est parti !",
+    subtitle: "Tout est prêt pour commencer",
+    icon: Icons.Rocket,
+    color: '#FF6B00'
+  },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const planFromUrl = (searchParams.get('plan') as PlanType) || 'equipe';
-  
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Step 1: Account
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  // Step 2: Company (only for Équipe/Enterprise)
-  const [companyName, setCompanyName] = useState('');
-  const [sector, setSector] = useState('');
-  
-  // Step 3: Team invites
-  const [inviteEmails, setInviteEmails] = useState<InviteEmail[]>([
-    { id: '1', email: '', valid: false }
-  ]);
-  
-  const plan = PLANS[planFromUrl];
-  const isSolo = planFromUrl === 'solo';
-  const totalSteps = isSolo ? 2 : 3;
-  
-  // Validate email format
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Form data
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    jobTitle: '',
+    companyName: '',
+    companySize: '',
+    industry: '',
+    teamEmails: [''],
+  });
+
+  const totalSteps = 5;
+  const step = steps[currentStep - 1];
+
+  const updateFormData = (field: string, value: string | string[]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-  
-  // Add invite email field
-  const addInviteEmail = () => {
-    if (inviteEmails.length < plan.seats - 1) {
-      setInviteEmails([
-        ...inviteEmails,
-        { id: Date.now().toString(), email: '', valid: false }
-      ]);
+
+  const addTeamEmail = () => {
+    if (formData.teamEmails.length < 5) {
+      setFormData(prev => ({ ...prev, teamEmails: [...prev.teamEmails, ''] }));
     }
   };
-  
-  // Remove invite email field
-  const removeInviteEmail = (id: string) => {
-    if (inviteEmails.length > 1) {
-      setInviteEmails(inviteEmails.filter(e => e.id !== id));
-    }
+
+  const removeTeamEmail = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      teamEmails: prev.teamEmails.filter((_, i) => i !== index)
+    }));
   };
-  
-  // Update invite email
-  const updateInviteEmail = (id: string, email: string) => {
-    setInviteEmails(inviteEmails.map(e => 
-      e.id === id ? { ...e, email, valid: isValidEmail(email) } : e
-    ));
+
+  const updateTeamEmail = (index: number, value: string) => {
+    const newEmails = [...formData.teamEmails];
+    newEmails[index] = value;
+    setFormData(prev => ({ ...prev, teamEmails: newEmails }));
   };
-  
-  // Check if step is valid
-  const isStepValid = () => {
+
+  const canProceed = () => {
     switch (currentStep) {
-      case 1:
-        return firstName && lastName && isValidEmail(email) && password.length >= 8;
-      case 2:
-        if (isSolo) return true; // Skip validation for solo
-        return companyName.length > 0;
-      case 3:
-        return true; // Always valid (can skip)
-      default:
-        return false;
+      case 1: return true;
+      case 2: return formData.firstName && formData.lastName;
+      case 3: return formData.companyName && formData.companySize;
+      case 4: return true; // Optional step
+      case 5: return true;
+      default: return false;
     }
   };
-  
-  // Count valid invites
-  const validInvitesCount = inviteEmails.filter(e => e.valid).length;
-  
-  // Handle next step
-  const handleNext = () => {
+
+  const handleNext = async () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(prev => prev + 1);
     } else {
-      handleComplete();
-    }
-  };
-  
-  // Handle skip invites
-  const handleSkipInvites = () => {
-    handleComplete();
-  };
-  
-  // Handle complete onboarding
-  const handleComplete = async () => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // In production: Create account, send invites, etc.
-    console.log('Account:', { firstName, lastName, email, password });
-    console.log('Company:', { companyName, sector });
-    console.log('Invites:', inviteEmails.filter(e => e.valid).map(e => e.email));
-    
-    // Redirect based on plan
-    if (isSolo) {
+      setIsLoading(true);
+      await new Promise(r => setTimeout(r, 1500));
       router.push('/dashboard');
-    } else {
-      router.push('/admin');
     }
   };
-  
-  // Handle previous step
-  const handlePrevious = () => {
+
+  const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const handleSkip = () => {
+    if (currentStep === 4) {
+      setCurrentStep(5);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col">
+    <div className="min-h-screen bg-[#0a0f1a] text-white flex flex-col">
+      <NeuralBackground />
+
       {/* Header */}
-      <header className="border-b border-slate-800/50 py-4">
-        <div className="max-w-2xl mx-auto px-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+      <header className="relative z-10 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#00F5FF] to-[#0066FF] rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 text-white"><Icons.Shield /></div>
             </div>
-            <span className="text-lg font-bold text-white">Formation AI Act</span>
-          </Link>
-          
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1.5">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
-            <span className="text-emerald-400 text-sm font-medium">Paiement confirmé</span>
+            <span className="font-bold text-lg hidden sm:block">Formation-IA-Act.fr</span>
+          </div>
+          <div className="text-white/40 text-sm">
+            Étape {currentStep} sur {totalSteps}
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center py-8 px-4">
-        <div className="w-full max-w-xl">
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-                <div key={step} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                    step < currentStep
-                      ? 'bg-emerald-500 text-white'
-                      : step === currentStep
-                        ? 'bg-cyan-500 text-white'
-                        : 'bg-slate-700 text-slate-400'
-                  }`}>
-                    {step < currentStep ? (
-                      <Check className="w-5 h-5" />
-                    ) : (
-                      step
-                    )}
-                  </div>
-                  {step < totalSteps && (
-                    <div className={`w-16 sm:w-24 h-1 mx-2 rounded-full transition-all ${
-                      step < currentStep ? 'bg-emerald-500' : 'bg-slate-700'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className={currentStep >= 1 ? 'text-white' : 'text-slate-500'}>Compte</span>
-              {!isSolo && (
-                <span className={currentStep >= 2 ? 'text-white' : 'text-slate-500'}>Entreprise</span>
-              )}
-              {!isSolo && (
-                <span className={currentStep >= 3 ? 'text-white' : 'text-slate-500'}>Équipe</span>
-              )}
-              {isSolo && (
-                <span className={currentStep >= 2 ? 'text-white' : 'text-slate-500'}>Confirmation</span>
-              )}
-            </div>
+      <main className="relative z-10 flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-2xl">
+          {/* Step Indicator */}
+          <div className="mb-12">
+            <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
           </div>
 
           {/* Step Content */}
           <AnimatePresence mode="wait">
-            {/* Step 1: Account */}
-            {currentStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6 sm:p-8"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
-                    <User className="w-6 h-6 text-cyan-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Créez votre compte</h2>
-                    <p className="text-slate-400 text-sm">Plan {plan.name} • {plan.seats} place{plan.seats > 1 ? 's' : ''}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Prénom</label>
-                      <input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Jean"
-                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Nom</label>
-                      <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Dupont"
-                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Email professionnel</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="jean.dupont@entreprise.com"
-                      className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Mot de passe</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Minimum 8 caractères"
-                      className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                    {password && password.length < 8 && (
-                      <p className="text-orange-400 text-sm mt-1">Minimum 8 caractères</p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 2: Company (for Équipe/Enterprise) */}
-            {currentStep === 2 && !isSolo && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6 sm:p-8"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-white">Votre entreprise</h2>
-                    <p className="text-slate-400 text-sm">Ces informations apparaîtront sur les certificats</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Nom de l'entreprise</label>
-                    <input
-                      type="text"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="Acme Corporation"
-                      className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Secteur d'activité (optionnel)</label>
-                    <select
-                      value={sector}
-                      onChange={(e) => setSector(e.target.value)}
-                      className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GlowCard glow={step.color}>
+                <div className="p-8 sm:p-10">
+                  {/* Step Header */}
+                  <div className="text-center mb-8">
+                    <div 
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                      style={{ background: `${step.color}20` }}
                     >
-                      <option value="">Sélectionner un secteur</option>
-                      <option value="tech">Technologies / IT</option>
-                      <option value="finance">Finance / Banque / Assurance</option>
-                      <option value="sante">Santé / Pharmaceutique</option>
-                      <option value="industrie">Industrie / Manufacturing</option>
-                      <option value="retail">Retail / E-commerce</option>
-                      <option value="services">Services / Conseil</option>
-                      <option value="public">Secteur public</option>
-                      <option value="autre">Autre</option>
-                    </select>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 2 for Solo OR Step 3 for Équipe/Enterprise: Team Invites */}
-            {((currentStep === 2 && isSolo) || (currentStep === 3 && !isSolo)) && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-              >
-                {isSolo ? (
-                  /* Solo: Confirmation */
-                  <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-2xl p-6 sm:p-8 text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Sparkles className="w-10 h-10 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-white mb-3">Tout est prêt ! 🎉</h2>
-                    <p className="text-slate-300 mb-6">
-                      Votre compte est configuré. Vous pouvez maintenant commencer votre formation AI Act.
-                    </p>
-                    <div className="bg-slate-800/50 rounded-xl p-4 text-left">
-                      <p className="text-slate-400 text-sm mb-2">Récapitulatif :</p>
-                      <p className="text-white font-medium">{firstName} {lastName}</p>
-                      <p className="text-slate-400 text-sm">{email}</p>
-                      <p className="text-cyan-400 text-sm mt-2">Plan {plan.name}</p>
-                    </div>
-                  </div>
-                ) : (
-                  /* Équipe/Enterprise: Invite Team */
-                  <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                        <Users className="w-6 h-6 text-blue-400" />
+                      <div className="w-8 h-8" style={{ color: step.color }}>
+                        <step.icon />
                       </div>
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{step.title}</h1>
+                    <p className="text-white/50">{step.subtitle}</p>
+                  </div>
+
+                  {/* Step 1: Welcome */}
+                  {currentStep === 1 && (
+                    <div className="space-y-6">
+                      <div className="bg-white/5 rounded-xl p-6 text-center">
+                        <p className="text-white/70 mb-4">
+                          Merci d'avoir choisi notre formation AI Act ! En quelques étapes, nous allons configurer votre espace de formation personnalisé.
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                          {[
+                            { icon: Icons.Award, text: "Certificat officiel" },
+                            { icon: Icons.Zap, text: "6 modules complets" },
+                            { icon: Icons.Users, text: "Espace équipe" },
+                          ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-white/50 text-sm">
+                              <div className="w-4 h-4 text-[#00F5FF]"><item.icon /></div>
+                              {item.text}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="text-center text-white/40 text-sm">
+                        ⏱️ Configuration en moins de 2 minutes
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Profile */}
+                  {currentStep === 2 && (
+                    <div className="space-y-6">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-white/60 text-sm mb-2">Prénom *</label>
+                          <input
+                            type="text"
+                            value={formData.firstName}
+                            onChange={e => updateFormData('firstName', e.target.value)}
+                            placeholder="Jean"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF]/50 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/60 text-sm mb-2">Nom *</label>
+                          <input
+                            type="text"
+                            value={formData.lastName}
+                            onChange={e => updateFormData('lastName', e.target.value)}
+                            placeholder="Dupont"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF]/50 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      
                       <div>
-                        <h2 className="text-xl font-bold text-white">Invitez votre équipe</h2>
-                        <p className="text-slate-400 text-sm">{plan.seats - 1} places disponibles</p>
+                        <label className="block text-white/60 text-sm mb-2">Fonction</label>
+                        <input
+                          type="text"
+                          value={formData.jobTitle}
+                          onChange={e => updateFormData('jobTitle', e.target.value)}
+                          placeholder="DPO, Directeur Juridique, DSI..."
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF]/50 transition-colors"
+                        />
                       </div>
                     </div>
+                  )}
 
-                    <p className="text-slate-400 text-sm mb-6">
-                      Ajoutez les emails de vos collaborateurs. Ils recevront une invitation pour créer leur compte et commencer la formation.
-                    </p>
-
-                    <div className="space-y-3 mb-6">
-                      {inviteEmails.map((invite, index) => (
-                        <div key={invite.id} className="flex gap-2">
-                          <div className="relative flex-1">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                              type="email"
-                              value={invite.email}
-                              onChange={(e) => updateInviteEmail(invite.id, e.target.value)}
-                              placeholder={`collaborateur${index + 1}@${companyName.toLowerCase().replace(/\s/g, '') || 'entreprise'}.com`}
-                              className={`w-full bg-slate-700/50 border rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                                invite.email && !invite.valid ? 'border-orange-500' : 'border-slate-600'
+                  {/* Step 3: Company */}
+                  {currentStep === 3 && (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-white/60 text-sm mb-2">Nom de l'entreprise *</label>
+                        <input
+                          type="text"
+                          value={formData.companyName}
+                          onChange={e => updateFormData('companyName', e.target.value)}
+                          placeholder="Acme Corporation"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#8B5CF6]/50 transition-colors"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-white/60 text-sm mb-2">Taille de l'entreprise *</label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {['1-10', '11-50', '51-250', '250+'].map(size => (
+                            <button
+                              key={size}
+                              onClick={() => updateFormData('companySize', size)}
+                              className={`py-3 rounded-xl text-sm font-medium transition-all ${
+                                formData.companySize === size
+                                  ? 'bg-[#8B5CF6] text-white'
+                                  : 'bg-white/5 text-white/60 hover:bg-white/10'
                               }`}
-                            />
-                            {invite.valid && (
-                              <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400" />
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-white/60 text-sm mb-2">Secteur d'activité</label>
+                        <select
+                          value={formData.industry}
+                          onChange={e => updateFormData('industry', e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#8B5CF6]/50 transition-colors"
+                        >
+                          <option value="" className="bg-[#111827]">Sélectionnez...</option>
+                          <option value="tech" className="bg-[#111827]">Technologies / IT</option>
+                          <option value="finance" className="bg-[#111827]">Finance / Banque</option>
+                          <option value="sante" className="bg-[#111827]">Santé</option>
+                          <option value="industrie" className="bg-[#111827]">Industrie</option>
+                          <option value="retail" className="bg-[#111827]">Retail / Commerce</option>
+                          <option value="services" className="bg-[#111827]">Services</option>
+                          <option value="public" className="bg-[#111827]">Secteur public</option>
+                          <option value="autre" className="bg-[#111827]">Autre</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Team Invitations */}
+                  {currentStep === 4 && (
+                    <div className="space-y-6">
+                      <div className="bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-xl p-4 text-center">
+                        <p className="text-[#00FF88] text-sm">
+                          💡 Vous pouvez inviter jusqu'à 4 collaborateurs maintenant (selon votre plan)
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {formData.teamEmails.map((email, index) => (
+                          <div key={index} className="flex gap-2">
+                            <div className="relative flex-1">
+                              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30">
+                                <Icons.Mail />
+                              </div>
+                              <input
+                                type="email"
+                                value={email}
+                                onChange={e => updateTeamEmail(index, e.target.value)}
+                                placeholder="collegue@entreprise.com"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00FF88]/50 transition-colors"
+                              />
+                            </div>
+                            {formData.teamEmails.length > 1 && (
+                              <button
+                                onClick={() => removeTeamEmail(index)}
+                                className="p-3 text-white/40 hover:text-red-400 transition-colors"
+                              >
+                                <div className="w-5 h-5"><Icons.Trash /></div>
+                              </button>
                             )}
                           </div>
-                          {inviteEmails.length > 1 && (
-                            <button
-                              onClick={() => removeInviteEmail(invite.id)}
-                              className="p-3 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-xl transition-colors"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {inviteEmails.length < plan.seats - 1 && (
-                      <button
-                        onClick={addInviteEmail}
-                        className="w-full py-3 border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-xl text-slate-400 hover:text-cyan-400 flex items-center justify-center gap-2 transition-colors mb-6"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Ajouter un collaborateur
-                      </button>
-                    )}
-
-                    {/* Summary */}
-                    <div className="bg-slate-800/50 rounded-xl p-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-400">Invitations à envoyer</span>
-                        <span className="text-white font-medium">{validInvitesCount} / {plan.seats - 1}</span>
+                        ))}
                       </div>
-                      {validInvitesCount === 0 && (
-                        <p className="text-slate-500 text-xs mt-2">
-                          💡 Vous pouvez aussi inviter plus tard depuis le Dashboard Admin
+
+                      {formData.teamEmails.length < 5 && (
+                        <button
+                          onClick={addTeamEmail}
+                          className="w-full py-3 border-2 border-dashed border-white/10 hover:border-[#00FF88]/50 rounded-xl text-white/40 hover:text-[#00FF88] flex items-center justify-center gap-2 transition-colors"
+                        >
+                          <div className="w-4 h-4"><Icons.Plus /></div>
+                          Ajouter un email
+                        </button>
+                      )}
+
+                      <p className="text-center text-white/30 text-sm">
+                        Les invitations seront envoyées après la configuration
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step 5: Ready */}
+                  {currentStep === 5 && (
+                    <div className="space-y-6">
+                      <div className="bg-gradient-to-br from-[#FF6B00]/10 to-[#FF4444]/10 rounded-xl p-6 text-center">
+                        <div className="text-5xl mb-4">🚀</div>
+                        <h3 className="text-xl font-bold text-white mb-2">Tout est prêt !</h3>
+                        <p className="text-white/60">
+                          Votre espace de formation est configuré. Vous pouvez maintenant commencer votre parcours de conformité AI Act.
                         </p>
+                      </div>
+
+                      {/* Summary */}
+                      <div className="bg-white/5 rounded-xl p-6 space-y-4">
+                        <h4 className="text-white font-semibold">Récapitulatif</h4>
+                        <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-white/40">Nom</span>
+                            <p className="text-white">{formData.firstName} {formData.lastName}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/40">Fonction</span>
+                            <p className="text-white">{formData.jobTitle || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/40">Entreprise</span>
+                            <p className="text-white">{formData.companyName}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/40">Invitations</span>
+                            <p className="text-white">
+                              {formData.teamEmails.filter(e => e).length || 0} collaborateur(s)
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* What's next */}
+                      <div className="space-y-3">
+                        {[
+                          { icon: "📚", text: "Accédez aux 6 modules de formation" },
+                          { icon: "🎯", text: "Suivez votre progression en temps réel" },
+                          { icon: "🏆", text: "Obtenez votre certificat AI Act" },
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-3 text-white/60 text-sm">
+                            <span className="text-lg">{item.icon}</span>
+                            {item.text}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation Buttons */}
+                  <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+                    <div>
+                      {currentStep > 1 && (
+                        <button
+                          onClick={handleBack}
+                          className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                        >
+                          <div className="w-5 h-5"><Icons.ArrowLeft /></div>
+                          Retour
+                        </button>
                       )}
                     </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          {/* Navigation Buttons */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            {currentStep > 1 && (
-              <button
-                onClick={handlePrevious}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Retour
-              </button>
-            )}
-            
-            <div className="flex-1 flex gap-3">
-              {/* Skip button for team invite step */}
-              {currentStep === 3 && !isSolo && (
-                <button
-                  onClick={handleSkipInvites}
-                  disabled={isLoading}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-colors"
-                >
-                  <SkipForward className="w-5 h-5" />
-                  Plus tard
-                </button>
-              )}
-              
-              <button
-                onClick={handleNext}
-                disabled={!isStepValid() || isLoading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Création en cours...
-                  </>
-                ) : currentStep === totalSteps ? (
-                  <>
-                    {currentStep === 3 && validInvitesCount > 0 ? (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Envoyer {validInvitesCount} invitation{validInvitesCount > 1 ? 's' : ''} et continuer
-                      </>
-                    ) : (
-                      <>
-                        <ArrowRight className="w-5 h-5" />
-                        Commencer la formation
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    Continuer
-                    <ChevronRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+                    <div className="flex items-center gap-3">
+                      {currentStep === 4 && (
+                        <button
+                          onClick={handleSkip}
+                          className="px-6 py-3 text-white/60 hover:text-white transition-colors"
+                        >
+                          Passer
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={handleNext}
+                        disabled={!canProceed() || isLoading}
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ background: step.color, color: currentStep === 1 ? 'black' : 'white' }}
+                      >
+                        {isLoading ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Chargement...
+                          </>
+                        ) : currentStep === totalSteps ? (
+                          <>
+                            Accéder à ma formation
+                            <div className="w-5 h-5"><Icons.ArrowRight /></div>
+                          </>
+                        ) : (
+                          <>
+                            Continuer
+                            <div className="w-5 h-5"><Icons.ArrowRight /></div>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </GlowCard>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 px-6 py-4 text-center">
+        <p className="text-white/30 text-sm">
+          Besoin d'aide ? <a href="mailto:support@formation-ia-act.fr" className="text-[#00F5FF] hover:underline">support@formation-ia-act.fr</a>
+        </p>
+      </footer>
     </div>
   );
 }
