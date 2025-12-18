@@ -292,14 +292,3 @@ export default function VerifyPage({ params }: { params: { code?: string[] } }) 
     </div>
   );
 }
-```
-
----
-
-**Structure de dossiers à créer sur GitHub :**
-```
-app/
-└── [locale]/
-    └── verify/
-        └── [[...code]]/      ← Créer ce dossier (avec les crochets!)
-            └── page.tsx      ← Coller le code ici
