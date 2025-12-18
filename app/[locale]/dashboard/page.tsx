@@ -848,6 +848,91 @@ export default function DashboardPage() {
             })}
           </div>
         </motion.div>
+
+        {/* Resources Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-12"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-white/50 text-sm uppercase tracking-widest">Ressources Téléchargeables</h3>
+            <span className="text-[#FFB800] text-sm font-medium">🎁 847€ de bonus inclus</span>
+          </div>
+          
+          <HoloCard glow="#FFB800">
+            <div className="p-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: "Registre des Systèmes IA", type: "Excel", size: "245 KB", icon: "📊", category: "Template", color: "#00FF88" },
+                  { name: "Politique IA Entreprise", type: "Word", size: "128 KB", icon: "📄", category: "Template", color: "#00F5FF" },
+                  { name: "Checklist Conformité AI Act", type: "PDF", size: "89 KB", icon: "✅", category: "Checklist", color: "#FF6B00" },
+                  { name: "EIAI - Étude d'Impact", type: "Word", size: "156 KB", icon: "📋", category: "Template", color: "#8B5CF6" },
+                  { name: "Matrice Classification Risques", type: "Excel", size: "178 KB", icon: "⚠️", category: "Outil", color: "#FF4444" },
+                  { name: "Guide Article 4 - Formation", type: "PDF", size: "2.1 MB", icon: "📚", category: "Guide", color: "#00F5FF" },
+                  { name: "Modèle Gouvernance IA", type: "Word", size: "134 KB", icon: "🏛️", category: "Template", color: "#FFB800" },
+                  { name: "Audit Trail Template", type: "Excel", size: "198 KB", icon: "🔍", category: "Template", color: "#00FF88" },
+                  { name: "Notice Information Utilisateurs", type: "Word", size: "67 KB", icon: "ℹ️", category: "Template", color: "#00F5FF" },
+                  { name: "Cartographie Systèmes IA", type: "Excel", size: "312 KB", icon: "🗺️", category: "Outil", color: "#8B5CF6" },
+                  { name: "Checklist Haut Risque", type: "PDF", size: "95 KB", icon: "🔒", category: "Checklist", color: "#FF4444" },
+                  { name: "Kit Communication Interne", type: "ZIP", size: "4.5 MB", icon: "📢", category: "Kit", color: "#FFB800" },
+                ].map((resource, i) => (
+                  <motion.button
+                    key={i}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl text-left transition-colors group border border-white/5 hover:border-white/10"
+                  >
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                      style={{ background: `${resource.color}15` }}
+                    >
+                      {resource.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-white font-medium text-sm truncate group-hover:text-[#FFB800] transition-colors">
+                        {resource.name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span 
+                          className="text-xs px-2 py-0.5 rounded-full"
+                          style={{ background: `${resource.color}20`, color: resource.color }}
+                        >
+                          {resource.category}
+                        </span>
+                        <span className="text-white/30 text-xs">{resource.type} • {resource.size}</span>
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-[#FFB800]/20 flex items-center justify-center text-white/30 group-hover:text-[#FFB800] transition-colors flex-shrink-0">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Download All Button */}
+              <div className="mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-white font-medium">Télécharger tout le pack</p>
+                  <p className="text-white/40 text-sm">12 fichiers • 8.2 MB au total</p>
+                </div>
+                <button className="flex items-center gap-2 px-6 py-3 bg-[#FFB800] hover:bg-[#FFB800]/90 text-black font-semibold rounded-xl transition-colors">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Tout télécharger (ZIP)
+                </button>
+              </div>
+            </div>
+          </HoloCard>
+        </motion.div>
       </main>
 
       {/* Custom Styles */}
