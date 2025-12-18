@@ -3,1116 +3,872 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { 
-  Play, CheckCircle, Lock, ChevronRight, Download, X,
-  FileSpreadsheet, FileText, ClipboardList, Award, LogOut,
-  User, Clock, Trophy, Flame, Zap, Star, Gift, 
-  BookOpen, Target, TrendingUp, ChevronDown, Settings,
-  Menu, FolderOpen, Medal, Shield, Users, ExternalLink,
-  Share2, Bell, Calendar, BarChart3, Sparkles
-} from 'lucide-react';
-import Link from 'next/link';
 
-// Données utilisateur simulées (en production: depuis l'auth/API)
-const initialUserData = {
-  id: 'user-123',
+// Icons as simple SVG components for cleaner code
+const IconShield = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+
+const IconPlay = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+);
+
+const IconCheck = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const IconLock = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+
+const IconFlame = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <path d="M12 2c0 5-4 6-4 10a4 4 0 0 0 8 0c0-4-4-5-4-10z"/>
+  </svg>
+);
+
+const IconZap = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+
+const IconAward = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
+const IconUsers = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+// User data
+const userData = {
   name: 'Jean',
   lastName: 'Dupont',
-  email: 'jean.dupont@acme.com',
   avatar: 'JD',
-  role: 'admin' as 'admin' | 'employee' | 'solo', // Changer à 'employee' pour tester
-  plan: 'Équipe',
-  companyName: 'Acme Corporation',
+  role: 'admin' as const,
   streak: 7,
-  totalXP: 1250,
-  weeklyXP: 380,
-  rank: 12,
+  xp: 1250,
+  level: 4,
 };
 
-// Modules de formation
-const initialModules = [
+// Modules with neural theme
+const modules = [
   { 
     id: 1, 
-    title: "Introduction à l'AI Act", 
-    description: "Comprendre les fondamentaux du règlement européen",
+    title: "Fondamentaux de l'AI Act",
+    subtitle: "Origines • Objectifs • Calendrier",
     duration: "45 min",
-    lessons: [
-      { id: 1, title: "Origines et objectifs de l'AI Act", duration: "10 min" },
-      { id: 2, title: "Calendrier d'application", duration: "8 min" },
-      { id: 3, title: "Acteurs concernés", duration: "12 min" },
-      { id: 4, title: "Articulation avec le RGPD", duration: "10 min" },
-      { id: 5, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 5,
     xp: 150,
     completed: true, 
     progress: 100,
-    quizScore: 90,
-    icon: "📋"
+    quizScore: 92,
+    color: '#00F5FF',
+    neuralNodes: 12,
   },
   { 
     id: 2, 
-    title: "Classification des risques", 
-    description: "Les 4 niveaux de risque et leurs implications",
+    title: "Classification des Risques",
+    subtitle: "4 niveaux • Interdictions • Obligations",
     duration: "1h",
-    lessons: [
-      { id: 1, title: "Les 4 niveaux de risque", duration: "15 min" },
-      { id: 2, title: "IA interdites (risque inacceptable)", duration: "12 min" },
-      { id: 3, title: "IA à haut risque", duration: "15 min" },
-      { id: 4, title: "IA à risque limité", duration: "10 min" },
-      { id: 5, title: "IA à risque minimal", duration: "8 min" },
-      { id: 6, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 6,
     xp: 200,
     completed: true, 
     progress: 100,
-    quizScore: 85,
-    icon: "⚠️"
+    quizScore: 88,
+    color: '#00FF88',
+    neuralNodes: 18,
   },
   { 
     id: 3, 
-    title: "Registre des systèmes IA", 
-    description: "Cartographier et documenter vos usages IA",
+    title: "Cartographie des Systèmes",
+    subtitle: "Audit • Registre • Impact",
     duration: "1h15",
-    lessons: [
-      { id: 1, title: "Méthodologie d'audit interne", duration: "15 min" },
-      { id: 2, title: "Inventaire des systèmes IA", duration: "12 min" },
-      { id: 3, title: "Classification de vos usages", duration: "15 min" },
-      { id: 4, title: "Le registre des traitements IA", duration: "15 min" },
-      { id: 5, title: "Évaluation d'impact algorithmique", duration: "12 min" },
-      { id: 6, title: "Template et outils pratiques", duration: "8 min" },
-      { id: 7, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 7,
     xp: 250,
     completed: false, 
     progress: 57,
     currentLesson: 5,
     quizScore: null,
-    icon: "📊"
+    color: '#FF00E5',
+    neuralNodes: 24,
   },
   { 
     id: 4, 
-    title: "Gouvernance IA", 
-    description: "Mettre en place une politique IA d'entreprise",
+    title: "Gouvernance IA",
+    subtitle: "Politique • Référent • Comité",
     duration: "1h",
-    lessons: [
-      { id: 1, title: "Rôles et responsabilités", duration: "12 min" },
-      { id: 2, title: "Le référent IA", duration: "10 min" },
-      { id: 3, title: "Politique IA d'entreprise", duration: "15 min" },
-      { id: 4, title: "Comité de pilotage IA", duration: "12 min" },
-      { id: 5, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 5,
     xp: 200,
     completed: false, 
     progress: 0,
     quizScore: null,
-    icon: "🏛️"
+    color: '#FFB800',
+    neuralNodes: 15,
   },
   { 
     id: 5, 
-    title: "Systèmes à haut risque", 
-    description: "Documentation technique et conformité",
+    title: "Systèmes Haut Risque",
+    subtitle: "Documentation • Marquage CE",
     duration: "1h30",
-    lessons: [
-      { id: 1, title: "Identifier les systèmes à haut risque", duration: "15 min" },
-      { id: 2, title: "Exigences de gestion des risques", duration: "12 min" },
-      { id: 3, title: "Data governance", duration: "15 min" },
-      { id: 4, title: "Documentation technique", duration: "15 min" },
-      { id: 5, title: "Transparence et information", duration: "10 min" },
-      { id: 6, title: "Contrôle humain", duration: "10 min" },
-      { id: 7, title: "Marquage CE", duration: "8 min" },
-      { id: 8, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 8,
     xp: 300,
     completed: false, 
     progress: 0,
     quizScore: null,
-    icon: "🔒"
+    color: '#FF4444',
+    neuralNodes: 30,
   },
   { 
     id: 6, 
-    title: "Audit et conformité", 
-    description: "Préparer et maintenir votre conformité",
+    title: "Audit & Conformité",
+    subtitle: "Contrôles • Sanctions • Amélioration",
     duration: "1h",
-    lessons: [
-      { id: 1, title: "Audits internes IA", duration: "15 min" },
-      { id: 2, title: "Indicateurs de conformité", duration: "12 min" },
-      { id: 3, title: "Amélioration continue", duration: "10 min" },
-      { id: 4, title: "Préparer les contrôles", duration: "12 min" },
-      { id: 5, title: "Sanctions et responsabilités", duration: "8 min" },
-      { id: 6, title: "Quiz du module", duration: "5 min" },
-    ],
+    lessons: 6,
     xp: 250,
     completed: false, 
     progress: 0,
     quizScore: null,
-    icon: "✅"
+    color: '#8B5CF6',
+    neuralNodes: 20,
   },
 ];
 
-// Ressources
-const resources = [
-  { id: 1, name: "Guide AI Act - Synthèse", module: 1, type: "pdf", file: "guide-ai-act-synthese.pdf", size: "2.4 MB" },
-  { id: 2, name: "Checklist : Êtes-vous concerné ?", module: 1, type: "xlsx", file: "checklist-etes-vous-concerne.xlsx", size: "156 KB" },
-  { id: 3, name: "Matrice classification risques", module: 2, type: "xlsx", file: "matrice-classification-risques.xlsx", size: "234 KB" },
-  { id: 4, name: "Exemples par secteur", module: 2, type: "pdf", file: "exemples-secteurs-activite.pdf", size: "1.8 MB" },
-  { id: 5, name: "Template Registre IA", module: 3, type: "xlsx", file: "template-registre-ia.xlsx", size: "445 KB" },
-  { id: 6, name: "Guide d'audit pas à pas", module: 3, type: "pdf", file: "guide-audit-pas-a-pas.pdf", size: "3.2 MB" },
-  { id: 7, name: "Modèle Politique IA", module: 4, type: "docx", file: "modele-politique-ia.docx", size: "189 KB" },
-  { id: 8, name: "Fiche de poste Référent IA", module: 4, type: "docx", file: "fiche-poste-referent-ia.docx", size: "124 KB" },
-  { id: 9, name: "Template Documentation technique", module: 5, type: "docx", file: "template-documentation-technique.docx", size: "267 KB" },
-  { id: 10, name: "Checklist Marquage CE", module: 5, type: "xlsx", file: "checklist-marquage-ce.xlsx", size: "178 KB" },
-  { id: 11, name: "Plan d'audit type", module: 6, type: "xlsx", file: "plan-audit-type.xlsx", size: "312 KB" },
-  { id: 12, name: "Tableau de bord conformité", module: 6, type: "xlsx", file: "tableau-bord-conformite-ia.xlsx", size: "534 KB" },
-];
+// Neural Network Background Component
+const NeuralBackground = () => {
+  const [nodes, setNodes] = useState<{x: number, y: number, size: number, delay: number}[]>([]);
+  
+  useEffect(() => {
+    const generatedNodes = Array.from({ length: 50 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 3 + 1,
+      delay: Math.random() * 5,
+    }));
+    setNodes(generatedNodes);
+  }, []);
 
-// Badges disponibles
-const allBadges = [
-  { id: 'early-bird', name: 'Lève-tôt', icon: '🌅', description: 'Première leçon avant 9h', earned: true, earnedDate: '15 Jan 2024' },
-  { id: 'first-module', name: 'Premier pas', icon: '🎯', description: 'Premier module terminé', earned: true, earnedDate: '16 Jan 2024' },
-  { id: 'week-streak', name: 'Semaine parfaite', icon: '🔥', description: '7 jours consécutifs', earned: true, earnedDate: '22 Jan 2024' },
-  { id: 'speed-learner', name: 'Rapide', icon: '⚡', description: 'Module en moins de 30min', earned: false },
-  { id: 'half-way', name: 'Mi-parcours', icon: '🏃', description: '50% de la formation', earned: false },
-  { id: 'perfect-quiz', name: 'Sans faute', icon: '💯', description: '100% à un quiz', earned: false },
-  { id: 'certified', name: 'Certifié', icon: '🏆', description: 'Formation complète', earned: false },
-  { id: 'helper', name: 'Entraide', icon: '🤝', description: 'Aider un collègue', earned: false },
-];
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Gradient mesh background */}
+      <div className="absolute inset-0 bg-[#030014]" />
+      
+      {/* Organic gradient blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#00F5FF]/5 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#FF00E5]/5 blur-[150px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+      <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] rounded-full bg-[#00FF88]/5 blur-[100px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '4s' }} />
+      
+      {/* Neural nodes */}
+      <svg className="absolute inset-0 w-full h-full opacity-30">
+        {nodes.map((node, i) => (
+          <g key={i}>
+            <circle
+              cx={`${node.x}%`}
+              cy={`${node.y}%`}
+              r={node.size}
+              fill="#00F5FF"
+              opacity="0.6"
+            >
+              <animate
+                attributeName="opacity"
+                values="0.2;0.8;0.2"
+                dur={`${3 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="r"
+                values={`${node.size};${node.size * 1.5};${node.size}`}
+                dur={`${4 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          </g>
+        ))}
+        {/* Connection lines */}
+        {nodes.slice(0, 20).map((node, i) => {
+          const nextNode = nodes[(i + 1) % 20];
+          return (
+            <line
+              key={`line-${i}`}
+              x1={`${node.x}%`}
+              y1={`${node.y}%`}
+              x2={`${nextNode.x}%`}
+              y2={`${nextNode.y}%`}
+              stroke="url(#neuralGradient)"
+              strokeWidth="0.5"
+              opacity="0.2"
+            >
+              <animate
+                attributeName="opacity"
+                values="0.1;0.3;0.1"
+                dur={`${5 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+            </line>
+          );
+        })}
+        <defs>
+          <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00F5FF" />
+            <stop offset="50%" stopColor="#FF00E5" />
+            <stop offset="100%" stopColor="#00FF88" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Scan line effect */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div 
+          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent"
+          style={{
+            animation: 'scanline 8s linear infinite',
+          }}
+        />
+      </div>
+
+      {/* Grid overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      <style jsx>{`
+        @keyframes scanline {
+          0% { transform: translateY(-100vh); }
+          100% { transform: translateY(100vh); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Holographic Card Component
+const HoloCard = ({ children, className = '', glow = '#00F5FF', hover = true }: { 
+  children: React.ReactNode, 
+  className?: string,
+  glow?: string,
+  hover?: boolean 
+}) => (
+  <motion.div
+    whileHover={hover ? { scale: 1.02, y: -4 } : {}}
+    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+    className={`relative group ${className}`}
+  >
+    {/* Glow effect */}
+    <div 
+      className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+      style={{ background: `${glow}20` }}
+    />
+    
+    {/* Holographic border */}
+    <div 
+      className="absolute -inset-[1px] rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity"
+      style={{
+        background: `linear-gradient(135deg, ${glow}40, transparent 40%, transparent 60%, ${glow}40)`,
+      }}
+    />
+    
+    {/* Main card */}
+    <div className="relative bg-[#0A0A1B]/80 backdrop-blur-xl rounded-2xl border border-white/5 overflow-hidden">
+      {/* Inner glow */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity"
+        style={{ background: `radial-gradient(circle at 50% 0%, ${glow}, transparent 70%)` }}
+      />
+      
+      {/* Noise texture */}
+      <div className="absolute inset-0 opacity-[0.015]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+      }} />
+      
+      <div className="relative">{children}</div>
+    </div>
+  </motion.div>
+);
+
+// Liquid Progress Bar
+const LiquidProgress = ({ progress, color }: { progress: number, color: string }) => (
+  <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: `${progress}%` }}
+      transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+      className="absolute inset-y-0 left-0 rounded-full"
+      style={{ 
+        background: `linear-gradient(90deg, ${color}, ${color}88)`,
+        boxShadow: `0 0 20px ${color}60, inset 0 0 10px rgba(255,255,255,0.2)`,
+      }}
+    >
+      {/* Liquid wave effect */}
+      <div className="absolute inset-0 overflow-hidden rounded-full">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)`,
+            animation: 'liquidWave 2s linear infinite',
+          }}
+        />
+      </div>
+    </motion.div>
+    <style jsx>{`
+      @keyframes liquidWave {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+    `}</style>
+  </div>
+);
+
+// Neural Orb Component (for modules)
+const NeuralOrb = ({ color, progress, completed, size = 'md' }: { 
+  color: string, 
+  progress: number, 
+  completed: boolean,
+  size?: 'sm' | 'md' | 'lg'
+}) => {
+  const sizes = { sm: 40, md: 56, lg: 80 };
+  const s = sizes[size];
+  
+  return (
+    <div className="relative" style={{ width: s, height: s }}>
+      {/* Outer glow */}
+      <div 
+        className="absolute inset-0 rounded-full blur-lg opacity-50"
+        style={{ background: color }}
+      />
+      
+      {/* Progress ring */}
+      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="rgba(255,255,255,0.1)"
+          strokeWidth="4"
+        />
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke={color}
+          strokeWidth="4"
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: progress / 100 }}
+          transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+          style={{
+            strokeDasharray: '283',
+            filter: `drop-shadow(0 0 6px ${color})`,
+          }}
+        />
+      </svg>
+      
+      {/* Inner orb */}
+      <div 
+        className="absolute inset-2 rounded-full flex items-center justify-center"
+        style={{ 
+          background: `radial-gradient(circle at 30% 30%, ${color}40, ${color}10)`,
+          border: `1px solid ${color}40`,
+        }}
+      >
+        {completed ? (
+          <div className="w-5 h-5 text-white">
+            <IconCheck />
+          </div>
+        ) : progress > 0 ? (
+          <span className="text-white font-bold text-sm">{progress}%</span>
+        ) : (
+          <div className="w-4 h-4 text-white/60">
+            <IconLock />
+          </div>
+        )}
+      </div>
+      
+      {/* Pulse effect for active */}
+      {progress > 0 && !completed && (
+        <div 
+          className="absolute inset-0 rounded-full animate-ping opacity-20"
+          style={{ background: color, animationDuration: '2s' }}
+        />
+      )}
+    </div>
+  );
+};
+
+// Stats Orb (for header stats)
+const StatsOrb = ({ icon, value, label, color }: { 
+  icon: React.ReactNode, 
+  value: string | number, 
+  label: string,
+  color: string 
+}) => (
+  <div className="flex items-center gap-3">
+    <div 
+      className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+      style={{ 
+        background: `linear-gradient(135deg, ${color}20, ${color}05)`,
+        border: `1px solid ${color}30`,
+        boxShadow: `0 0 20px ${color}10`,
+      }}
+    >
+      <div className="w-5 h-5" style={{ color }}>{icon}</div>
+    </div>
+    <div>
+      <div className="text-white font-bold text-lg leading-none">{value}</div>
+      <div className="text-white/40 text-xs mt-0.5">{label}</div>
+    </div>
+  </div>
+);
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'learn' | 'resources' | 'badges'>('learn');
-  const [showStreakModal, setShowStreakModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showModuleDetail, setShowModuleDetail] = useState<number | null>(null);
-  const [showBadgeDetail, setShowBadgeDetail] = useState<typeof allBadges[0] | null>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [notification, setNotification] = useState<{type: 'success' | 'info', message: string} | null>(null);
-  
-  // State pour les modules (persistant pendant la session)
-  const [modules, setModules] = useState(initialModules);
-  const [userData, setUserData] = useState(initialUserData);
-  
-  // Calculs
+  const [showMenu, setShowMenu] = useState(false);
+  const [hoveredModule, setHoveredModule] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculations
   const completedModules = modules.filter(m => m.completed).length;
   const totalProgress = Math.round(modules.reduce((acc, m) => acc + m.progress, 0) / modules.length);
   const currentModule = modules.find(m => !m.completed && m.progress > 0) || modules.find(m => !m.completed);
-  const totalXPPossible = modules.reduce((acc, m) => acc + m.xp, 0);
-  const earnedXP = modules.filter(m => m.completed).reduce((acc, m) => acc + m.xp, 0) + 
-                   (currentModule ? Math.round((currentModule.progress / 100) * currentModule.xp) : 0);
-  
-  // Calcul score quiz moyen
-  const modulesWithQuiz = modules.filter(m => m.quizScore !== null);
-  const averageQuizScore = modulesWithQuiz.length > 0
-    ? Math.round(modulesWithQuiz.reduce((acc, m) => acc + (m.quizScore || 0), 0) / modulesWithQuiz.length)
-    : 0;
-  
-  // Éligibilité certificat
-  const canGetCertificate = completedModules === 6 && averageQuizScore >= 80;
+  const totalXP = modules.reduce((acc, m) => acc + m.xp, 0);
+  const earnedXP = modules.filter(m => m.completed).reduce((acc, m) => acc + m.xp, 0);
   const isAdmin = userData.role === 'admin';
-
-  // Notification
-  const showNotification = (type: 'success' | 'info', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case 'xlsx': return <FileSpreadsheet className="w-5 h-5" />;
-      case 'docx': return <FileText className="w-5 h-5" />;
-      case 'pdf': return <ClipboardList className="w-5 h-5" />;
-      default: return <FileText className="w-5 h-5" />;
-    }
-  };
-
-  const getFileColor = (type: string) => {
-    switch (type) {
-      case 'xlsx': return 'text-emerald-400 bg-emerald-500/10';
-      case 'docx': return 'text-blue-400 bg-blue-500/10';
-      case 'pdf': return 'text-red-400 bg-red-500/10';
-      default: return 'text-slate-400 bg-slate-500/10';
-    }
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Bonjour';
-    if (hour < 18) return 'Bon après-midi';
-    return 'Bonsoir';
-  };
 
   const handleStartModule = (moduleId: number) => {
     router.push(`/formation?module=${moduleId}&lesson=1`);
   };
 
-  const handleContinueModule = (moduleId: number) => {
-    const module = modules.find(m => m.id === moduleId);
-    const lessonId = module?.currentLesson || 1;
-    router.push(`/formation?module=${moduleId}&lesson=${lessonId}`);
-  };
-
-  const handleDownloadResource = (resource: typeof resources[0]) => {
-    // Simule le téléchargement
-    showNotification('success', `Téléchargement de "${resource.name}" démarré`);
-  };
-
-  const handleDownloadAll = () => {
-    showNotification('success', 'Téléchargement du ZIP (12 fichiers) démarré');
-  };
-
-  const handleLogout = () => {
-    router.push('/');
-  };
-
-  const handleShareProgress = () => {
-    navigator.clipboard.writeText(`J'ai complété ${totalProgress}% de ma formation AI Act ! 🚀`);
-    showNotification('info', 'Progression copiée dans le presse-papier');
-  };
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#0f172a]">
-      {/* Notification Toast */}
-      <AnimatePresence>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 ${
-              notification.type === 'success' 
-                ? 'bg-emerald-500 text-white' 
-                : 'bg-cyan-500 text-white'
-            }`}
-          >
-            <CheckCircle className="w-5 h-5" />
-            {notification.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="min-h-screen relative">
+      <NeuralBackground />
+      
       {/* Header */}
-      <header className="bg-[#0f172a]/95 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
+      <header className="relative z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <div className="relative w-12 h-12">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#00F5FF] to-[#FF00E5] rounded-xl rotate-45 transform-gpu" />
+                <div className="absolute inset-[2px] bg-[#030014] rounded-[10px] rotate-45" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 text-[#00F5FF]">
+                    <IconShield />
+                  </div>
+                </div>
               </div>
-              <span className="text-lg font-bold text-white hidden sm:block">Formation AI Act</span>
-            </Link>
+              <div>
+                <h1 className="text-white font-semibold tracking-tight">AI Act Academy</h1>
+                <p className="text-white/30 text-xs tracking-widest uppercase">Neural Learning System</p>
+              </div>
+            </motion.div>
 
-            {/* Navigation desktop */}
-            <nav className="hidden md:flex items-center gap-1">
-              {[
-                { id: 'learn', label: 'Apprendre', icon: BookOpen },
-                { id: 'resources', label: 'Ressources', icon: FolderOpen },
-                { id: 'badges', label: 'Badges', icon: Medal },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-cyan-500/20 text-cyan-400'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+            {/* Stats */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="hidden md:flex items-center gap-8"
+            >
+              <StatsOrb 
+                icon={<IconFlame />} 
+                value={userData.streak} 
+                label="Jours" 
+                color="#FF6B00"
+              />
+              <StatsOrb 
+                icon={<IconZap />} 
+                value={`${earnedXP}`} 
+                label="XP" 
+                color="#FFB800"
+              />
+              <StatsOrb 
+                icon={<IconAward />} 
+                value={`${completedModules}/6`} 
+                label="Modules" 
+                color="#00FF88"
+              />
+            </motion.div>
 
-            {/* Right side */}
-            <div className="flex items-center gap-3">
-              {/* Admin Button */}
+            {/* Profile */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-4"
+            >
               {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="hidden sm:flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg px-3 py-1.5 text-purple-400 text-sm font-medium transition-colors"
+                <button
+                  onClick={() => router.push('/admin')}
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-sm font-medium hover:bg-[#8B5CF6]/20 transition-colors"
                 >
-                  <Users className="w-4 h-4" />
-                  Gérer l'équipe
-                </Link>
+                  <div className="w-4 h-4"><IconUsers /></div>
+                  Admin
+                </button>
               )}
-
-              {/* Streak */}
-              <button 
-                onClick={() => setShowStreakModal(true)}
-                className="flex items-center gap-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-full px-3 py-1.5 transition-colors"
-              >
-                <Flame className="w-5 h-5 text-orange-400" />
-                <span className="text-orange-400 font-bold">{userData.streak}</span>
-              </button>
-
-              {/* XP */}
-              <div className="hidden sm:flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full px-3 py-1.5">
-                <Zap className="w-5 h-5 text-yellow-400" />
-                <span className="text-yellow-400 font-bold">{earnedXP}</span>
-              </div>
-
-              {/* Profile Menu */}
+              
               <div className="relative">
                 <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-slate-800/50 rounded-lg p-1 transition-colors"
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="relative w-12 h-12 rounded-full overflow-hidden group"
                 >
-                  <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {userData.avatar}
+                  {/* Avatar ring */}
+                  <div className="absolute -inset-[2px] bg-gradient-to-r from-[#00F5FF] via-[#FF00E5] to-[#00FF88] rounded-full animate-spin-slow opacity-60 group-hover:opacity-100 transition-opacity" style={{ animationDuration: '4s' }} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">{userData.avatar}</span>
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 hidden sm:block transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
-                  {showProfileMenu && (
+                  {showMenu && (
                     <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
+                      <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-12 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden"
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="absolute right-0 top-16 z-50 w-72"
                       >
-                        {/* User Info */}
-                        <div className="p-4 border-b border-slate-700">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-                              {userData.avatar}
+                        <HoloCard glow="#00F5FF" hover={false}>
+                          <div className="p-4">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center border border-white/10">
+                                <span className="text-white font-bold">{userData.avatar}</span>
+                              </div>
+                              <div>
+                                <p className="text-white font-semibold">{userData.name} {userData.lastName}</p>
+                                <p className="text-white/40 text-sm">Niveau {userData.level}</p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-white font-semibold truncate">{userData.name} {userData.lastName}</p>
-                              <p className="text-slate-400 text-sm truncate">{userData.email}</p>
-                            </div>
-                          </div>
-                          <div className="mt-3 flex items-center gap-2">
-                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              isAdmin ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-300'
-                            }`}>
-                              {isAdmin ? 'Admin' : 'Membre'}
-                            </span>
-                            <span className="text-slate-500 text-xs">• Plan {userData.plan}</span>
-                          </div>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="p-3 border-b border-slate-700">
-                          <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="bg-slate-700/30 rounded-lg p-2">
-                              <p className="text-lg font-bold text-white">{totalProgress}%</p>
-                              <p className="text-slate-500 text-xs">Progression</p>
-                            </div>
-                            <div className="bg-slate-700/30 rounded-lg p-2">
-                              <p className="text-lg font-bold text-yellow-400">{earnedXP}</p>
-                              <p className="text-slate-500 text-xs">XP</p>
-                            </div>
-                            <div className="bg-slate-700/30 rounded-lg p-2">
-                              <p className="text-lg font-bold text-orange-400">{userData.streak}</p>
-                              <p className="text-slate-500 text-xs">Streak</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Menu Items */}
-                        <div className="p-2">
-                          {isAdmin && (
-                            <Link
-                              href="/admin"
-                              onClick={() => setShowProfileMenu(false)}
-                              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                            
+                            <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-3" />
+                            
+                            <button
+                              onClick={() => router.push('/')}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
                             >
-                              <Users className="w-5 h-5 text-purple-400" />
-                              <span>Tableau de bord admin</span>
-                              <ExternalLink className="w-4 h-4 ml-auto text-slate-500" />
-                            </Link>
-                          )}
-                          
-                          {canGetCertificate && (
-                            <Link
-                              href="/certificate"
-                              onClick={() => setShowProfileMenu(false)}
-                              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
-                            >
-                              <Award className="w-5 h-5 text-yellow-400" />
-                              <span>Mon certificat</span>
-                              <span className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Disponible</span>
-                            </Link>
-                          )}
-
-                          <button
-                            onClick={() => { handleShareProgress(); setShowProfileMenu(false); }}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
-                          >
-                            <Share2 className="w-5 h-5" />
-                            <span>Partager ma progression</span>
-                          </button>
-
-                          <button
-                            onClick={() => setShowProfileMenu(false)}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
-                          >
-                            <Settings className="w-5 h-5" />
-                            <span>Paramètres</span>
-                          </button>
-
-                          <hr className="my-2 border-slate-700" />
-
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-                          >
-                            <LogOut className="w-5 h-5" />
-                            <span>Déconnexion</span>
-                          </button>
-                        </div>
+                              <div className="w-5 h-5"><IconLogout /></div>
+                              Déconnexion
+                            </button>
+                          </div>
+                        </HoloCard>
                       </motion.div>
                     </>
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Mobile menu */}
-              <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden text-slate-400 hover:text-white"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            </div>
+            </motion.div>
           </div>
         </div>
-
-        {/* Mobile navigation */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-slate-800 overflow-hidden"
-            >
-              <div className="px-4 py-3 space-y-1">
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium text-purple-400 bg-purple-500/10"
-                  >
-                    <Users className="w-5 h-5" />
-                    Gérer l'équipe
-                  </Link>
-                )}
-                {[
-                  { id: 'learn', label: 'Apprendre', icon: BookOpen },
-                  { id: 'resources', label: 'Ressources', icon: FolderOpen },
-                  { id: 'badges', label: 'Badges', icon: Medal },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => { setActiveTab(tab.id as typeof activeTab); setIsMobileMenuOpen(false); }}
-                    className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium transition-all ${
-                      activeTab === tab.id
-                        ? 'bg-cyan-500/20 text-cyan-400'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                    }`}
-                  >
-                    <tab.icon className="w-5 h-5" />
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Certificate Banner */}
-        {canGetCertificate && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-            <Link href="/certificate" className="block">
-              <div className="bg-gradient-to-r from-yellow-500/20 via-amber-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-yellow-500/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center">
-                    <Award className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg">Félicitations ! 🎉</h3>
-                    <p className="text-slate-300 text-sm">Votre certificat est prêt à être téléchargé</p>
-                  </div>
-                </div>
-                <button className="bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                  <Download className="w-5 h-5" />
-                  Obtenir mon certificat
-                </button>
-              </div>
-            </Link>
-          </motion.div>
-        )}
-
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         {/* Welcome Section */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                {getGreeting()}, {userData.name} ! 👋
-              </h1>
-              <p className="text-slate-400">
-                {totalProgress < 100 
-                  ? `Vous avez complété ${totalProgress}% de votre formation. Continuez comme ça !`
-                  : `Félicitations ! Vous avez terminé la formation. 🎉`
-                }
-              </p>
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-12"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Bienvenue, {userData.name}
+            <span className="inline-block ml-3 animate-wave">👋</span>
+          </h2>
+          <p className="text-white/50 text-lg max-w-2xl">
+            Poursuivez votre parcours de conformité. Chaque module maîtrisé vous rapproche de la certification AI Act.
+          </p>
+        </motion.div>
 
-            <div className="flex flex-wrap gap-3">
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                  <Trophy className="w-5 h-5 text-emerald-400" />
-                </div>
+        {/* Progress Overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-12"
+        >
+          <HoloCard glow="#00F5FF">
+            <div className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                 <div>
-                  <p className="text-2xl font-bold text-white">{completedModules}/6</p>
-                  <p className="text-slate-500 text-xs">Modules</p>
+                  <h3 className="text-white/50 text-sm uppercase tracking-widest mb-2">Progression Globale</h3>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-bold text-white">{totalProgress}%</span>
+                    <span className="text-white/30">complété</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-8">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#00FF88]">{completedModules}</div>
+                    <div className="text-white/30 text-sm">Modules</div>
+                  </div>
+                  <div className="h-12 w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#FFB800]">{earnedXP}</div>
+                    <div className="text-white/30 text-sm">XP gagnés</div>
+                  </div>
+                  <div className="h-12 w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#FF6B00]">{userData.streak}</div>
+                    <div className="text-white/30 text-sm">Série</div>
+                  </div>
                 </div>
               </div>
               
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 text-cyan-400" />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${averageQuizScore >= 80 ? 'text-emerald-400' : 'text-white'}`}>{averageQuizScore}%</p>
-                  <p className="text-slate-500 text-xs">Score quiz</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Global Progress Bar */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
-          <div className="bg-gradient-to-r from-slate-800/80 to-slate-800/40 border border-slate-700/50 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-cyan-400" />
-                <span className="text-white font-medium">Progression globale</span>
-              </div>
-              <span className="text-3xl font-bold text-white">{totalProgress}%</span>
-            </div>
-            <div className="h-4 bg-slate-700/50 rounded-full overflow-hidden">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${totalProgress}%` }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 rounded-full relative"
-              >
-                <div className="absolute inset-0 bg-white/20 animate-pulse" />
-              </motion.div>
-            </div>
-            <div className="flex items-center justify-between mt-3 text-sm">
-              <span className="text-slate-400">
-                <span className="text-yellow-400 font-medium">{earnedXP}</span>/{totalXPPossible} XP
-              </span>
-              {totalProgress >= 100 && (
-                <span className="text-emerald-400 font-medium flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4" /> Terminé !
-                </span>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Content based on active tab */}
-        <AnimatePresence mode="wait">
-          {activeTab === 'learn' && (
-            <motion.div key="learn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-              {/* Continue Learning Card */}
-              {currentModule && totalProgress < 100 && (
-                <div className="mb-8">
-                  <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <Play className="w-5 h-5 text-cyan-400" />
-                    Continuer votre apprentissage
-                  </h2>
-                  <div className="bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
-                    
-                    <div className="relative flex flex-col lg:flex-row lg:items-center gap-6">
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl flex-shrink-0 shadow-lg shadow-cyan-500/25">
-                          {currentModule.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-cyan-400 text-sm font-medium">Module {currentModule.id}</span>
-                            <span className="text-slate-500">•</span>
-                            <span className="text-slate-400 text-sm">{currentModule.duration}</span>
-                          </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{currentModule.title}</h3>
-                          <p className="text-slate-400 text-sm mb-3 hidden sm:block">{currentModule.description}</p>
-                          
-                          <div className="flex items-center gap-3">
-                            <div className="flex-1 max-w-xs">
-                              <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500 rounded-full"
-                                  style={{ width: `${currentModule.progress}%` }}
-                                />
-                              </div>
-                            </div>
-                            <span className="text-slate-400 text-sm">
-                              {currentModule.currentLesson || 1}/{currentModule.lessons.length} leçons
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <button 
-                        onClick={() => handleContinueModule(currentModule.id)}
-                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-3 text-lg transition-all hover:scale-[1.02] shadow-lg shadow-cyan-500/25"
-                      >
-                        <Play className="w-6 h-6" fill="white" />
-                        Reprendre
-                      </button>
-                    </div>
+              <LiquidProgress progress={totalProgress} color="#00F5FF" />
+              
+              {/* Module indicators */}
+              <div className="flex justify-between mt-4">
+                {modules.map((m, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <div 
+                      className="w-3 h-3 rounded-full transition-all"
+                      style={{ 
+                        background: m.completed ? m.color : m.progress > 0 ? `${m.color}50` : 'rgba(255,255,255,0.1)',
+                        boxShadow: m.completed ? `0 0 10px ${m.color}` : 'none',
+                      }}
+                    />
+                    <span className="text-white/30 text-xs mt-1">M{m.id}</span>
                   </div>
-                </div>
-              )}
-
-              {/* All Modules */}
-              <div>
-                <h2 className="text-lg font-semibold text-white mb-4">Tous les modules</h2>
-                <div className="grid gap-4">
-                  {modules.map((module, index) => {
-                    const isLocked = index > 0 && !modules[index - 1].completed && module.progress === 0;
-                    const isCurrent = currentModule?.id === module.id;
-                    
-                    return (
-                      <motion.div
-                        key={module.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className={`bg-slate-800/30 border rounded-xl p-5 transition-all cursor-pointer ${
-                          module.completed 
-                            ? 'border-emerald-500/30 hover:border-emerald-500/50' 
-                            : isCurrent
-                              ? 'border-cyan-500/30 hover:border-cyan-500/50'
-                              : isLocked
-                                ? 'border-slate-700/50 opacity-60 cursor-not-allowed'
-                                : 'border-slate-700/50 hover:border-slate-600'
-                        }`}
-                        onClick={() => !isLocked && setShowModuleDetail(module.id)}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
-                            module.completed
-                              ? 'bg-emerald-500/20'
-                              : isCurrent
-                                ? 'bg-cyan-500/20'
-                                : 'bg-slate-700/50'
-                          }`}>
-                            {isLocked ? <Lock className="w-6 h-6 text-slate-500" /> : module.icon}
-                          </div>
-                          
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-slate-500 text-sm">Module {module.id}</span>
-                              {module.completed && <CheckCircle className="w-4 h-4 text-emerald-400" />}
-                              {isCurrent && <span className="text-cyan-400 text-xs bg-cyan-500/20 px-2 py-0.5 rounded">En cours</span>}
-                            </div>
-                            <h3 className="text-white font-semibold">{module.title}</h3>
-                            <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-400">
-                              <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {module.duration}</span>
-                              <span>{module.lessons.length} leçons</span>
-                              <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-400" /> {module.xp} XP</span>
-                              {module.quizScore !== null && (
-                                <span className={`flex items-center gap-1 ${module.quizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
-                                  Quiz: {module.quizScore}%
-                                </span>
-                              )}
-                            </div>
-                            
-                            {module.progress > 0 && module.progress < 100 && (
-                              <div className="mt-3">
-                                <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden max-w-xs">
-                                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${module.progress}%` }} />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex-shrink-0">
-                            {module.completed ? (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleStartModule(module.id); }}
-                                className="text-emerald-400 hover:text-emerald-300 font-medium text-sm flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 px-4 py-2 rounded-lg transition-colors"
-                              >
-                                Revoir <ChevronRight className="w-4 h-4" />
-                              </button>
-                            ) : isLocked ? (
-                              <span className="text-slate-500 text-sm flex items-center gap-1">
-                                <Lock className="w-4 h-4" /> Verrouillé
-                              </span>
-                            ) : isCurrent ? (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleContinueModule(module.id); }}
-                                className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                              >
-                                <Play className="w-4 h-4" /> Continuer
-                              </button>
-                            ) : (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleStartModule(module.id); }}
-                                className="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                              >
-                                Commencer
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'resources' && (
-            <motion.div key="resources" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-              {/* Download All Banner */}
-              <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                    <Gift className="w-6 h-6 text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-lg">12 ressources professionnelles</h3>
-                    <p className="text-slate-400 text-sm">Valeur totale : 847€ • Inclus dans votre formation</p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleDownloadAll}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
-                >
-                  <Download className="w-5 h-5" />
-                  Tout télécharger (ZIP)
-                </button>
-              </div>
-
-              {/* Resources by Module */}
-              <div className="space-y-6">
-                {[1, 2, 3, 4, 5, 6].map((moduleId) => {
-                  const moduleResources = resources.filter(r => r.module === moduleId);
-                  const module = modules.find(m => m.id === moduleId);
-                  return (
-                    <div key={moduleId}>
-                      <h3 className="text-sm font-medium text-slate-400 mb-3 flex items-center gap-2">
-                        <span className="text-lg">{module?.icon}</span>
-                        Module {moduleId} : {module?.title}
-                      </h3>
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {moduleResources.map((resource) => (
-                          <button
-                            key={resource.id}
-                            onClick={() => handleDownloadResource(resource)}
-                            className="group bg-slate-800/30 hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 rounded-xl p-4 flex items-center gap-4 transition-all text-left"
-                          >
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getFileColor(resource.type)}`}>
-                              {getFileIcon(resource.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-white font-medium text-sm group-hover:text-cyan-400 transition-colors truncate">
-                                {resource.name}
-                              </p>
-                              <p className="text-slate-500 text-xs mt-0.5 uppercase">
-                                {resource.type} • {resource.size}
-                              </p>
-                            </div>
-                            <Download className="w-5 h-5 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'badges' && (
-            <motion.div key="badges" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-              {/* Badge Stats */}
-              <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-6 mb-8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-white font-semibold text-lg mb-1">Vos accomplissements</h3>
-                    <p className="text-slate-400 text-sm">
-                      {allBadges.filter(b => b.earned).length} badges sur {allBadges.length} débloqués
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {allBadges.filter(b => b.earned).map((badge) => (
-                      <button
-                        key={badge.id}
-                        onClick={() => setShowBadgeDetail(badge)}
-                        className="text-2xl hover:scale-110 transition-transform"
-                      >
-                        {badge.icon}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* All Badges Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {allBadges.map((badge) => (
-                  <button
-                    key={badge.id}
-                    onClick={() => badge.earned && setShowBadgeDetail(badge)}
-                    className={`relative bg-slate-800/30 border rounded-xl p-5 transition-all text-left ${
-                      badge.earned 
-                        ? 'border-purple-500/30 hover:border-purple-500/50 cursor-pointer' 
-                        : 'border-slate-700/50 opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl ${
-                        badge.earned ? 'bg-purple-500/20' : 'bg-slate-800 grayscale'
-                      }`}>
-                        {badge.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-white font-semibold">{badge.name}</h4>
-                        <p className="text-slate-500 text-sm mt-1">{badge.description}</p>
-                        {badge.earned && (
-                          <span className="inline-flex items-center gap-1 text-emerald-400 text-xs mt-2">
-                            <CheckCircle className="w-3 h-3" /> Obtenu
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    {!badge.earned && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-slate-900/50">
-                        <Lock className="w-8 h-8 text-slate-600" />
-                      </div>
-                    )}
-                  </button>
                 ))}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </HoloCard>
+        </motion.div>
+
+        {/* Continue Learning */}
+        {currentModule && totalProgress < 100 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mb-12"
+          >
+            <h3 className="text-white/50 text-sm uppercase tracking-widest mb-4">Reprendre la Formation</h3>
+            
+            <HoloCard glow={currentModule.color}>
+              <div className="p-6 md:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                  <NeuralOrb 
+                    color={currentModule.color} 
+                    progress={currentModule.progress} 
+                    completed={false}
+                    size="lg"
+                  />
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{ 
+                          background: `${currentModule.color}20`,
+                          color: currentModule.color,
+                        }}
+                      >
+                        Module {currentModule.id}
+                      </span>
+                      <span className="text-white/30 text-sm">{currentModule.duration}</span>
+                    </div>
+                    <h4 className="text-2xl font-bold text-white mb-1">{currentModule.title}</h4>
+                    <p className="text-white/40">{currentModule.subtitle}</p>
+                    
+                    <div className="mt-4">
+                      <LiquidProgress progress={currentModule.progress} color={currentModule.color} />
+                      <div className="flex justify-between mt-2 text-sm">
+                        <span className="text-white/40">{currentModule.currentLesson || 1}/{currentModule.lessons} leçons</span>
+                        <span style={{ color: currentModule.color }}>{currentModule.xp} XP</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleStartModule(currentModule.id)}
+                    className="relative group px-8 py-4 rounded-xl font-semibold text-white overflow-hidden"
+                    style={{ background: currentModule.color }}
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
+                    <div className="relative flex items-center gap-2">
+                      <div className="w-5 h-5"><IconPlay /></div>
+                      Continuer
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </HoloCard>
+          </motion.div>
+        )}
+
+        {/* All Modules */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h3 className="text-white/50 text-sm uppercase tracking-widest mb-6">Tous les Modules</h3>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((module, index) => {
+              const isLocked = index > 0 && !modules[index - 1].completed && module.progress === 0;
+              const isCurrent = currentModule?.id === module.id;
+              
+              return (
+                <motion.div
+                  key={module.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  onHoverStart={() => !isLocked && setHoveredModule(module.id)}
+                  onHoverEnd={() => setHoveredModule(null)}
+                >
+                  <HoloCard 
+                    glow={module.color} 
+                    hover={!isLocked}
+                    className={isLocked ? 'opacity-40' : ''}
+                  >
+                    <div className="p-6">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <NeuralOrb 
+                          color={module.color} 
+                          progress={module.progress} 
+                          completed={module.completed}
+                        />
+                        <div className="text-right">
+                          <span 
+                            className="text-xs font-medium"
+                            style={{ color: module.color }}
+                          >
+                            +{module.xp} XP
+                          </span>
+                          <p className="text-white/30 text-xs">{module.duration}</p>
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="mb-4">
+                        <span className="text-white/30 text-xs">Module {module.id}</span>
+                        <h4 className="text-white font-semibold text-lg mt-1">{module.title}</h4>
+                        <p className="text-white/40 text-sm mt-1">{module.subtitle}</p>
+                      </div>
+
+                      {/* Progress */}
+                      <div className="mb-4">
+                        <LiquidProgress progress={module.progress} color={module.color} />
+                        <div className="flex justify-between mt-2 text-xs">
+                          <span className="text-white/30">{module.lessons} leçons</span>
+                          {module.quizScore && (
+                            <span className="text-[#00FF88]">Quiz: {module.quizScore}%</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <button
+                        onClick={() => !isLocked && handleStartModule(module.id)}
+                        disabled={isLocked}
+                        className="w-full py-3 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2"
+                        style={{
+                          background: module.completed 
+                            ? 'rgba(255,255,255,0.05)' 
+                            : isLocked 
+                              ? 'rgba(255,255,255,0.02)'
+                              : `${module.color}20`,
+                          color: module.completed 
+                            ? 'rgba(255,255,255,0.5)' 
+                            : isLocked 
+                              ? 'rgba(255,255,255,0.2)'
+                              : module.color,
+                          border: `1px solid ${module.completed ? 'rgba(255,255,255,0.1)' : isLocked ? 'rgba(255,255,255,0.05)' : `${module.color}30`}`,
+                        }}
+                      >
+                        {isLocked ? (
+                          <>
+                            <div className="w-4 h-4"><IconLock /></div>
+                            Verrouillé
+                          </>
+                        ) : module.completed ? (
+                          <>
+                            <div className="w-4 h-4"><IconCheck /></div>
+                            Revoir
+                          </>
+                        ) : isCurrent ? (
+                          <>
+                            <div className="w-4 h-4"><IconPlay /></div>
+                            Continuer
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-4 h-4"><IconPlay /></div>
+                            Commencer
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </HoloCard>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       </main>
 
-      {/* ===== MODALS ===== */}
-
-      {/* Streak Modal */}
-      <AnimatePresence>
-        {showStreakModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowStreakModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Flame className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {userData.streak} jours de suite ! 🔥
-              </h3>
-              <p className="text-slate-400 mb-6">
-                Continuez votre série d'apprentissage pour gagner des badges exclusifs.
-              </p>
-              <div className="flex justify-center gap-2 mb-6">
-                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                  <div
-                    key={day}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                      day <= userData.streak
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-slate-700 text-slate-500'
-                    }`}
-                  >
-                    {day <= userData.streak ? '✓' : day}
-                  </div>
-                ))}
-              </div>
-              <div className="text-slate-500 text-sm mb-4">
-                🎯 Prochain objectif : 14 jours pour le badge "Deux semaines"
-              </div>
-              <button
-                onClick={() => setShowStreakModal(false)}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity"
-              >
-                Continuer ma série
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Module Detail Modal */}
-      <AnimatePresence>
-        {showModuleDetail && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowModuleDetail(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const module = modules.find(m => m.id === showModuleDetail);
-                if (!module) return null;
-                
-                return (
-                  <>
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${
-                          module.completed ? 'bg-emerald-500/20' : 'bg-cyan-500/20'
-                        }`}>
-                          {module.icon}
-                        </div>
-                        <div>
-                          <span className="text-slate-400 text-sm">Module {module.id}</span>
-                          <h3 className="text-xl font-bold text-white">{module.title}</h3>
-                        </div>
-                      </div>
-                      <button onClick={() => setShowModuleDetail(null)} className="text-slate-400 hover:text-white">
-                        <X className="w-6 h-6" />
-                      </button>
-                    </div>
-
-                    <p className="text-slate-400 mb-6">{module.description}</p>
-
-                    <div className="grid grid-cols-3 gap-3 mb-6">
-                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
-                        <p className="text-lg font-bold text-white">{module.duration}</p>
-                        <p className="text-slate-500 text-xs">Durée</p>
-                      </div>
-                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
-                        <p className="text-lg font-bold text-white">{module.lessons.length}</p>
-                        <p className="text-slate-500 text-xs">Leçons</p>
-                      </div>
-                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
-                        <p className="text-lg font-bold text-yellow-400">{module.xp}</p>
-                        <p className="text-slate-500 text-xs">XP</p>
-                      </div>
-                    </div>
-
-                    <div className="mb-6">
-                      <h4 className="text-white font-semibold mb-3">Contenu du module</h4>
-                      <div className="space-y-2">
-                        {module.lessons.map((lesson, idx) => {
-                          const isCompleted = module.completed || (module.currentLesson && idx < module.currentLesson - 1);
-                          const isCurrent = !module.completed && module.currentLesson === idx + 1;
-                          
-                          return (
-                            <div
-                              key={idx}
-                              className={`flex items-center gap-3 p-3 rounded-lg ${
-                                isCompleted ? 'bg-emerald-500/10' : isCurrent ? 'bg-cyan-500/10' : 'bg-slate-700/30'
-                              }`}
-                            >
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                isCompleted ? 'bg-emerald-500 text-white' : isCurrent ? 'bg-cyan-500 text-white' : 'bg-slate-600 text-slate-400'
-                              }`}>
-                                {isCompleted ? <CheckCircle className="w-4 h-4" /> : idx + 1}
-                              </div>
-                              <span className={`flex-1 text-sm ${isCompleted ? 'text-emerald-400' : isCurrent ? 'text-cyan-400' : 'text-slate-400'}`}>
-                                {lesson.title}
-                              </span>
-                              <span className="text-slate-500 text-xs">{lesson.duration}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setShowModuleDetail(null);
-                        if (module.completed) {
-                          handleStartModule(module.id);
-                        } else if (module.progress > 0) {
-                          handleContinueModule(module.id);
-                        } else {
-                          handleStartModule(module.id);
-                        }
-                      }}
-                      className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${
-                        module.completed
-                          ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
-                          : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
-                      }`}
-                    >
-                      <Play className="w-5 h-5" />
-                      {module.completed ? 'Revoir le module' : module.progress > 0 ? 'Continuer' : 'Commencer'}
-                    </button>
-                  </>
-                );
-              })()}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Badge Detail Modal */}
-      <AnimatePresence>
-        {showBadgeDetail && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowBadgeDetail(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-5xl">
-                {showBadgeDetail.icon}
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">{showBadgeDetail.name}</h3>
-              <p className="text-slate-400 mb-4">{showBadgeDetail.description}</p>
-              {showBadgeDetail.earnedDate && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-4 py-2 inline-flex items-center gap-2 mb-4">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400 text-sm">Obtenu le {showBadgeDetail.earnedDate}</span>
-                </div>
-              )}
-              <button
-                onClick={() => setShowBadgeDetail(null)}
-                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-xl transition-colors"
-              >
-                Fermer
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Custom Styles */}
+      <style jsx global>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 4s linear infinite;
+        }
+        @keyframes wave {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(20deg); }
+          75% { transform: rotate(-20deg); }
+        }
+        .animate-wave {
+          animation: wave 1s ease-in-out infinite;
+          transform-origin: 70% 70%;
+        }
+      `}</style>
     </div>
   );
 }
