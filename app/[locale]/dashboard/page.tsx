@@ -3,209 +3,360 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  BookOpen, Download, Play, CheckCircle, Lock, ChevronRight,
+  Play, CheckCircle, Lock, ChevronRight, Download,
   FileSpreadsheet, FileText, ClipboardList, Award, LogOut,
-  User, BarChart3, Clock, Trophy
+  User, Clock, Trophy, ArrowRight, Sparkles, BookOpen,
+  BarChart3, Calendar, Gift, Home
 } from 'lucide-react';
 import Link from 'next/link';
 
 const modules = [
-  { id: 1, title: "Introduction à l'AI Act", description: "Comprendre les fondamentaux du règlement européen", duration: "45 min", lessons: 5, completed: true, progress: 100 },
-  { id: 2, title: "Classification des risques", description: "Les 4 niveaux de risque et leurs implications", duration: "1h", lessons: 6, completed: true, progress: 100 },
-  { id: 3, title: "Registre des systèmes IA", description: "Cartographier et documenter vos usages IA", duration: "1h15", lessons: 7, completed: false, progress: 60 },
-  { id: 4, title: "Gouvernance IA", description: "Mettre en place une politique IA efficace", duration: "1h", lessons: 5, completed: false, progress: 0 },
-  { id: 5, title: "Systèmes haut risque", description: "Documentation technique et marquage CE", duration: "1h30", lessons: 8, completed: false, progress: 0 },
-  { id: 6, title: "Audit et conformité", description: "Préparer et maintenir votre conformité", duration: "1h", lessons: 6, completed: false, progress: 0 },
+  { id: 1, title: "Introduction à l'AI Act", description: "Comprendre les fondamentaux", duration: "45 min", completed: true, progress: 100 },
+  { id: 2, title: "Classification des risques", description: "Les 4 niveaux de risque", duration: "1h", completed: true, progress: 100 },
+  { id: 3, title: "Registre des systèmes IA", description: "Cartographier vos usages", duration: "1h15", completed: false, progress: 60 },
+  { id: 4, title: "Gouvernance IA", description: "Politique et organisation", duration: "1h", completed: false, progress: 0 },
+  { id: 5, title: "Systèmes haut risque", description: "Documentation technique", duration: "1h30", completed: false, progress: 0 },
+  { id: 6, title: "Audit et conformité", description: "Maintenir la conformité", duration: "1h", completed: false, progress: 0 },
 ];
 
 const resources = [
-  { id: 1, name: "Guide AI Act - Synthèse", module: 1, type: "pdf", file: "guide-ai-act-synthese.pdf", value: 97 },
-  { id: 2, name: "Checklist : Êtes-vous concerné ?", module: 1, type: "xlsx", file: "checklist-etes-vous-concerne.xlsx", value: 47 },
-  { id: 3, name: "Matrice classification risques", module: 2, type: "xlsx", file: "matrice-classification-risques.xlsx", value: 127 },
-  { id: 4, name: "Exemples par secteur d'activité", module: 2, type: "pdf", file: "exemples-secteurs-activite.pdf", value: 67 },
-  { id: 5, name: "Template Registre IA", module: 3, type: "xlsx", file: "template-registre-ia.xlsx", value: 97 },
-  { id: 6, name: "Guide d'audit pas à pas", module: 3, type: "pdf", file: "guide-audit-pas-a-pas.pdf", value: 77 },
-  { id: 7, name: "Modèle Politique IA", module: 4, type: "docx", file: "modele-politique-ia.docx", value: 67 },
-  { id: 8, name: "Fiche de poste Référent IA", module: 4, type: "docx", file: "fiche-poste-referent-ia.docx", value: 47 },
-  { id: 9, name: "Template Documentation technique", module: 5, type: "docx", file: "template-documentation-technique.docx", value: 97 },
-  { id: 10, name: "Checklist Marquage CE", module: 5, type: "xlsx", file: "checklist-marquage-ce.xlsx", value: 47 },
-  { id: 11, name: "Plan d'audit type", module: 6, type: "xlsx", file: "plan-audit-type.xlsx", value: 47 },
-  { id: 12, name: "Tableau de bord conformité", module: 6, type: "xlsx", file: "tableau-bord-conformite-ia.xlsx", value: 127 },
+  { id: 1, name: "Guide AI Act - Synthèse", module: 1, type: "pdf", file: "guide-ai-act-synthese.pdf" },
+  { id: 2, name: "Checklist : Êtes-vous concerné ?", module: 1, type: "xlsx", file: "checklist-etes-vous-concerne.xlsx" },
+  { id: 3, name: "Matrice classification risques", module: 2, type: "xlsx", file: "matrice-classification-risques.xlsx" },
+  { id: 4, name: "Exemples par secteur", module: 2, type: "pdf", file: "exemples-secteurs-activite.pdf" },
+  { id: 5, name: "Template Registre IA", module: 3, type: "xlsx", file: "template-registre-ia.xlsx" },
+  { id: 6, name: "Guide d'audit pas à pas", module: 3, type: "pdf", file: "guide-audit-pas-a-pas.pdf" },
+  { id: 7, name: "Modèle Politique IA", module: 4, type: "docx", file: "modele-politique-ia.docx" },
+  { id: 8, name: "Fiche de poste Référent IA", module: 4, type: "docx", file: "fiche-poste-referent-ia.docx" },
+  { id: 9, name: "Template Documentation technique", module: 5, type: "docx", file: "template-documentation-technique.docx" },
+  { id: 10, name: "Checklist Marquage CE", module: 5, type: "xlsx", file: "checklist-marquage-ce.xlsx" },
+  { id: 11, name: "Plan d'audit type", module: 6, type: "xlsx", file: "plan-audit-type.xlsx" },
+  { id: 12, name: "Tableau de bord conformité", module: 6, type: "xlsx", file: "tableau-bord-conformite-ia.xlsx" },
 ];
 
-const getFileIcon = (type: string) => {
-  switch (type) {
-    case 'xlsx': return <FileSpreadsheet className="w-5 h-5" />;
-    case 'docx': return <FileText className="w-5 h-5" />;
-    case 'pdf': return <ClipboardList className="w-5 h-5" />;
-    default: return <FileText className="w-5 h-5" />;
-  }
-};
-
-const getFileColor = (type: string) => {
-  switch (type) {
-    case 'xlsx': return 'text-emerald-400 bg-emerald-400/10';
-    case 'docx': return 'text-blue-400 bg-blue-400/10';
-    case 'pdf': return 'text-red-400 bg-red-400/10';
-    default: return 'text-slate-400 bg-slate-400/10';
-  }
-};
-
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'modules' | 'resources'>('modules');
-  const [selectedModule, setSelectedModule] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'formation' | 'ressources'>('formation');
+  
+  const completedModules = modules.filter(m => m.completed).length;
   const totalProgress = Math.round(modules.reduce((acc, m) => acc + m.progress, 0) / modules.length);
-  const filteredResources = selectedModule ? resources.filter(r => r.module === selectedModule) : resources;
+  const currentModule = modules.find(m => !m.completed && m.progress > 0) || modules.find(m => !m.completed);
+
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'xlsx': return <FileSpreadsheet className="w-5 h-5" />;
+      case 'docx': return <FileText className="w-5 h-5" />;
+      case 'pdf': return <ClipboardList className="w-5 h-5" />;
+      default: return <FileText className="w-5 h-5" />;
+    }
+  };
+
+  const getFileColor = (type: string) => {
+    switch (type) {
+      case 'xlsx': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+      case 'docx': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+      case 'pdf': return 'text-red-400 bg-red-500/10 border-red-500/20';
+      default: return 'text-slate-400 bg-slate-500/10 border-slate-500/20';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <aside className="fixed left-0 top-0 h-full w-64 bg-slate-800 border-r border-slate-700 z-40">
-        <div className="p-4 border-b border-slate-700">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">IA</span>
+    <div className="min-h-screen bg-[#0a0f1a]">
+      {/* Header simple */}
+      <header className="bg-[#0a0f1a]/80 backdrop-blur-lg border-b border-slate-800/50 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-white">Formation AI Act</span>
+            </Link>
+            
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2 text-sm text-slate-400">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <span>Jean D.</span>
+              </div>
+              <Link href="/login" className="text-slate-400 hover:text-white transition-colors">
+                <LogOut className="w-5 h-5" />
+              </Link>
             </div>
-            <span className="text-white font-semibold">Formation AI Act</span>
-          </Link>
+          </div>
         </div>
-        <nav className="p-4 space-y-2">
-          <button onClick={() => setActiveTab('modules')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'modules' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:bg-slate-700'}`}>
-            <BookOpen className="w-5 h-5" /><span>Modules</span>
-          </button>
-          <button onClick={() => setActiveTab('resources')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'resources' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:bg-slate-700'}`}>
-            <Download className="w-5 h-5" /><span>Ressources</span>
-            <span className="ml-auto bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full">12</span>
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-700 transition-colors">
-            <Award className="w-5 h-5" /><span>Certificat</span>
-          </button>
-        </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {/* Welcome + Progress */}
+        <div className="mb-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
+          >
             <div>
-              <p className="text-white text-sm font-medium">Jean Dupont</p>
-              <p className="text-slate-400 text-xs">Offre Équipe</p>
+              <h1 className="text-2xl font-bold text-white mb-1">Bonjour Jean 👋</h1>
+              <p className="text-slate-400">Continuez votre parcours de formation</p>
             </div>
-          </div>
-          <Link href="/login" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
-            <LogOut className="w-4 h-4" />Déconnexion
-          </Link>
-        </div>
-      </aside>
+            <div className="flex items-center gap-3">
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-2 flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-400" />
+                <span className="text-white font-medium">{completedModules}/6</span>
+                <span className="text-slate-400 text-sm">modules</span>
+              </div>
+            </div>
+          </motion.div>
 
-      <main className="ml-64 p-8">
-        <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center"><BarChart3 className="w-6 h-6 text-blue-400" /></div>
-              <div><p className="text-slate-400 text-sm">Progression</p><p className="text-2xl font-bold text-white">{totalProgress}%</p></div>
+          {/* Progress bar global */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-5"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-slate-300 font-medium">Progression globale</span>
+              <span className="text-2xl font-bold text-white">{totalProgress}%</span>
             </div>
-          </div>
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center"><CheckCircle className="w-6 h-6 text-emerald-400" /></div>
-              <div><p className="text-slate-400 text-sm">Modules terminés</p><p className="text-2xl font-bold text-white">{modules.filter(m => m.completed).length}/{modules.length}</p></div>
+            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${totalProgress}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+              />
             </div>
-          </div>
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center"><Clock className="w-6 h-6 text-purple-400" /></div>
-              <div><p className="text-slate-400 text-sm">Temps restant</p><p className="text-2xl font-bold text-white">4h30</p></div>
+            <div className="flex items-center justify-between mt-3 text-sm">
+              <span className="text-slate-500">{completedModules} modules terminés</span>
+              <span className="text-slate-500">~{6 - completedModules}h restantes</span>
             </div>
-          </div>
-          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center"><Trophy className="w-6 h-6 text-orange-400" /></div>
-              <div><p className="text-slate-400 text-sm">Certificat</p><p className="text-lg font-bold text-orange-400">En cours...</p></div>
-            </div>
-          </div>
+          </motion.div>
         </div>
 
-        {activeTab === 'modules' ? (
-          <div>
-            <h1 className="text-2xl font-bold text-white mb-6">Vos modules de formation</h1>
-            <div className="grid gap-4">
-              {modules.map((module, index) => (
-                <motion.div key={module.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-slate-800 rounded-xl border border-slate-700 p-6 hover:border-slate-600 transition-colors">
-                  <div className="flex items-center gap-6">
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${module.completed ? 'bg-emerald-500/20' : module.progress > 0 ? 'bg-blue-500/20' : 'bg-slate-700'}`}>
-                      {module.completed ? <CheckCircle className="w-7 h-7 text-emerald-400" /> : module.progress > 0 ? <Play className="w-7 h-7 text-blue-400" /> : <Lock className="w-7 h-7 text-slate-500" />}
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="text-slate-500 text-sm">Module {module.id}</span>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-500 text-sm">{module.duration}</span>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-500 text-sm">{module.lessons} leçons</span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-1">{module.title}</h3>
-                      <p className="text-slate-400 text-sm">{module.description}</p>
-                      <div className="mt-3 flex items-center gap-3">
-                        <div className="flex-grow h-2 bg-slate-700 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all ${module.completed ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${module.progress}%` }} />
+        {/* Continue Module Card */}
+        {currentModule && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-2xl p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                    {currentModule.id}
+                  </div>
+                  <div>
+                    <p className="text-cyan-400 text-sm font-medium mb-1">Continuer</p>
+                    <h3 className="text-xl font-bold text-white mb-1">{currentModule.title}</h3>
+                    <p className="text-slate-400 text-sm">{currentModule.description}</p>
+                    {currentModule.progress > 0 && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${currentModule.progress}%` }} />
                         </div>
-                        <span className="text-sm text-slate-400">{module.progress}%</span>
+                        <span className="text-cyan-400 text-xs">{currentModule.progress}%</span>
                       </div>
+                    )}
+                  </div>
+                </div>
+                <button className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 whitespace-nowrap">
+                  <Play className="w-5 h-5" />
+                  {currentModule.progress > 0 ? 'Reprendre' : 'Commencer'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('formation')}
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all ${
+              activeTab === 'formation'
+                ? 'bg-white text-slate-900'
+                : 'bg-slate-800/50 text-slate-400 hover:text-white'
+            }`}
+          >
+            Formation
+          </button>
+          <button
+            onClick={() => setActiveTab('ressources')}
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              activeTab === 'ressources'
+                ? 'bg-white text-slate-900'
+                : 'bg-slate-800/50 text-slate-400 hover:text-white'
+            }`}
+          >
+            Ressources
+            <span className="bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full">12</span>
+          </button>
+        </div>
+
+        {activeTab === 'formation' ? (
+          /* Modules List */
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            className="space-y-3"
+          >
+            {modules.map((module, index) => (
+              <motion.div
+                key={module.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`bg-slate-800/30 border rounded-xl p-4 transition-all ${
+                  module.completed 
+                    ? 'border-emerald-500/30 hover:border-emerald-500/50' 
+                    : module.progress > 0 
+                      ? 'border-cyan-500/30 hover:border-cyan-500/50' 
+                      : 'border-slate-700/50 hover:border-slate-600'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  {/* Status Icon */}
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    module.completed 
+                      ? 'bg-emerald-500/20' 
+                      : module.progress > 0 
+                        ? 'bg-cyan-500/20' 
+                        : 'bg-slate-800'
+                  }`}>
+                    {module.completed ? (
+                      <CheckCircle className="w-6 h-6 text-emerald-400" />
+                    ) : module.progress > 0 ? (
+                      <Play className="w-6 h-6 text-cyan-400" />
+                    ) : (
+                      <span className="text-slate-500 font-bold">{module.id}</span>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="font-semibold text-white truncate">{module.title}</h3>
+                      <span className="text-slate-500 text-sm hidden sm:inline">• {module.duration}</span>
                     </div>
-                    <button className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors ${module.completed ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : module.progress > 0 ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-slate-700 text-slate-400'}`}>
-                      {module.completed ? 'Revoir' : module.progress > 0 ? 'Continuer' : 'Commencer'}<ChevronRight className="w-5 h-5" />
+                    <p className="text-slate-400 text-sm truncate">{module.description}</p>
+                  </div>
+
+                  {/* Action */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {module.progress > 0 && !module.completed && (
+                      <div className="hidden sm:flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${module.progress}%` }} />
+                        </div>
+                        <span className="text-slate-400 text-xs">{module.progress}%</span>
+                      </div>
+                    )}
+                    <button className={`p-2 rounded-lg transition-colors ${
+                      module.completed
+                        ? 'text-slate-400 hover:bg-slate-700'
+                        : module.progress > 0
+                          ? 'text-cyan-400 hover:bg-cyan-500/10'
+                          : 'text-slate-500 hover:bg-slate-700'
+                    }`}>
+                      <ChevronRight className="w-5 h-5" />
                     </button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-white">Vos ressources</h1>
-                <p className="text-slate-400">12 ressources professionnelles (847€ de valeur incluse)</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-sm">Filtrer :</span>
-                <select value={selectedModule || ''} onChange={(e) => setSelectedModule(e.target.value ? Number(e.target.value) : null)} className="bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Tous les modules</option>
-                  {modules.map(m => (<option key={m.id} value={m.id}>Module {m.id} - {m.title}</option>))}
-                </select>
-              </div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredResources.map((resource, index) => (
-                <motion.div key={resource.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="bg-slate-800 rounded-xl border border-slate-700 p-5 hover:border-slate-600 transition-colors">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getFileColor(resource.type)}`}>{getFileIcon(resource.type)}</div>
-                    <div className="flex-grow min-w-0">
-                      <span className="text-xs text-slate-500 uppercase">Module {resource.module}</span>
-                      <h3 className="text-white font-medium mt-1 truncate">{resource.name}</h3>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-slate-500 uppercase">{resource.type}</span>
-                        <span className="text-xs text-emerald-400">({resource.value}€ de valeur)</span>
-                      </div>
-                    </div>
-                  </div>
-                  <a href={`/resources/${resource.file}`} download className="mt-4 w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm">
-                    <Download className="w-4 h-4" />Télécharger
-                  </a>
-                </motion.div>
-              ))}
-            </div>
-            <div className="mt-8 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-xl border border-emerald-500/30 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">Télécharger toutes les ressources</h3>
-                  <p className="text-slate-400 text-sm">12 fichiers • Excel, Word et PDF • 847€ de valeur</p>
                 </div>
-                <a href="/resources/ressources-formation-ia-act.zip" download className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors font-medium">
-                  <Download className="w-5 h-5" />Tout télécharger (.zip)
-                </a>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          /* Resources Grid */
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Download All Banner */}
+            <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                  <Gift className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">12 ressources incluses</p>
+                  <p className="text-slate-400 text-sm">847€ de valeur offerte</p>
+                </div>
               </div>
+              
+                href="/resources/ressources-formation-ia-act.zip"
+                download
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Tout télécharger
+              </a>
             </div>
-          </div>
+
+            {/* Resources Grid */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {resources.map((resource, index) => (
+                <motion.a
+                  key={resource.id}
+                  href={`/resources/${resource.file}`}
+                  download
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4 hover:border-slate-600 transition-all group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${getFileColor(resource.type)}`}>
+                      {getFileIcon(resource.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium text-sm truncate group-hover:text-cyan-400 transition-colors">
+                        {resource.name}
+                      </p>
+                      <p className="text-slate-500 text-xs mt-0.5">
+                        Module {resource.module} • {resource.type.toUpperCase()}
+                      </p>
+                    </div>
+                    <Download className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                  </div>
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Certificat Banner */}
+        {totalProgress >= 100 ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-6 text-center"
+          >
+            <Award className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+            <h3 className="text-xl font-bold text-white mb-2">Félicitations ! 🎉</h3>
+            <p className="text-slate-300 mb-4">Vous avez terminé la formation. Téléchargez votre certificat.</p>
+            <button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity">
+              Obtenir mon certificat
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-8 bg-slate-800/30 border border-slate-700/50 rounded-xl p-5 flex items-center gap-4"
+          >
+            <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Award className="w-6 h-6 text-slate-500" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Certificat de compétence</p>
+              <p className="text-slate-400 text-sm">Terminez les 6 modules pour l'obtenir</p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-white">{totalProgress}%</p>
+              <p className="text-slate-500 text-xs">complété</p>
+            </div>
+          </motion.div>
         )}
       </main>
     </div>
