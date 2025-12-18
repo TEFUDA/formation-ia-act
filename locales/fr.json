@@ -101,31 +101,31 @@
     },
     "solo": {
       "name": "Solo",
-      "price": "499",
+      "price": "500",
       "period": "€",
-      "description": "Idéal pour les TPE et indépendants",
-      "seats": "Jusqu'à 10 collaborateurs",
-      "pricePerSeat": "49,90€ / personne",
+      "description": "Idéal pour les indépendants",
+      "seats": "1 collaborateur",
+      "pricePerSeat": "500€ / personne",
       "features": ["Accès à tous les modules", "Vidéos de formation", "Quiz de validation", "Certificat de conformité", "Support par email"]
     },
     "pme": {
-      "name": "PME",
-      "price": "999",
+      "name": "Équipe",
+      "price": "2 000",
       "period": "€",
-      "description": "Pour les PME en croissance",
-      "seats": "Jusqu'à 50 collaborateurs",
-      "pricePerSeat": "19,98€ / personne",
+      "description": "Pour les petites équipes",
+      "seats": "Jusqu'à 5 collaborateurs",
+      "pricePerSeat": "400€ / personne",
       "popular": "Le plus populaire",
       "features": ["Tout Solo +", "Dashboard administrateur", "Suivi progression équipe", "Certificats personnalisés", "Support prioritaire"]
     },
     "enterprise": {
       "name": "Enterprise",
-      "price": "8 999",
+      "price": "18 000",
       "period": "€",
-      "description": "Pour les grandes organisations",
-      "seats": "Jusqu'à 500 collaborateurs",
-      "pricePerSeat": "18€ / personne",
-      "features": ["Tout PME +", "Formation sur-mesure", "Audit personnalisé", "Intégration SSO", "Account manager dédié", "SLA garanti"]
+      "description": "Pour les organisations",
+      "seats": "Jusqu'à 50 collaborateurs",
+      "pricePerSeat": "360€ / personne",
+      "features": ["Tout Équipe +", "Formation sur-mesure", "Audit personnalisé", "Intégration SSO", "Account manager dédié", "SLA garanti"]
     },
     "cta": "Démarrer maintenant"
   },
