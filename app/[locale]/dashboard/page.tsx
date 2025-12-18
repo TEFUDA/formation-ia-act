@@ -1,20 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { 
   Play, CheckCircle, Lock, ChevronRight, Download, X,
   FileSpreadsheet, FileText, ClipboardList, Award, LogOut,
   User, Clock, Trophy, Flame, Zap, Star, Gift, 
-  BookOpen, Target, TrendingUp, Calendar, Crown,
-  ChevronDown, Settings, Menu, FolderOpen, Medal,
-  Sparkles, Shield, Users, ExternalLink
+  BookOpen, Target, TrendingUp, ChevronDown, Settings,
+  Menu, FolderOpen, Medal, Shield, Users, ExternalLink,
+  Share2, Bell, Calendar, BarChart3, Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 
 // Données utilisateur simulées (en production: depuis l'auth/API)
-const userData = {
+const initialUserData = {
   id: 'user-123',
   name: 'Jean',
   lastName: 'Dupont',
@@ -27,17 +27,22 @@ const userData = {
   totalXP: 1250,
   weeklyXP: 380,
   rank: 12,
-  badges: ['early-bird', 'first-module', 'week-streak'],
 };
 
 // Modules de formation
-const modules = [
+const initialModules = [
   { 
     id: 1, 
     title: "Introduction à l'AI Act", 
     description: "Comprendre les fondamentaux du règlement européen",
     duration: "45 min",
-    lessons: 5,
+    lessons: [
+      { id: 1, title: "Origines et objectifs de l'AI Act", duration: "10 min" },
+      { id: 2, title: "Calendrier d'application", duration: "8 min" },
+      { id: 3, title: "Acteurs concernés", duration: "12 min" },
+      { id: 4, title: "Articulation avec le RGPD", duration: "10 min" },
+      { id: 5, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 150,
     completed: true, 
     progress: 100,
@@ -49,7 +54,14 @@ const modules = [
     title: "Classification des risques", 
     description: "Les 4 niveaux de risque et leurs implications",
     duration: "1h",
-    lessons: 6,
+    lessons: [
+      { id: 1, title: "Les 4 niveaux de risque", duration: "15 min" },
+      { id: 2, title: "IA interdites (risque inacceptable)", duration: "12 min" },
+      { id: 3, title: "IA à haut risque", duration: "15 min" },
+      { id: 4, title: "IA à risque limité", duration: "10 min" },
+      { id: 5, title: "IA à risque minimal", duration: "8 min" },
+      { id: 6, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 200,
     completed: true, 
     progress: 100,
@@ -61,10 +73,18 @@ const modules = [
     title: "Registre des systèmes IA", 
     description: "Cartographier et documenter vos usages IA",
     duration: "1h15",
-    lessons: 7,
+    lessons: [
+      { id: 1, title: "Méthodologie d'audit interne", duration: "15 min" },
+      { id: 2, title: "Inventaire des systèmes IA", duration: "12 min" },
+      { id: 3, title: "Classification de vos usages", duration: "15 min" },
+      { id: 4, title: "Le registre des traitements IA", duration: "15 min" },
+      { id: 5, title: "Évaluation d'impact algorithmique", duration: "12 min" },
+      { id: 6, title: "Template et outils pratiques", duration: "8 min" },
+      { id: 7, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 250,
     completed: false, 
-    progress: 60,
+    progress: 57,
     currentLesson: 5,
     quizScore: null,
     icon: "📊"
@@ -74,7 +94,13 @@ const modules = [
     title: "Gouvernance IA", 
     description: "Mettre en place une politique IA d'entreprise",
     duration: "1h",
-    lessons: 5,
+    lessons: [
+      { id: 1, title: "Rôles et responsabilités", duration: "12 min" },
+      { id: 2, title: "Le référent IA", duration: "10 min" },
+      { id: 3, title: "Politique IA d'entreprise", duration: "15 min" },
+      { id: 4, title: "Comité de pilotage IA", duration: "12 min" },
+      { id: 5, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 200,
     completed: false, 
     progress: 0,
@@ -86,7 +112,16 @@ const modules = [
     title: "Systèmes à haut risque", 
     description: "Documentation technique et conformité",
     duration: "1h30",
-    lessons: 8,
+    lessons: [
+      { id: 1, title: "Identifier les systèmes à haut risque", duration: "15 min" },
+      { id: 2, title: "Exigences de gestion des risques", duration: "12 min" },
+      { id: 3, title: "Data governance", duration: "15 min" },
+      { id: 4, title: "Documentation technique", duration: "15 min" },
+      { id: 5, title: "Transparence et information", duration: "10 min" },
+      { id: 6, title: "Contrôle humain", duration: "10 min" },
+      { id: 7, title: "Marquage CE", duration: "8 min" },
+      { id: 8, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 300,
     completed: false, 
     progress: 0,
@@ -98,7 +133,14 @@ const modules = [
     title: "Audit et conformité", 
     description: "Préparer et maintenir votre conformité",
     duration: "1h",
-    lessons: 6,
+    lessons: [
+      { id: 1, title: "Audits internes IA", duration: "15 min" },
+      { id: 2, title: "Indicateurs de conformité", duration: "12 min" },
+      { id: 3, title: "Amélioration continue", duration: "10 min" },
+      { id: 4, title: "Préparer les contrôles", duration: "12 min" },
+      { id: 5, title: "Sanctions et responsabilités", duration: "8 min" },
+      { id: 6, title: "Quiz du module", duration: "5 min" },
+    ],
     xp: 250,
     completed: false, 
     progress: 0,
@@ -109,28 +151,30 @@ const modules = [
 
 // Ressources
 const resources = [
-  { id: 1, name: "Guide AI Act - Synthèse", module: 1, type: "pdf", file: "guide-ai-act-synthese.pdf" },
-  { id: 2, name: "Checklist : Êtes-vous concerné ?", module: 1, type: "xlsx", file: "checklist-etes-vous-concerne.xlsx" },
-  { id: 3, name: "Matrice classification risques", module: 2, type: "xlsx", file: "matrice-classification-risques.xlsx" },
-  { id: 4, name: "Exemples par secteur", module: 2, type: "pdf", file: "exemples-secteurs-activite.pdf" },
-  { id: 5, name: "Template Registre IA", module: 3, type: "xlsx", file: "template-registre-ia.xlsx" },
-  { id: 6, name: "Guide d'audit pas à pas", module: 3, type: "pdf", file: "guide-audit-pas-a-pas.pdf" },
-  { id: 7, name: "Modèle Politique IA", module: 4, type: "docx", file: "modele-politique-ia.docx" },
-  { id: 8, name: "Fiche de poste Référent IA", module: 4, type: "docx", file: "fiche-poste-referent-ia.docx" },
-  { id: 9, name: "Template Documentation technique", module: 5, type: "docx", file: "template-documentation-technique.docx" },
-  { id: 10, name: "Checklist Marquage CE", module: 5, type: "xlsx", file: "checklist-marquage-ce.xlsx" },
-  { id: 11, name: "Plan d'audit type", module: 6, type: "xlsx", file: "plan-audit-type.xlsx" },
-  { id: 12, name: "Tableau de bord conformité", module: 6, type: "xlsx", file: "tableau-bord-conformite-ia.xlsx" },
+  { id: 1, name: "Guide AI Act - Synthèse", module: 1, type: "pdf", file: "guide-ai-act-synthese.pdf", size: "2.4 MB" },
+  { id: 2, name: "Checklist : Êtes-vous concerné ?", module: 1, type: "xlsx", file: "checklist-etes-vous-concerne.xlsx", size: "156 KB" },
+  { id: 3, name: "Matrice classification risques", module: 2, type: "xlsx", file: "matrice-classification-risques.xlsx", size: "234 KB" },
+  { id: 4, name: "Exemples par secteur", module: 2, type: "pdf", file: "exemples-secteurs-activite.pdf", size: "1.8 MB" },
+  { id: 5, name: "Template Registre IA", module: 3, type: "xlsx", file: "template-registre-ia.xlsx", size: "445 KB" },
+  { id: 6, name: "Guide d'audit pas à pas", module: 3, type: "pdf", file: "guide-audit-pas-a-pas.pdf", size: "3.2 MB" },
+  { id: 7, name: "Modèle Politique IA", module: 4, type: "docx", file: "modele-politique-ia.docx", size: "189 KB" },
+  { id: 8, name: "Fiche de poste Référent IA", module: 4, type: "docx", file: "fiche-poste-referent-ia.docx", size: "124 KB" },
+  { id: 9, name: "Template Documentation technique", module: 5, type: "docx", file: "template-documentation-technique.docx", size: "267 KB" },
+  { id: 10, name: "Checklist Marquage CE", module: 5, type: "xlsx", file: "checklist-marquage-ce.xlsx", size: "178 KB" },
+  { id: 11, name: "Plan d'audit type", module: 6, type: "xlsx", file: "plan-audit-type.xlsx", size: "312 KB" },
+  { id: 12, name: "Tableau de bord conformité", module: 6, type: "xlsx", file: "tableau-bord-conformite-ia.xlsx", size: "534 KB" },
 ];
 
 // Badges disponibles
 const allBadges = [
-  { id: 'early-bird', name: 'Lève-tôt', icon: '🌅', description: 'Première leçon avant 9h', earned: true },
-  { id: 'first-module', name: 'Premier pas', icon: '🎯', description: 'Premier module terminé', earned: true },
-  { id: 'week-streak', name: 'Semaine parfaite', icon: '🔥', description: '7 jours consécutifs', earned: true },
+  { id: 'early-bird', name: 'Lève-tôt', icon: '🌅', description: 'Première leçon avant 9h', earned: true, earnedDate: '15 Jan 2024' },
+  { id: 'first-module', name: 'Premier pas', icon: '🎯', description: 'Premier module terminé', earned: true, earnedDate: '16 Jan 2024' },
+  { id: 'week-streak', name: 'Semaine parfaite', icon: '🔥', description: '7 jours consécutifs', earned: true, earnedDate: '22 Jan 2024' },
   { id: 'speed-learner', name: 'Rapide', icon: '⚡', description: 'Module en moins de 30min', earned: false },
   { id: 'half-way', name: 'Mi-parcours', icon: '🏃', description: '50% de la formation', earned: false },
+  { id: 'perfect-quiz', name: 'Sans faute', icon: '💯', description: '100% à un quiz', earned: false },
   { id: 'certified', name: 'Certifié', icon: '🏆', description: 'Formation complète', earned: false },
+  { id: 'helper', name: 'Entraide', icon: '🤝', description: 'Aider un collègue', earned: false },
 ];
 
 export default function DashboardPage() {
@@ -138,8 +182,14 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'learn' | 'resources' | 'badges'>('learn');
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showModuleDetail, setShowModuleDetail] = useState<number | null>(null);
+  const [showBadgeDetail, setShowBadgeDetail] = useState<typeof allBadges[0] | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<number | null>(null);
+  const [notification, setNotification] = useState<{type: 'success' | 'info', message: string} | null>(null);
+  
+  // State pour les modules (persistant pendant la session)
+  const [modules, setModules] = useState(initialModules);
+  const [userData, setUserData] = useState(initialUserData);
   
   // Calculs
   const completedModules = modules.filter(m => m.completed).length;
@@ -149,14 +199,21 @@ export default function DashboardPage() {
   const earnedXP = modules.filter(m => m.completed).reduce((acc, m) => acc + m.xp, 0) + 
                    (currentModule ? Math.round((currentModule.progress / 100) * currentModule.xp) : 0);
   
-  // Vérifier si l'utilisateur peut obtenir son certificat
-  const averageQuizScore = modules.filter(m => m.quizScore !== null).length > 0
-    ? Math.round(modules.filter(m => m.quizScore !== null).reduce((acc, m) => acc + (m.quizScore || 0), 0) / modules.filter(m => m.quizScore !== null).length)
+  // Calcul score quiz moyen
+  const modulesWithQuiz = modules.filter(m => m.quizScore !== null);
+  const averageQuizScore = modulesWithQuiz.length > 0
+    ? Math.round(modulesWithQuiz.reduce((acc, m) => acc + (m.quizScore || 0), 0) / modulesWithQuiz.length)
     : 0;
+  
+  // Éligibilité certificat
   const canGetCertificate = completedModules === 6 && averageQuizScore >= 80;
-
-  // L'utilisateur est-il admin ?
   const isAdmin = userData.role === 'admin';
+
+  // Notification
+  const showNotification = (type: 'success' | 'info', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -184,21 +241,54 @@ export default function DashboardPage() {
   };
 
   const handleStartModule = (moduleId: number) => {
-    router.push(`/formation?module=${moduleId}`);
+    router.push(`/formation?module=${moduleId}&lesson=1`);
   };
 
-  const handleContinueModule = (moduleId: number, lessonId?: number) => {
-    const lesson = lessonId || 1;
-    router.push(`/formation?module=${moduleId}&lesson=${lesson}`);
+  const handleContinueModule = (moduleId: number) => {
+    const module = modules.find(m => m.id === moduleId);
+    const lessonId = module?.currentLesson || 1;
+    router.push(`/formation?module=${moduleId}&lesson=${lessonId}`);
+  };
+
+  const handleDownloadResource = (resource: typeof resources[0]) => {
+    // Simule le téléchargement
+    showNotification('success', `Téléchargement de "${resource.name}" démarré`);
+  };
+
+  const handleDownloadAll = () => {
+    showNotification('success', 'Téléchargement du ZIP (12 fichiers) démarré');
   };
 
   const handleLogout = () => {
-    // En production: appeler l'API de déconnexion
     router.push('/');
+  };
+
+  const handleShareProgress = () => {
+    navigator.clipboard.writeText(`J'ai complété ${totalProgress}% de ma formation AI Act ! 🚀`);
+    showNotification('info', 'Progression copiée dans le presse-papier');
   };
 
   return (
     <div className="min-h-screen bg-[#0f172a]">
+      {/* Notification Toast */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 ${
+              notification.type === 'success' 
+                ? 'bg-emerald-500 text-white' 
+                : 'bg-cyan-500 text-white'
+            }`}
+          >
+            <CheckCircle className="w-5 h-5" />
+            {notification.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="bg-[#0f172a]/95 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -235,7 +325,7 @@ export default function DashboardPage() {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
-              {/* Admin Button (only for admins) */}
+              {/* Admin Button */}
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -261,7 +351,7 @@ export default function DashboardPage() {
                 <span className="text-yellow-400 font-bold">{earnedXP}</span>
               </div>
 
-              {/* Avatar & Profile Menu */}
+              {/* Profile Menu */}
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -273,14 +363,10 @@ export default function DashboardPage() {
                   <ChevronDown className={`w-4 h-4 text-slate-400 hidden sm:block transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Profile Dropdown */}
                 <AnimatePresence>
                   {showProfileMenu && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setShowProfileMenu(false)} 
-                      />
+                      <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
                       <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -300,13 +386,29 @@ export default function DashboardPage() {
                           </div>
                           <div className="mt-3 flex items-center gap-2">
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              isAdmin 
-                                ? 'bg-purple-500/20 text-purple-400' 
-                                : 'bg-slate-700 text-slate-300'
+                              isAdmin ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-300'
                             }`}>
                               {isAdmin ? 'Admin' : 'Membre'}
                             </span>
                             <span className="text-slate-500 text-xs">• Plan {userData.plan}</span>
+                          </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="p-3 border-b border-slate-700">
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="bg-slate-700/30 rounded-lg p-2">
+                              <p className="text-lg font-bold text-white">{totalProgress}%</p>
+                              <p className="text-slate-500 text-xs">Progression</p>
+                            </div>
+                            <div className="bg-slate-700/30 rounded-lg p-2">
+                              <p className="text-lg font-bold text-yellow-400">{earnedXP}</p>
+                              <p className="text-slate-500 text-xs">XP</p>
+                            </div>
+                            <div className="bg-slate-700/30 rounded-lg p-2">
+                              <p className="text-lg font-bold text-orange-400">{userData.streak}</p>
+                              <p className="text-slate-500 text-xs">Streak</p>
+                            </div>
                           </div>
                         </div>
 
@@ -335,6 +437,14 @@ export default function DashboardPage() {
                               <span className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Disponible</span>
                             </Link>
                           )}
+
+                          <button
+                            onClick={() => { handleShareProgress(); setShowProfileMenu(false); }}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                          >
+                            <Share2 className="w-5 h-5" />
+                            <span>Partager ma progression</span>
+                          </button>
 
                           <button
                             onClick={() => setShowProfileMenu(false)}
@@ -416,13 +526,9 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Certificate Banner (if eligible) */}
+        {/* Certificate Banner */}
         {canGetCertificate && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
             <Link href="/certificate" className="block">
               <div className="bg-gradient-to-r from-yellow-500/20 via-amber-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-yellow-500/50 transition-colors">
                 <div className="flex items-center gap-4">
@@ -444,11 +550,7 @@ export default function DashboardPage() {
         )}
 
         {/* Welcome Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }} 
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
@@ -478,7 +580,7 @@ export default function DashboardPage() {
                   <Target className="w-5 h-5 text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white">{averageQuizScore}%</p>
+                  <p className={`text-2xl font-bold ${averageQuizScore >= 80 ? 'text-emerald-400' : 'text-white'}`}>{averageQuizScore}%</p>
                   <p className="text-slate-500 text-xs">Score quiz</p>
                 </div>
               </div>
@@ -487,12 +589,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Global Progress Bar */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }} 
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
           <div className="bg-gradient-to-r from-slate-800/80 to-slate-800/40 border border-slate-700/50 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
@@ -527,12 +624,7 @@ export default function DashboardPage() {
         {/* Content based on active tab */}
         <AnimatePresence mode="wait">
           {activeTab === 'learn' && (
-            <motion.div
-              key="learn"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
+            <motion.div key="learn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               {/* Continue Learning Card */}
               {currentModule && totalProgress < 100 && (
                 <div className="mb-8">
@@ -567,14 +659,14 @@ export default function DashboardPage() {
                               </div>
                             </div>
                             <span className="text-slate-400 text-sm">
-                              {currentModule.currentLesson || 1}/{currentModule.lessons} leçons
+                              {currentModule.currentLesson || 1}/{currentModule.lessons.length} leçons
                             </span>
                           </div>
                         </div>
                       </div>
 
                       <button 
-                        onClick={() => handleContinueModule(currentModule.id, currentModule.currentLesson)}
+                        onClick={() => handleContinueModule(currentModule.id)}
                         className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-3 text-lg transition-all hover:scale-[1.02] shadow-lg shadow-cyan-500/25"
                       >
                         <Play className="w-6 h-6" fill="white" />
@@ -599,15 +691,16 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`bg-slate-800/30 border rounded-xl p-5 transition-all ${
+                        className={`bg-slate-800/30 border rounded-xl p-5 transition-all cursor-pointer ${
                           module.completed 
                             ? 'border-emerald-500/30 hover:border-emerald-500/50' 
                             : isCurrent
                               ? 'border-cyan-500/30 hover:border-cyan-500/50'
                               : isLocked
-                                ? 'border-slate-700/50 opacity-60'
+                                ? 'border-slate-700/50 opacity-60 cursor-not-allowed'
                                 : 'border-slate-700/50 hover:border-slate-600'
                         }`}
+                        onClick={() => !isLocked && setShowModuleDetail(module.id)}
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                           <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
@@ -623,22 +716,14 @@ export default function DashboardPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-slate-500 text-sm">Module {module.id}</span>
-                              {module.completed && (
-                                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                              )}
-                              {isCurrent && (
-                                <span className="text-cyan-400 text-xs bg-cyan-500/20 px-2 py-0.5 rounded">En cours</span>
-                              )}
+                              {module.completed && <CheckCircle className="w-4 h-4 text-emerald-400" />}
+                              {isCurrent && <span className="text-cyan-400 text-xs bg-cyan-500/20 px-2 py-0.5 rounded">En cours</span>}
                             </div>
                             <h3 className="text-white font-semibold">{module.title}</h3>
                             <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-400">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" /> {module.duration}
-                              </span>
-                              <span>{module.lessons} leçons</span>
-                              <span className="flex items-center gap-1">
-                                <Zap className="w-4 h-4 text-yellow-400" /> {module.xp} XP
-                              </span>
+                              <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {module.duration}</span>
+                              <span>{module.lessons.length} leçons</span>
+                              <span className="flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-400" /> {module.xp} XP</span>
                               {module.quizScore !== null && (
                                 <span className={`flex items-center gap-1 ${module.quizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
                                   Quiz: {module.quizScore}%
@@ -649,10 +734,7 @@ export default function DashboardPage() {
                             {module.progress > 0 && module.progress < 100 && (
                               <div className="mt-3">
                                 <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden max-w-xs">
-                                  <div 
-                                    className="h-full bg-cyan-500 rounded-full"
-                                    style={{ width: `${module.progress}%` }}
-                                  />
+                                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${module.progress}%` }} />
                                 </div>
                               </div>
                             )}
@@ -661,11 +743,10 @@ export default function DashboardPage() {
                           <div className="flex-shrink-0">
                             {module.completed ? (
                               <button
-                                onClick={() => handleStartModule(module.id)}
-                                className="text-emerald-400 hover:text-emerald-300 font-medium text-sm flex items-center gap-1"
+                                onClick={(e) => { e.stopPropagation(); handleStartModule(module.id); }}
+                                className="text-emerald-400 hover:text-emerald-300 font-medium text-sm flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 px-4 py-2 rounded-lg transition-colors"
                               >
-                                Revoir
-                                <ChevronRight className="w-4 h-4" />
+                                Revoir <ChevronRight className="w-4 h-4" />
                               </button>
                             ) : isLocked ? (
                               <span className="text-slate-500 text-sm flex items-center gap-1">
@@ -673,14 +754,14 @@ export default function DashboardPage() {
                               </span>
                             ) : isCurrent ? (
                               <button
-                                onClick={() => handleContinueModule(module.id, module.currentLesson)}
+                                onClick={(e) => { e.stopPropagation(); handleContinueModule(module.id); }}
                                 className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                               >
                                 <Play className="w-4 h-4" /> Continuer
                               </button>
                             ) : (
                               <button
-                                onClick={() => handleStartModule(module.id)}
+                                onClick={(e) => { e.stopPropagation(); handleStartModule(module.id); }}
                                 className="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                               >
                                 Commencer
@@ -697,12 +778,7 @@ export default function DashboardPage() {
           )}
 
           {activeTab === 'resources' && (
-            <motion.div
-              key="resources"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
+            <motion.div key="resources" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               {/* Download All Banner */}
               <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -714,14 +790,13 @@ export default function DashboardPage() {
                     <p className="text-slate-400 text-sm">Valeur totale : 847€ • Inclus dans votre formation</p>
                   </div>
                 </div>
-                <a
-                  href="/resources/ressources-formation-ia-act.zip"
-                  download
+                <button
+                  onClick={handleDownloadAll}
                   className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
                 >
                   <Download className="w-5 h-5" />
                   Tout télécharger (ZIP)
-                </a>
+                </button>
               </div>
 
               {/* Resources by Module */}
@@ -737,11 +812,10 @@ export default function DashboardPage() {
                       </h3>
                       <div className="grid sm:grid-cols-2 gap-3">
                         {moduleResources.map((resource) => (
-                          <a
+                          <button
                             key={resource.id}
-                            href={`/resources/${resource.file}`}
-                            download
-                            className="group bg-slate-800/30 hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 rounded-xl p-4 flex items-center gap-4 transition-all"
+                            onClick={() => handleDownloadResource(resource)}
+                            className="group bg-slate-800/30 hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 rounded-xl p-4 flex items-center gap-4 transition-all text-left"
                           >
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getFileColor(resource.type)}`}>
                               {getFileIcon(resource.type)}
@@ -751,11 +825,11 @@ export default function DashboardPage() {
                                 {resource.name}
                               </p>
                               <p className="text-slate-500 text-xs mt-0.5 uppercase">
-                                {resource.type}
+                                {resource.type} • {resource.size}
                               </p>
                             </div>
                             <Download className="w-5 h-5 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-                          </a>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -766,12 +840,7 @@ export default function DashboardPage() {
           )}
 
           {activeTab === 'badges' && (
-            <motion.div
-              key="badges"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
+            <motion.div key="badges" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               {/* Badge Stats */}
               <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-6 mb-8">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -783,21 +852,28 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {allBadges.filter(b => b.earned).map((badge) => (
-                      <div key={badge.id} className="text-2xl">{badge.icon}</div>
+                      <button
+                        key={badge.id}
+                        onClick={() => setShowBadgeDetail(badge)}
+                        className="text-2xl hover:scale-110 transition-transform"
+                      >
+                        {badge.icon}
+                      </button>
                     ))}
                   </div>
                 </div>
               </div>
 
               {/* All Badges Grid */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {allBadges.map((badge) => (
-                  <div
+                  <button
                     key={badge.id}
-                    className={`relative bg-slate-800/30 border rounded-xl p-5 transition-all ${
+                    onClick={() => badge.earned && setShowBadgeDetail(badge)}
+                    className={`relative bg-slate-800/30 border rounded-xl p-5 transition-all text-left ${
                       badge.earned 
-                        ? 'border-purple-500/30 hover:border-purple-500/50' 
-                        : 'border-slate-700/50 opacity-50'
+                        ? 'border-purple-500/30 hover:border-purple-500/50 cursor-pointer' 
+                        : 'border-slate-700/50 opacity-50 cursor-not-allowed'
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -817,17 +893,19 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     {!badge.earned && (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-slate-900/50">
                         <Lock className="w-8 h-8 text-slate-600" />
                       </div>
                     )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
+
+      {/* ===== MODALS ===== */}
 
       {/* Streak Modal */}
       <AnimatePresence>
@@ -869,11 +947,167 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
+              <div className="text-slate-500 text-sm mb-4">
+                🎯 Prochain objectif : 14 jours pour le badge "Deux semaines"
+              </div>
               <button
                 onClick={() => setShowStreakModal(false)}
                 className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity"
               >
                 Continuer ma série
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Module Detail Modal */}
+      <AnimatePresence>
+        {showModuleDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowModuleDetail(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const module = modules.find(m => m.id === showModuleDetail);
+                if (!module) return null;
+                
+                return (
+                  <>
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${
+                          module.completed ? 'bg-emerald-500/20' : 'bg-cyan-500/20'
+                        }`}>
+                          {module.icon}
+                        </div>
+                        <div>
+                          <span className="text-slate-400 text-sm">Module {module.id}</span>
+                          <h3 className="text-xl font-bold text-white">{module.title}</h3>
+                        </div>
+                      </div>
+                      <button onClick={() => setShowModuleDetail(null)} className="text-slate-400 hover:text-white">
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+
+                    <p className="text-slate-400 mb-6">{module.description}</p>
+
+                    <div className="grid grid-cols-3 gap-3 mb-6">
+                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
+                        <p className="text-lg font-bold text-white">{module.duration}</p>
+                        <p className="text-slate-500 text-xs">Durée</p>
+                      </div>
+                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
+                        <p className="text-lg font-bold text-white">{module.lessons.length}</p>
+                        <p className="text-slate-500 text-xs">Leçons</p>
+                      </div>
+                      <div className="bg-slate-700/30 rounded-lg p-3 text-center">
+                        <p className="text-lg font-bold text-yellow-400">{module.xp}</p>
+                        <p className="text-slate-500 text-xs">XP</p>
+                      </div>
+                    </div>
+
+                    <div className="mb-6">
+                      <h4 className="text-white font-semibold mb-3">Contenu du module</h4>
+                      <div className="space-y-2">
+                        {module.lessons.map((lesson, idx) => {
+                          const isCompleted = module.completed || (module.currentLesson && idx < module.currentLesson - 1);
+                          const isCurrent = !module.completed && module.currentLesson === idx + 1;
+                          
+                          return (
+                            <div
+                              key={idx}
+                              className={`flex items-center gap-3 p-3 rounded-lg ${
+                                isCompleted ? 'bg-emerald-500/10' : isCurrent ? 'bg-cyan-500/10' : 'bg-slate-700/30'
+                              }`}
+                            >
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                isCompleted ? 'bg-emerald-500 text-white' : isCurrent ? 'bg-cyan-500 text-white' : 'bg-slate-600 text-slate-400'
+                              }`}>
+                                {isCompleted ? <CheckCircle className="w-4 h-4" /> : idx + 1}
+                              </div>
+                              <span className={`flex-1 text-sm ${isCompleted ? 'text-emerald-400' : isCurrent ? 'text-cyan-400' : 'text-slate-400'}`}>
+                                {lesson.title}
+                              </span>
+                              <span className="text-slate-500 text-xs">{lesson.duration}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setShowModuleDetail(null);
+                        if (module.completed) {
+                          handleStartModule(module.id);
+                        } else if (module.progress > 0) {
+                          handleContinueModule(module.id);
+                        } else {
+                          handleStartModule(module.id);
+                        }
+                      }}
+                      className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${
+                        module.completed
+                          ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                          : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400'
+                      }`}
+                    >
+                      <Play className="w-5 h-5" />
+                      {module.completed ? 'Revoir le module' : module.progress > 0 ? 'Continuer' : 'Commencer'}
+                    </button>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Badge Detail Modal */}
+      <AnimatePresence>
+        {showBadgeDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowBadgeDetail(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-5xl">
+                {showBadgeDetail.icon}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{showBadgeDetail.name}</h3>
+              <p className="text-slate-400 mb-4">{showBadgeDetail.description}</p>
+              {showBadgeDetail.earnedDate && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-4 py-2 inline-flex items-center gap-2 mb-4">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span className="text-emerald-400 text-sm">Obtenu le {showBadgeDetail.earnedDate}</span>
+                </div>
+              )}
+              <button
+                onClick={() => setShowBadgeDetail(null)}
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-xl transition-colors"
+              >
+                Fermer
               </button>
             </motion.div>
           </motion.div>
