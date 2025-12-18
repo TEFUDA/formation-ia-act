@@ -4,30 +4,27 @@ import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { 
   Shield, 
   CheckCircle2, 
   Clock, 
-  Users, 
   Award, 
-  BookOpen, 
   AlertTriangle,
   ArrowRight,
   Star,
   Zap,
   FileCheck,
-  Building2,
   ChevronRight,
-  Play,
   FileText,
   Headphones,
   Timer,
-  TrendingUp
+  Gift,
+  FileSpreadsheet,
+  ClipboardList,
+  BadgeCheck
 } from 'lucide-react'
 import Link from 'next/link'
 
-// Calcul des jours restants jusqu'au 2 août 2026
 function getDaysUntilDeadline() {
   const deadline = new Date('2026-08-02')
   const today = new Date()
@@ -37,7 +34,7 @@ function getDaysUntilDeadline() {
 }
 
 function getProgressPercentage() {
-  const start = new Date('2024-08-01') // Entrée en vigueur
+  const start = new Date('2024-08-01')
   const deadline = new Date('2026-08-02')
   const today = new Date()
   const total = deadline.getTime() - start.getTime()
@@ -55,9 +52,26 @@ export default function LandingPage() {
     setProgress(getProgressPercentage())
   }, [])
 
+  const bonusResources = [
+    { module: 1, name: "Guide AI Act - Synthèse complète", price: 97 },
+    { module: 1, name: "Checklist : Êtes-vous concerné ?", price: 47 },
+    { module: 2, name: "Matrice de classification des risques", price: 127 },
+    { module: 2, name: "Exemples par secteur d'activité", price: 67 },
+    { module: 3, name: "Template Registre IA (Excel)", price: 97 },
+    { module: 3, name: "Guide d'audit pas à pas", price: 77 },
+    { module: 4, name: "Modèle Politique IA d'entreprise", price: 67 },
+    { module: 4, name: "Fiche de poste Référent IA", price: 47 },
+    { module: 5, name: "Template documentation technique", price: 97 },
+    { module: 5, name: "Checklist marquage CE", price: 47 },
+    { module: 6, name: "Plan d'audit type", price: 47 },
+    { module: 6, name: "Tableau de bord conformité IA", price: 127 },
+  ]
+
+  const totalBonusValue = bonusResources.reduce((sum, r) => sum + r.price, 0)
+
   return (
     <div className="min-h-screen bg-[#0a0f1a]">
-      {/* Bandeau d'urgence rouge */}
+      {/* Bandeau d'urgence */}
       <div className="bg-gradient-to-r from-red-600 to-red-500 text-white py-3 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-sm md:text-base">
           <Timer className="w-5 h-5 animate-pulse" />
@@ -85,7 +99,7 @@ export default function LandingPage() {
                 <span className="text-white">.fr</span>
               </span>
             </div>
-            <Link href="/formation">
+            <Link href="/login">
               <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
                 Connexion
               </Button>
@@ -98,15 +112,12 @@ export default function LandingPage() {
       <section className="pt-12 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column */}
             <div>
-              {/* Badge alerte */}
               <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/40 rounded-full px-4 py-2 mb-6">
                 <AlertTriangle className="w-4 h-4 text-orange-400" />
                 <span className="text-orange-400 text-sm font-medium">Obligation légale depuis février 2025</span>
               </div>
               
-              {/* Title */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight">
                 Formez vos équipes
                 <br />
@@ -116,12 +127,10 @@ export default function LandingPage() {
                 avant les sanctions
               </p>
               
-              {/* Subtitle */}
               <p className="text-lg text-slate-400 mb-8 max-w-xl">
                 La première formation en ligne certifiante pour mettre votre entreprise en conformité avec le règlement européen sur l'Intelligence Artificielle.
               </p>
               
-              {/* Features Grid */}
               <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
@@ -139,7 +148,7 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
                     <FileText className="w-5 h-5 text-slate-400" />
                   </div>
-                  <span className="text-slate-300 text-sm">Templates & checklists inclus</span>
+                  <span className="text-slate-300 text-sm">12 templates & checklists</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
@@ -149,23 +158,19 @@ export default function LandingPage() {
                 </div>
               </div>
               
-              {/* CTA Button */}
-              <Link href="/formation">
-                <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-lg px-8 py-6 rounded-xl shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all">
+              {/* CTA Button → PRICING */}
+              <Link href="/pricing">
+                <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-lg px-8 py-6 rounded-xl shadow-lg shadow-orange-500/25">
                   <Zap className="w-5 h-5 mr-2" />
                   Évaluez votre niveau de risque
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               
-              {/* Social Proof */}
               <div className="flex items-center gap-6 mt-8">
                 <div className="flex -space-x-2">
-                  {['A', 'B', 'C', 'D', 'E'].map((letter, i) => (
-                    <div 
-                      key={letter}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 border-2 border-[#0a0f1a] flex items-center justify-center text-xs font-medium text-white"
-                    >
+                  {['A', 'B', 'C', 'D', 'E'].map((letter) => (
+                    <div key={letter} className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 border-2 border-[#0a0f1a] flex items-center justify-center text-xs font-medium text-white">
                       {letter}
                     </div>
                   ))}
@@ -182,11 +187,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Column - Countdown Card */}
+            {/* Countdown Card */}
             <div className="lg:pl-8">
               <Card className="bg-[#111827] border-slate-800 overflow-hidden">
                 <CardContent className="p-8">
-                  {/* Countdown Number */}
                   <div className="text-center mb-6">
                     <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-orange-500 mb-2">
                       {daysLeft}
@@ -194,21 +198,16 @@ export default function LandingPage() {
                     <p className="text-slate-400">jours avant l'échéance AI Act</p>
                   </div>
                   
-                  {/* Progress Bar */}
                   <div className="mb-8">
                     <div className="flex items-center justify-between text-sm mb-2">
                       <span className="text-slate-400">Progression vers la deadline</span>
                       <span className="text-orange-400 font-semibold">{progress}%</span>
                     </div>
                     <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-1000"
-                        style={{ width: `${progress}%` }}
-                      />
+                      <div className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full" style={{ width: `${progress}%` }} />
                     </div>
                   </div>
                   
-                  {/* Stats Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-800/50 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-white mb-1">35M€</div>
@@ -234,65 +233,50 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Urgency Section - Timeline */}
+      {/* Timeline Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">{t('urgency.title')}</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              L'AI Act entre progressivement en application. Ne vous laissez pas surprendre.
-            </p>
+            <p className="text-slate-400 max-w-2xl mx-auto">L'AI Act entre progressivement en application.</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Deadline 1 - PASSÉ */}
             <Card className="bg-red-500/10 border-red-500/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                PASSÉ
-              </div>
+              <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">PASSÉ</div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center mb-4">
                   <AlertTriangle className="w-6 h-6 text-red-400" />
                 </div>
                 <CardTitle className="text-white">{t('urgency.deadline1.date')}</CardTitle>
-                <CardDescription className="text-red-300 font-medium">
-                  {t('urgency.deadline1.title')}
-                </CardDescription>
+                <CardDescription className="text-red-300 font-medium">{t('urgency.deadline1.title')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-400">{t('urgency.deadline1.description')}</p>
               </CardContent>
             </Card>
 
-            {/* Deadline 2 - URGENT */}
             <Card className="bg-orange-500/10 border-orange-500/30 relative overflow-hidden ring-2 ring-orange-500/50">
-              <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg animate-pulse">
-                URGENT
-              </div>
+              <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg animate-pulse">URGENT</div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center mb-4">
                   <Clock className="w-6 h-6 text-orange-400" />
                 </div>
                 <CardTitle className="text-white">{t('urgency.deadline2.date')}</CardTitle>
-                <CardDescription className="text-orange-300 font-medium">
-                  {t('urgency.deadline2.title')}
-                </CardDescription>
+                <CardDescription className="text-orange-300 font-medium">{t('urgency.deadline2.title')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-400">{t('urgency.deadline2.description')}</p>
               </CardContent>
             </Card>
 
-            {/* Deadline 3 */}
             <Card className="bg-blue-500/10 border-blue-500/30">
               <CardHeader>
                 <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
                   <FileCheck className="w-6 h-6 text-blue-400" />
                 </div>
                 <CardTitle className="text-white">{t('urgency.deadline3.date')}</CardTitle>
-                <CardDescription className="text-blue-300 font-medium">
-                  {t('urgency.deadline3.title')}
-                </CardDescription>
+                <CardDescription className="text-blue-300 font-medium">{t('urgency.deadline3.title')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-400">{t('urgency.deadline3.description')}</p>
@@ -316,7 +300,7 @@ export default function LandingPage() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((num) => (
-              <Card key={num} className="bg-[#111827] border-slate-800 hover:border-cyan-500/50 transition-all duration-300 group">
+              <Card key={num} className="bg-[#111827] border-slate-800 hover:border-cyan-500/50 transition-all group">
                 <CardHeader>
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
@@ -349,8 +333,68 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Bonus Section */}
+      <section id="bonus" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-emerald-900/20 to-slate-900/30 border-y border-emerald-500/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/40 rounded-full px-4 py-2 mb-6">
+              <Gift className="w-5 h-5 text-emerald-400" />
+              <span className="text-emerald-400 font-medium">BONUS EXCLUSIFS</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-4">12 ressources professionnelles incluses</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Templates, checklists et guides prêts à l'emploi</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            {bonusResources.map((resource, idx) => (
+              <div key={idx} className="bg-[#111827] border border-slate-800 rounded-xl p-4 flex items-start gap-4 hover:border-emerald-500/50 transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  {resource.name.includes('Template') || resource.name.includes('Tableau') ? (
+                    <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+                  ) : resource.name.includes('Checklist') ? (
+                    <ClipboardList className="w-5 h-5 text-emerald-400" />
+                  ) : (
+                    <FileText className="w-5 h-5 text-emerald-400" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-cyan-400 bg-cyan-500/20 px-2 py-0.5 rounded">Module {resource.module}</span>
+                  </div>
+                  <h4 className="text-white font-medium text-sm truncate">{resource.name}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-slate-500 line-through text-sm">{resource.price}€</span>
+                    <span className="text-emerald-400 font-semibold text-sm">OFFERT</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 border border-emerald-500/30 rounded-2xl p-8 text-center">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+              <div>
+                <p className="text-slate-400 mb-2">Valeur totale des bonus</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-4xl font-bold text-slate-500 line-through">{totalBonusValue}€</span>
+                  <span className="text-4xl font-bold text-emerald-400">OFFERTS</span>
+                </div>
+              </div>
+              <div className="hidden md:block w-px h-16 bg-slate-700" />
+              <div>
+                <p className="text-slate-400 mb-2">Avec votre formation</p>
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="w-6 h-6 text-emerald-400" />
+                  <span className="text-xl font-semibold text-white">Accès immédiat aux 12 ressources</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/30">
+      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">{t('pricing.title')}</h2>
@@ -362,15 +406,11 @@ export default function LandingPage() {
             <Card className="bg-[#111827] border-slate-800">
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-white text-xl">{t('pricing.solo.name')}</CardTitle>
-                <CardDescription className="text-slate-400">
-                  {t('pricing.solo.description')}
-                </CardDescription>
+                <CardDescription className="text-slate-400">{t('pricing.solo.description')}</CardDescription>
                 <div className="mt-6">
                   <span className="text-5xl font-bold text-white">{t('pricing.solo.price')}</span>
                   <span className="text-slate-400">{t('pricing.solo.period')}</span>
                 </div>
-                <div className="text-sm text-slate-400 mt-2">{t('pricing.solo.seats')}</div>
-                <div className="text-xs text-cyan-400 mt-1">{t('pricing.solo.pricePerSeat')}</div>
               </CardHeader>
               <CardContent className="space-y-4">
                 {(t.raw('pricing.solo.features') as string[]).map((feature: string, idx: number) => (
@@ -379,7 +419,11 @@ export default function LandingPage() {
                     <span className="text-slate-300 text-sm">{feature}</span>
                   </div>
                 ))}
-                <Link href="/formation" className="block pt-4">
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-800">
+                  <Gift className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <span className="text-emerald-400 text-sm font-medium">+ 12 ressources ({totalBonusValue}€ de valeur)</span>
+                </div>
+                <Link href="/pricing" className="block pt-4">
                   <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-slate-800">
                     {t('pricing.cta')}
                   </Button>
@@ -394,15 +438,11 @@ export default function LandingPage() {
               </div>
               <CardHeader className="text-center pb-8 pt-8">
                 <CardTitle className="text-white text-xl">{t('pricing.pme.name')}</CardTitle>
-                <CardDescription className="text-slate-400">
-                  {t('pricing.pme.description')}
-                </CardDescription>
+                <CardDescription className="text-slate-400">{t('pricing.pme.description')}</CardDescription>
                 <div className="mt-6">
                   <span className="text-5xl font-bold text-white">{t('pricing.pme.price')}</span>
                   <span className="text-slate-400">{t('pricing.pme.period')}</span>
                 </div>
-                <div className="text-sm text-slate-400 mt-2">{t('pricing.pme.seats')}</div>
-                <div className="text-xs text-orange-400 mt-1">{t('pricing.pme.pricePerSeat')}</div>
               </CardHeader>
               <CardContent className="space-y-4">
                 {(t.raw('pricing.pme.features') as string[]).map((feature: string, idx: number) => (
@@ -411,7 +451,11 @@ export default function LandingPage() {
                     <span className="text-slate-300 text-sm">{feature}</span>
                   </div>
                 ))}
-                <Link href="/formation" className="block pt-4">
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-800">
+                  <Gift className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <span className="text-emerald-400 text-sm font-medium">+ 12 ressources ({totalBonusValue}€ de valeur)</span>
+                </div>
+                <Link href="/pricing" className="block pt-4">
                   <Button className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white" size="lg">
                     {t('pricing.cta')}
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -424,15 +468,11 @@ export default function LandingPage() {
             <Card className="bg-[#111827] border-slate-800">
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-white text-xl">{t('pricing.enterprise.name')}</CardTitle>
-                <CardDescription className="text-slate-400">
-                  {t('pricing.enterprise.description')}
-                </CardDescription>
+                <CardDescription className="text-slate-400">{t('pricing.enterprise.description')}</CardDescription>
                 <div className="mt-6">
                   <span className="text-5xl font-bold text-white">{t('pricing.enterprise.price')}</span>
                   <span className="text-slate-400">{t('pricing.enterprise.period')}</span>
                 </div>
-                <div className="text-sm text-slate-400 mt-2">{t('pricing.enterprise.seats')}</div>
-                <div className="text-xs text-cyan-400 mt-1">{t('pricing.enterprise.pricePerSeat')}</div>
               </CardHeader>
               <CardContent className="space-y-4">
                 {(t.raw('pricing.enterprise.features') as string[]).map((feature: string, idx: number) => (
@@ -441,7 +481,11 @@ export default function LandingPage() {
                     <span className="text-slate-300 text-sm">{feature}</span>
                   </div>
                 ))}
-                <Link href="/formation" className="block pt-4">
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-800">
+                  <Gift className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <span className="text-emerald-400 text-sm font-medium">+ 12 ressources ({totalBonusValue}€ de valeur)</span>
+                </div>
+                <Link href="/pricing" className="block pt-4">
                   <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-slate-800">
                     {t('pricing.cta')}
                   </Button>
@@ -453,10 +497,9 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8">
+      <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/30">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-white text-center mb-12">{t('faq.title')}</h2>
-          
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((num) => (
               <Card key={num} className="bg-[#111827] border-slate-800">
@@ -475,7 +518,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Final */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-orange-600/20 to-red-600/20 border-y border-orange-500/20">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-red-500/20 border border-red-500/40 rounded-full px-4 py-2 mb-6">
@@ -484,7 +527,7 @@ export default function LandingPage() {
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">{t('cta.title')}</h2>
           <p className="text-slate-400 mb-8">{t('cta.subtitle')}</p>
-          <Link href="/formation">
+          <Link href="/pricing">
             <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-lg px-10 py-6 rounded-xl shadow-lg shadow-orange-500/25">
               {t('cta.button')}
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -513,9 +556,7 @@ export default function LandingPage() {
               <a href="#" className="hover:text-white transition-colors">{t('footer.terms')}</a>
               <a href="#" className="hover:text-white transition-colors">{t('footer.contact')}</a>
             </div>
-            <div className="text-sm text-slate-500">
-              {t('footer.copyright')}
-            </div>
+            <div className="text-sm text-slate-500">{t('footer.copyright')}</div>
           </div>
         </div>
       </footer>
