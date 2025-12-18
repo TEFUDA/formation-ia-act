@@ -71,12 +71,13 @@ const FloatingBadge = ({ children, delay = 0, className = '' }: { children: Reac
 );
 
 // Glowing Card
-const GlowCard = ({ children, glow = '#00F5FF', className = '' }: { children: React.ReactNode, glow?: string, className?: string }) => (
+const GlowCard = ({ children, glow = '#00F5FF', className = '', active = false }: { children: React.ReactNode, glow?: string, className?: string, active?: boolean }) => (
   <motion.div
     whileHover={{ scale: 1.02, y: -5 }}
     transition={{ type: 'spring', stiffness: 400 }}
     className={`relative group ${className}`}
   >
+    {active && <div className="absolute -inset-[2px] rounded-2xl" style={{ background: `linear-gradient(135deg, ${glow}, ${glow}50)` }} />}
     <div className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" style={{ background: `${glow}30` }} />
     <div className="absolute -inset-[1px] rounded-2xl opacity-30 group-hover:opacity-60 transition-opacity" style={{ background: `linear-gradient(135deg, ${glow}40, transparent 50%, ${glow}40)` }} />
     <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
@@ -412,7 +413,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {plans.map((plan, i) => (
               <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <GlowCard glow={plan.color} className={plan.popular ? 'ring-2' : ''} style={{ '--tw-ring-color': plan.color } as React.CSSProperties}>
+                <GlowCard glow={plan.color} active={plan.popular}>
                   <div className="p-6">
                     {plan.popular && (
                       <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium mb-4" style={{ background: `${plan.color}20`, color: plan.color }}>
