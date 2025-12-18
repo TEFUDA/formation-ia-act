@@ -20,7 +20,20 @@ export default async function LocaleLayout({
   params: { locale: string }
 }) {
   const messages = await getMessages()
+// app/[locale]/layout.tsx
 
+import DevTools from '@/app/components/DevTools';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <DevTools />  {/* ← Ajoute ça */}
+      </body>
+    </html>
+  );
+}
   return (
     <html lang={locale} className="dark">
       <body className={inter.className}>
