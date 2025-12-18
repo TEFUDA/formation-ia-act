@@ -74,7 +74,7 @@ export default function PricingPage() {
     setIsProcessing(true);
     // Simule un délai de paiement puis redirige
     setTimeout(() => {
-      window.location.href = '/login';
+      router.push(`/onboarding?plan=${selectedPlan}`);
     }, 1500);
   };
 
