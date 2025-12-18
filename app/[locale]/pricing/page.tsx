@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Check, User, Users, Building2, ArrowRight, CreditCard, Shield, Zap, Gift } from 'lucide-react';
 import Link from 'next/link';
@@ -67,6 +68,7 @@ const plans = [
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<string>('equipe');
   const [isProcessing, setIsProcessing] = useState(false);
 
