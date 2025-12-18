@@ -855,6 +855,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
           className="mt-12"
+          id="ressources"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-white/50 text-sm uppercase tracking-widest">Ressources Téléchargeables</h3>
@@ -865,24 +866,26 @@ export default function DashboardPage() {
             <div className="p-6">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { name: "Registre des Systèmes IA", type: "Excel", size: "245 KB", icon: "📊", category: "Template", color: "#00FF88" },
-                  { name: "Politique IA Entreprise", type: "Word", size: "128 KB", icon: "📄", category: "Template", color: "#00F5FF" },
-                  { name: "Checklist Conformité AI Act", type: "PDF", size: "89 KB", icon: "✅", category: "Checklist", color: "#FF6B00" },
-                  { name: "EIAI - Étude d'Impact", type: "Word", size: "156 KB", icon: "📋", category: "Template", color: "#8B5CF6" },
-                  { name: "Matrice Classification Risques", type: "Excel", size: "178 KB", icon: "⚠️", category: "Outil", color: "#FF4444" },
-                  { name: "Guide Article 4 - Formation", type: "PDF", size: "2.1 MB", icon: "📚", category: "Guide", color: "#00F5FF" },
-                  { name: "Modèle Gouvernance IA", type: "Word", size: "134 KB", icon: "🏛️", category: "Template", color: "#FFB800" },
-                  { name: "Audit Trail Template", type: "Excel", size: "198 KB", icon: "🔍", category: "Template", color: "#00FF88" },
-                  { name: "Notice Information Utilisateurs", type: "Word", size: "67 KB", icon: "ℹ️", category: "Template", color: "#00F5FF" },
-                  { name: "Cartographie Systèmes IA", type: "Excel", size: "312 KB", icon: "🗺️", category: "Outil", color: "#8B5CF6" },
-                  { name: "Checklist Haut Risque", type: "PDF", size: "95 KB", icon: "🔒", category: "Checklist", color: "#FF4444" },
-                  { name: "Kit Communication Interne", type: "ZIP", size: "4.5 MB", icon: "📢", category: "Kit", color: "#FFB800" },
+                  { name: "Template Registre IA", type: "Excel", size: "245 KB", icon: "📊", category: "Template", color: "#00FF88", file: "template-registre-ia.xlsx" },
+                  { name: "Modèle Politique IA", type: "Word", size: "128 KB", icon: "📄", category: "Template", color: "#00F5FF", file: "modele-politique-ia.docx" },
+                  { name: "Checklist Êtes-vous Concerné", type: "Excel", size: "89 KB", icon: "✅", category: "Checklist", color: "#FF6B00", file: "checklist-etes-vous-concerne.xlsx" },
+                  { name: "Template Documentation Technique", type: "Word", size: "156 KB", icon: "📋", category: "Template", color: "#8B5CF6", file: "template-documentation-technique.docx" },
+                  { name: "Matrice Classification Risques", type: "Excel", size: "178 KB", icon: "⚠️", category: "Outil", color: "#FF4444", file: "matrice-classification-risques.xlsx" },
+                  { name: "Guide AI Act Synthèse", type: "PDF", size: "2.1 MB", icon: "📚", category: "Guide", color: "#00F5FF", file: "guide-ai-act-synthese.pdf" },
+                  { name: "Fiche Poste Référent IA", type: "Word", size: "134 KB", icon: "👤", category: "Template", color: "#FFB800", file: "fiche-poste-referent-ia.docx" },
+                  { name: "Plan Audit Type", type: "Excel", size: "198 KB", icon: "🔍", category: "Template", color: "#00FF88", file: "plan-audit-type.xlsx" },
+                  { name: "Tableau Bord Conformité IA", type: "Excel", size: "312 KB", icon: "📈", category: "Outil", color: "#00F5FF", file: "tableau-bord-conformite-ia.xlsx" },
+                  { name: "Guide Audit Pas à Pas", type: "PDF", size: "1.8 MB", icon: "📖", category: "Guide", color: "#8B5CF6", file: "guide-audit-pas-a-pas.pdf" },
+                  { name: "Checklist Marquage CE", type: "Excel", size: "95 KB", icon: "🏷️", category: "Checklist", color: "#FF4444", file: "checklist-marquage-ce.xlsx" },
+                  { name: "Exemples Secteurs Activité", type: "PDF", size: "850 KB", icon: "🏢", category: "Guide", color: "#FFB800", file: "exemples-secteurs-activite.pdf" },
                 ].map((resource, i) => (
-                  <motion.button
+                  <motion.a
                     key={i}
+                    href={`/resources/${resource.file}`}
+                    download={resource.file}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl text-left transition-colors group border border-white/5 hover:border-white/10"
+                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl text-left transition-colors group border border-white/5 hover:border-white/10 cursor-pointer"
                   >
                     <div 
                       className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -911,7 +914,7 @@ export default function DashboardPage() {
                         <line x1="12" y1="15" x2="12" y2="3"/>
                       </svg>
                     </div>
-                  </motion.button>
+                  </motion.a>
                 ))}
               </div>
 
@@ -921,14 +924,18 @@ export default function DashboardPage() {
                   <p className="text-white font-medium">Télécharger tout le pack</p>
                   <p className="text-white/40 text-sm">12 fichiers • 8.2 MB au total</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-[#FFB800] hover:bg-[#FFB800]/90 text-black font-semibold rounded-xl transition-colors">
+                <a 
+                  href="/resources/pack-complet-ai-act.zip"
+                  download="pack-complet-ai-act.zip"
+                  className="flex items-center gap-2 px-6 py-3 bg-[#FFB800] hover:bg-[#FFB800]/90 text-black font-semibold rounded-xl transition-colors"
+                >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                   </svg>
                   Tout télécharger (ZIP)
-                </button>
+                </a>
               </div>
             </div>
           </HoloCard>
