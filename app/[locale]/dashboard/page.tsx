@@ -2,22 +2,27 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { 
   Play, CheckCircle, Lock, ChevronRight, Download, X,
   FileSpreadsheet, FileText, ClipboardList, Award, LogOut,
   User, Clock, Trophy, Flame, Zap, Star, Gift, 
   BookOpen, Target, TrendingUp, Calendar, Crown,
-  ChevronDown, Volume2, Pause, SkipForward, Settings,
-  Bell, Search, Menu, Home, FolderOpen, Medal,
-  Sparkles, PartyPopper, Shield
+  ChevronDown, Settings, Menu, FolderOpen, Medal,
+  Sparkles, Shield, Users, ExternalLink
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Données utilisateur simulées
+// Données utilisateur simulées (en production: depuis l'auth/API)
 const userData = {
+  id: 'user-123',
   name: 'Jean',
+  lastName: 'Dupont',
+  email: 'jean.dupont@acme.com',
   avatar: 'JD',
+  role: 'admin' as 'admin' | 'employee' | 'solo', // Changer à 'employee' pour tester
   plan: 'Équipe',
+  companyName: 'Acme Corporation',
   streak: 7,
   totalXP: 1250,
   weeklyXP: 380,
@@ -36,6 +41,7 @@ const modules = [
     xp: 150,
     completed: true, 
     progress: 100,
+    quizScore: 90,
     icon: "📋"
   },
   { 
@@ -47,6 +53,7 @@ const modules = [
     xp: 200,
     completed: true, 
     progress: 100,
+    quizScore: 85,
     icon: "⚠️"
   },
   { 
@@ -59,6 +66,7 @@ const modules = [
     completed: false, 
     progress: 60,
     currentLesson: 5,
+    quizScore: null,
     icon: "📊"
   },
   { 
@@ -70,6 +78,7 @@ const modules = [
     xp: 200,
     completed: false, 
     progress: 0,
+    quizScore: null,
     icon: "🏛️"
   },
   { 
@@ -81,6 +90,7 @@ const modules = [
     xp: 300,
     completed: false, 
     progress: 0,
+    quizScore: null,
     icon: "🔒"
   },
   { 
@@ -92,6 +102,7 @@ const modules = [
     xp: 250,
     completed: false, 
     progress: 0,
+    quizScore: null,
     icon: "✅"
   },
 ];
@@ -123,9 +134,12 @@ const allBadges = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'learn' | 'resources' | 'badges'>('learn');
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<number | null>(null);
   
   // Calculs
   const completedModules = modules.filter(m => m.completed).length;
@@ -134,6 +148,15 @@ export default function DashboardPage() {
   const totalXPPossible = modules.reduce((acc, m) => acc + m.xp, 0);
   const earnedXP = modules.filter(m => m.completed).reduce((acc, m) => acc + m.xp, 0) + 
                    (currentModule ? Math.round((currentModule.progress / 100) * currentModule.xp) : 0);
+  
+  // Vérifier si l'utilisateur peut obtenir son certificat
+  const averageQuizScore = modules.filter(m => m.quizScore !== null).length > 0
+    ? Math.round(modules.filter(m => m.quizScore !== null).reduce((acc, m) => acc + (m.quizScore || 0), 0) / modules.filter(m => m.quizScore !== null).length)
+    : 0;
+  const canGetCertificate = completedModules === 6 && averageQuizScore >= 80;
+
+  // L'utilisateur est-il admin ?
+  const isAdmin = userData.role === 'admin';
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -153,12 +176,25 @@ export default function DashboardPage() {
     }
   };
 
-  // Greeting basé sur l'heure
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Bonjour';
     if (hour < 18) return 'Bon après-midi';
     return 'Bonsoir';
+  };
+
+  const handleStartModule = (moduleId: number) => {
+    router.push(`/formation?module=${moduleId}`);
+  };
+
+  const handleContinueModule = (moduleId: number, lessonId?: number) => {
+    const lesson = lessonId || 1;
+    router.push(`/formation?module=${moduleId}&lesson=${lesson}`);
+  };
+
+  const handleLogout = () => {
+    // En production: appeler l'API de déconnexion
+    router.push('/');
   };
 
   return (
@@ -199,6 +235,17 @@ export default function DashboardPage() {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
+              {/* Admin Button (only for admins) */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="hidden sm:flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg px-3 py-1.5 text-purple-400 text-sm font-medium transition-colors"
+                >
+                  <Users className="w-4 h-4" />
+                  Gérer l'équipe
+                </Link>
+              )}
+
               {/* Streak */}
               <button 
                 onClick={() => setShowStreakModal(true)}
@@ -214,11 +261,103 @@ export default function DashboardPage() {
                 <span className="text-yellow-400 font-bold">{earnedXP}</span>
               </div>
 
-              {/* Avatar */}
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {userData.avatar}
-                </div>
+              {/* Avatar & Profile Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-2 hover:bg-slate-800/50 rounded-lg p-1 transition-colors"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {userData.avatar}
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 hidden sm:block transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Profile Dropdown */}
+                <AnimatePresence>
+                  {showProfileMenu && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowProfileMenu(false)} 
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute right-0 top-12 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden"
+                      >
+                        {/* User Info */}
+                        <div className="p-4 border-b border-slate-700">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                              {userData.avatar}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-semibold truncate">{userData.name} {userData.lastName}</p>
+                              <p className="text-slate-400 text-sm truncate">{userData.email}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                              isAdmin 
+                                ? 'bg-purple-500/20 text-purple-400' 
+                                : 'bg-slate-700 text-slate-300'
+                            }`}>
+                              {isAdmin ? 'Admin' : 'Membre'}
+                            </span>
+                            <span className="text-slate-500 text-xs">• Plan {userData.plan}</span>
+                          </div>
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="p-2">
+                          {isAdmin && (
+                            <Link
+                              href="/admin"
+                              onClick={() => setShowProfileMenu(false)}
+                              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                            >
+                              <Users className="w-5 h-5 text-purple-400" />
+                              <span>Tableau de bord admin</span>
+                              <ExternalLink className="w-4 h-4 ml-auto text-slate-500" />
+                            </Link>
+                          )}
+                          
+                          {canGetCertificate && (
+                            <Link
+                              href="/certificate"
+                              onClick={() => setShowProfileMenu(false)}
+                              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                            >
+                              <Award className="w-5 h-5 text-yellow-400" />
+                              <span>Mon certificat</span>
+                              <span className="ml-auto text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Disponible</span>
+                            </Link>
+                          )}
+
+                          <button
+                            onClick={() => setShowProfileMenu(false)}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+                          >
+                            <Settings className="w-5 h-5" />
+                            <span>Paramètres</span>
+                          </button>
+
+                          <hr className="my-2 border-slate-700" />
+
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                          >
+                            <LogOut className="w-5 h-5" />
+                            <span>Déconnexion</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Mobile menu */}
@@ -242,6 +381,16 @@ export default function DashboardPage() {
               className="md:hidden border-t border-slate-800 overflow-hidden"
             >
               <div className="px-4 py-3 space-y-1">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg font-medium text-purple-400 bg-purple-500/10"
+                  >
+                    <Users className="w-5 h-5" />
+                    Gérer l'équipe
+                  </Link>
+                )}
                 {[
                   { id: 'learn', label: 'Apprendre', icon: BookOpen },
                   { id: 'resources', label: 'Ressources', icon: FolderOpen },
@@ -267,6 +416,33 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Certificate Banner (if eligible) */}
+        {canGetCertificate && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Link href="/certificate" className="block">
+              <div className="bg-gradient-to-r from-yellow-500/20 via-amber-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-yellow-500/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center">
+                    <Award className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg">Félicitations ! 🎉</h3>
+                    <p className="text-slate-300 text-sm">Votre certificat est prêt à être téléchargé</p>
+                  </div>
+                </div>
+                <button className="bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                  <Download className="w-5 h-5" />
+                  Obtenir mon certificat
+                </button>
+              </div>
+            </Link>
+          </motion.div>
+        )}
+
         {/* Welcome Section */}
         <motion.div 
           initial={{ opacity: 0, y: 10 }} 
@@ -274,7 +450,6 @@ export default function DashboardPage() {
           className="mb-8"
         >
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            {/* Greeting */}
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                 {getGreeting()}, {userData.name} ! 👋
@@ -287,7 +462,6 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Quick Stats */}
             <div className="flex flex-wrap gap-3">
               <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
@@ -301,11 +475,11 @@ export default function DashboardPage() {
               
               <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 flex items-center gap-3">
                 <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-cyan-400" />
+                  <Target className="w-5 h-5 text-cyan-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white">~{Math.round((6 - completedModules) * 1.2)}h</p>
-                  <p className="text-slate-500 text-xs">Restantes</p>
+                  <p className="text-2xl font-bold text-white">{averageQuizScore}%</p>
+                  <p className="text-slate-500 text-xs">Score quiz</p>
                 </div>
               </div>
             </div>
@@ -322,12 +496,10 @@ export default function DashboardPage() {
           <div className="bg-gradient-to-r from-slate-800/80 to-slate-800/40 border border-slate-700/50 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <Target className="w-5 h-5 text-cyan-400" />
+                <TrendingUp className="w-5 h-5 text-cyan-400" />
                 <span className="text-white font-medium">Progression globale</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-3xl font-bold text-white">{totalProgress}%</span>
-              </div>
+              <span className="text-3xl font-bold text-white">{totalProgress}%</span>
             </div>
             <div className="h-4 bg-slate-700/50 rounded-full overflow-hidden">
               <motion.div 
@@ -340,14 +512,9 @@ export default function DashboardPage() {
               </motion.div>
             </div>
             <div className="flex items-center justify-between mt-3 text-sm">
-              <div className="flex items-center gap-4">
-                <span className="text-slate-400">
-                  <span className="text-emerald-400 font-medium">{completedModules}</span> modules terminés
-                </span>
-                <span className="text-slate-400">
-                  <span className="text-yellow-400 font-medium">{earnedXP}</span>/{totalXPPossible} XP
-                </span>
-              </div>
+              <span className="text-slate-400">
+                <span className="text-yellow-400 font-medium">{earnedXP}</span>/{totalXPPossible} XP
+              </span>
               {totalProgress >= 100 && (
                 <span className="text-emerald-400 font-medium flex items-center gap-1">
                   <CheckCircle className="w-4 h-4" /> Terminé !
@@ -367,18 +534,16 @@ export default function DashboardPage() {
               exit={{ opacity: 0, y: -10 }}
             >
               {/* Continue Learning Card */}
-              {currentModule && (
+              {currentModule && totalProgress < 100 && (
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <Play className="w-5 h-5 text-cyan-400" />
                     Continuer votre apprentissage
                   </h2>
                   <div className="bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden">
-                    {/* Background decoration */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
                     
                     <div className="relative flex flex-col lg:flex-row lg:items-center gap-6">
-                      {/* Module info */}
                       <div className="flex items-start gap-4 flex-1">
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl flex-shrink-0 shadow-lg shadow-cyan-500/25">
                           {currentModule.icon}
@@ -392,7 +557,6 @@ export default function DashboardPage() {
                           <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{currentModule.title}</h3>
                           <p className="text-slate-400 text-sm mb-3 hidden sm:block">{currentModule.description}</p>
                           
-                          {/* Progress */}
                           <div className="flex items-center gap-3">
                             <div className="flex-1 max-w-xs">
                               <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
@@ -402,31 +566,20 @@ export default function DashboardPage() {
                                 />
                               </div>
                             </div>
-                            <span className="text-cyan-400 font-medium text-sm">{currentModule.progress}%</span>
+                            <span className="text-slate-400 text-sm">
+                              {currentModule.currentLesson || 1}/{currentModule.lessons} leçons
+                            </span>
                           </div>
-                          
-                          {currentModule.currentLesson && (
-                            <p className="text-slate-500 text-sm mt-2">
-                              Leçon {currentModule.currentLesson}/{currentModule.lessons}
-                            </p>
-                          )}
                         </div>
                       </div>
 
-                      {/* CTA */}
-                      <div className="flex flex-col items-stretch lg:items-end gap-3">
-                        <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02]">
-                          <Play className="w-6 h-6" fill="white" />
-                          <span className="text-lg">
-                            {currentModule.progress > 0 ? 'Reprendre' : 'Commencer'}
-                          </span>
-                        </button>
-                        <div className="flex items-center justify-center gap-2 text-sm">
-                          <Zap className="w-4 h-4 text-yellow-400" />
-                          <span className="text-yellow-400 font-medium">+{currentModule.xp} XP</span>
-                          <span className="text-slate-500">à gagner</span>
-                        </div>
-                      </div>
+                      <button 
+                        onClick={() => handleContinueModule(currentModule.id, currentModule.currentLesson)}
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-3 text-lg transition-all hover:scale-[1.02] shadow-lg shadow-cyan-500/25"
+                      >
+                        <Play className="w-6 h-6" fill="white" />
+                        Reprendre
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -434,126 +587,112 @@ export default function DashboardPage() {
 
               {/* All Modules */}
               <div>
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-slate-400" />
-                  Tous les modules
-                </h2>
-                <div className="grid gap-3">
-                  {modules.map((module, index) => (
-                    <motion.div
-                      key={module.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`group bg-slate-800/30 hover:bg-slate-800/50 border rounded-xl p-4 sm:p-5 transition-all cursor-pointer ${
-                        module.completed 
-                          ? 'border-emerald-500/30 hover:border-emerald-500/50' 
-                          : module.progress > 0 
-                            ? 'border-cyan-500/30 hover:border-cyan-500/50' 
-                            : 'border-slate-700/50 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Icon */}
-                        <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 transition-transform group-hover:scale-105 ${
+                <h2 className="text-lg font-semibold text-white mb-4">Tous les modules</h2>
+                <div className="grid gap-4">
+                  {modules.map((module, index) => {
+                    const isLocked = index > 0 && !modules[index - 1].completed && module.progress === 0;
+                    const isCurrent = currentModule?.id === module.id;
+                    
+                    return (
+                      <motion.div
+                        key={module.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className={`bg-slate-800/30 border rounded-xl p-5 transition-all ${
                           module.completed 
-                            ? 'bg-emerald-500/20' 
-                            : module.progress > 0 
-                              ? 'bg-cyan-500/20' 
-                              : 'bg-slate-800'
-                        }`}>
-                          {module.completed ? (
-                            <CheckCircle className="w-8 h-8 text-emerald-400" />
-                          ) : (
-                            module.icon
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                              module.completed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'
-                            }`}>
-                              Module {module.id}
-                            </span>
-                            <span className="text-slate-500 text-xs hidden sm:inline">{module.duration} • {module.lessons} leçons</span>
+                            ? 'border-emerald-500/30 hover:border-emerald-500/50' 
+                            : isCurrent
+                              ? 'border-cyan-500/30 hover:border-cyan-500/50'
+                              : isLocked
+                                ? 'border-slate-700/50 opacity-60'
+                                : 'border-slate-700/50 hover:border-slate-600'
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
+                            module.completed
+                              ? 'bg-emerald-500/20'
+                              : isCurrent
+                                ? 'bg-cyan-500/20'
+                                : 'bg-slate-700/50'
+                          }`}>
+                            {isLocked ? <Lock className="w-6 h-6 text-slate-500" /> : module.icon}
                           </div>
-                          <h3 className="font-semibold text-white group-hover:text-cyan-400 transition-colors truncate">
-                            {module.title}
-                          </h3>
-                          <p className="text-slate-500 text-sm truncate hidden sm:block">{module.description}</p>
                           
-                          {/* Progress bar for in-progress modules */}
-                          {module.progress > 0 && !module.completed && (
-                            <div className="flex items-center gap-2 mt-2">
-                              <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-cyan-500 rounded-full"
-                                  style={{ width: `${module.progress}%` }}
-                                />
-                              </div>
-                              <span className="text-cyan-400 text-xs font-medium">{module.progress}%</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-slate-500 text-sm">Module {module.id}</span>
+                              {module.completed && (
+                                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                              )}
+                              {isCurrent && (
+                                <span className="text-cyan-400 text-xs bg-cyan-500/20 px-2 py-0.5 rounded">En cours</span>
+                              )}
                             </div>
-                          )}
-                        </div>
-
-                        {/* Right side */}
-                        <div className="flex items-center gap-4 flex-shrink-0">
-                          <div className="hidden sm:flex items-center gap-1 text-sm">
-                            <Zap className="w-4 h-4 text-yellow-400" />
-                            <span className="text-yellow-400 font-medium">{module.xp}</span>
+                            <h3 className="text-white font-semibold">{module.title}</h3>
+                            <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-400">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" /> {module.duration}
+                              </span>
+                              <span>{module.lessons} leçons</span>
+                              <span className="flex items-center gap-1">
+                                <Zap className="w-4 h-4 text-yellow-400" /> {module.xp} XP
+                              </span>
+                              {module.quizScore !== null && (
+                                <span className={`flex items-center gap-1 ${module.quizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
+                                  Quiz: {module.quizScore}%
+                                </span>
+                              )}
+                            </div>
+                            
+                            {module.progress > 0 && module.progress < 100 && (
+                              <div className="mt-3">
+                                <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden max-w-xs">
+                                  <div 
+                                    className="h-full bg-cyan-500 rounded-full"
+                                    style={{ width: `${module.progress}%` }}
+                                  />
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <ChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${
-                            module.completed ? 'text-emerald-400' : module.progress > 0 ? 'text-cyan-400' : 'text-slate-500'
-                          }`} />
+
+                          <div className="flex-shrink-0">
+                            {module.completed ? (
+                              <button
+                                onClick={() => handleStartModule(module.id)}
+                                className="text-emerald-400 hover:text-emerald-300 font-medium text-sm flex items-center gap-1"
+                              >
+                                Revoir
+                                <ChevronRight className="w-4 h-4" />
+                              </button>
+                            ) : isLocked ? (
+                              <span className="text-slate-500 text-sm flex items-center gap-1">
+                                <Lock className="w-4 h-4" /> Verrouillé
+                              </span>
+                            ) : isCurrent ? (
+                              <button
+                                onClick={() => handleContinueModule(module.id, module.currentLesson)}
+                                className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                              >
+                                <Play className="w-4 h-4" /> Continuer
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleStartModule(module.id)}
+                                className="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                              >
+                                Commencer
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
-
-              {/* Certificate Banner */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }} 
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-8"
-              >
-                {totalProgress >= 100 ? (
-                  <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0xMHY2aDZ2LTZoLTZ6bTAgLTEwdjZoNnYtNmgtNnptLTEwIDEwdjZoNnYtNmgtNnptMCAxMHY2aDZ2LTZoLTZ6bTAgMTB2Nmg2di02aC02em0tMTAtMTB2Nmg2di02aC02em0wIDEwdjZoNnYtNmgtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50" />
-                    <div className="relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/30">
-                        <Award className="w-10 h-10 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Félicitations ! 🎉</h3>
-                      <p className="text-slate-300 mb-6 max-w-md mx-auto">
-                        Vous avez terminé la formation AI Act. Téléchargez votre certificat de compétence.
-                      </p>
-                      <button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 flex items-center gap-2 mx-auto">
-                        <Download className="w-5 h-5" />
-                        Télécharger mon certificat
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5 flex items-center gap-4">
-                    <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Award className="w-7 h-7 text-slate-500" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold">Certificat de compétence AI Act</h3>
-                      <p className="text-slate-500 text-sm">Terminez les 6 modules pour l'obtenir</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-white">{totalProgress}%</div>
-                      <div className="text-slate-500 text-xs">complété</div>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
             </motion.div>
           )}
 
