@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 // Icons
@@ -13,38 +13,55 @@ const Icons = {
   Users: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
   Award: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>,
   Zap: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-  Book: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
-  Target: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
   Clock: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  Globe: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-  Building: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>,
+  AlertTriangle: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
   Star: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
   Menu: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
   X: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  FileText: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
+  Headphones: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>,
+  CheckCircle: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+  Quote: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>,
+  Linkedin: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>,
+  Mail: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+  Calendar: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  ShieldCheck: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>,
 };
 
-// Neural Particle Field
-const NeuralField = () => {
-  const [particles, setParticles] = useState<{x: number, y: number, size: number, speed: number, opacity: number}[]>([]);
+// Calculate days until August 2, 2026 (AI Act full enforcement)
+const calculateDaysUntil = () => {
+  const deadline = new Date('2026-08-02');
+  const today = new Date();
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
+
+// Neural Background
+const NeuralBackground = () => {
+  const [particles, setParticles] = useState<{x: number, y: number, size: number, speed: number}[]>([]);
   
   useEffect(() => {
-    setParticles(Array.from({ length: 80 }, () => ({
+    setParticles(Array.from({ length: 50 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
+      size: Math.random() * 2 + 1,
       speed: Math.random() * 20 + 10,
-      opacity: Math.random() * 0.5 + 0.2,
     })));
   }, []);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 bg-[#0a0f1a]" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#00F5FF]/5 blur-[120px] rounded-full" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#FF6B00]/5 blur-[100px] rounded-full" />
+      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(rgba(0, 245, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.3) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full bg-[#00F5FF]"
-          style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%`, opacity: p.opacity }}
-          animate={{ y: [0, -30, 0], opacity: [p.opacity, p.opacity * 1.5, p.opacity] }}
+          style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%`, opacity: 0.3 }}
+          animate={{ y: [0, -20, 0], opacity: [0.2, 0.5, 0.2] }}
           transition={{ duration: p.speed, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
@@ -52,140 +69,122 @@ const NeuralField = () => {
   );
 };
 
-// Floating Badge Component
-const FloatingBadge = ({ children, delay = 0, className = '' }: { children: React.ReactNode, delay?: number, className?: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-    className={className}
-  >
-    <motion.div
-      animate={{ y: [0, -10, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
-      className="bg-[#0A0A1B]/80 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 shadow-2xl"
-    >
+// Glow Card
+const GlowCard = ({ children, glow = '#00F5FF', className = '' }: { children: React.ReactNode, glow?: string, className?: string }) => (
+  <div className={`relative group ${className}`}>
+    <div className="absolute -inset-[1px] rounded-2xl opacity-30 group-hover:opacity-50 transition-opacity" style={{ background: `linear-gradient(135deg, ${glow}40, transparent 50%, ${glow}40)` }} />
+    <div className="relative bg-[#111827]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
       {children}
-    </motion.div>
-  </motion.div>
-);
-
-// Glowing Card
-const GlowCard = ({ children, glow = '#00F5FF', className = '', active = false }: { children: React.ReactNode, glow?: string, className?: string, active?: boolean }) => (
-  <motion.div
-    whileHover={{ scale: 1.02, y: -5 }}
-    transition={{ type: 'spring', stiffness: 400 }}
-    className={`relative group ${className}`}
-  >
-    {active && <div className="absolute -inset-[2px] rounded-2xl" style={{ background: `linear-gradient(135deg, ${glow}, ${glow}50)` }} />}
-    <div className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" style={{ background: `${glow}30` }} />
-    <div className="absolute -inset-[1px] rounded-2xl opacity-30 group-hover:opacity-60 transition-opacity" style={{ background: `linear-gradient(135deg, ${glow}40, transparent 50%, ${glow}40)` }} />
-    <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity" style={{ background: `radial-gradient(circle at 50% 0%, ${glow}, transparent 70%)` }} />
-      <div className="relative">{children}</div>
     </div>
-  </motion.div>
+  </div>
 );
 
-// Pricing Data
-const plans = [
+// Testimonials
+const testimonials = [
   {
-    id: 'solo',
-    name: 'Solo',
-    price: 500,
-    description: 'Pour les professionnels individuels',
-    color: '#00F5FF',
-    features: ['1 utilisateur', '6 modules complets', 'Certificat officiel', 'Accès 12 mois', 'Support email'],
-    popular: false,
+    name: "Sophie Martin",
+    role: "DPO",
+    company: "BNP Paribas",
+    image: "SM",
+    quote: "Formation très complète qui m'a permis de comprendre les obligations de l'AI Act et de préparer notre entreprise. Les templates sont un vrai plus.",
+    rating: 5,
   },
   {
-    id: 'equipe',
-    name: 'Équipe',
-    price: 2000,
-    description: 'Pour les petites équipes',
-    color: '#00FF88',
-    features: ['5 utilisateurs', '6 modules complets', 'Certificats officiels', 'Dashboard manager', 'Support prioritaire', 'Ressources téléchargeables'],
-    popular: true,
+    name: "Thomas Durand",
+    role: "Directeur Juridique",
+    company: "Capgemini",
+    image: "TD",
+    quote: "Indispensable pour toute personne impliquée dans la conformité IA. Le certificat est reconnu et apprécié par nos clients.",
+    rating: 5,
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 18000,
-    description: 'Pour les grandes organisations',
-    color: '#8B5CF6',
-    features: ['50 utilisateurs', '6 modules complets', 'Certificats officiels', 'Dashboard avancé', 'Support dédié', 'Rapports personnalisés', 'Formation sur-mesure'],
-    popular: false,
+    name: "Marie Lefevre",
+    role: "Chief AI Officer",
+    company: "Société Générale",
+    image: "ML",
+    quote: "Nous avons formé 40 collaborateurs. Le dashboard admin et le suivi de progression sont excellents pour les grandes équipes.",
+    rating: 5,
   },
 ];
 
-// Modules Data
+// Modules
 const modules = [
   { num: 1, title: "Fondamentaux de l'AI Act", duration: "45 min", icon: "📋", color: '#00F5FF' },
-  { num: 2, title: "Classification des Risques", duration: "1h", icon: "⚠️", color: '#00FF88' },
-  { num: 3, title: "Cartographie des Systèmes", duration: "1h15", icon: "📊", color: '#FF00E5' },
+  { num: 2, title: "Classification des Risques", duration: "1h", icon: "⚠️", color: '#FF6B00' },
+  { num: 3, title: "Cartographie des Systèmes IA", duration: "1h15", icon: "📊", color: '#00FF88' },
   { num: 4, title: "Gouvernance IA", duration: "1h", icon: "🏛️", color: '#FFB800' },
   { num: 5, title: "Systèmes Haut Risque", duration: "1h30", icon: "🔒", color: '#FF4444' },
   { num: 6, title: "Audit & Conformité", duration: "1h", icon: "✅", color: '#8B5CF6' },
 ];
 
-// Stats
-const stats = [
-  { value: '35M€', label: "Amende maximale", icon: Icons.Shield },
-  { value: '6h', label: "Formation complète", icon: Icons.Clock },
-  { value: '100%', label: "Article 4 compliant", icon: Icons.Target },
-  { value: '27', label: "Pays concernés", icon: Icons.Globe },
+// Plans
+const plans = [
+  { id: 'solo', name: 'Solo', price: 500, users: '1', color: '#00F5FF', features: ['1 utilisateur', '6 modules', 'Certificat', '12 mois accès'] },
+  { id: 'equipe', name: 'Équipe', price: 2000, users: '5', color: '#00FF88', popular: true, features: ['5 utilisateurs', '6 modules', 'Certificats', 'Dashboard admin', 'Support prioritaire'] },
+  { id: 'enterprise', name: 'Enterprise', price: 18000, users: '50', color: '#8B5CF6', features: ['50 utilisateurs', '6 modules', 'Certificats', 'Dashboard avancé', 'Account manager', 'Formation sur-mesure'] },
+];
+
+// How it works steps
+const steps = [
+  { num: 1, title: "Inscription", desc: "Créez votre compte et choisissez votre formule", icon: "📝" },
+  { num: 2, title: "Formation", desc: "Suivez les 6 modules à votre rythme", icon: "🎓" },
+  { num: 3, title: "Quiz", desc: "Validez vos connaissances (80% requis)", icon: "✍️" },
+  { num: 4, title: "Certificat", desc: "Obtenez votre certificat officiel", icon: "🏆" },
 ];
 
 export default function LandingPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+  const [daysLeft, setDaysLeft] = useState(227);
+
+  useEffect(() => {
+    setDaysLeft(calculateDaysUntil());
+  }, []);
+
+  const progressPercent = Math.max(0, Math.min(100, ((365 * 2 - daysLeft) / (365 * 2)) * 100));
 
   return (
-    <div className="min-h-screen bg-[#030014] text-white overflow-x-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[#030014]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#00F5FF]/10 via-[#FF00E5]/5 to-transparent blur-[100px] rounded-full" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#8B5CF6]/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#00FF88]/5 blur-[100px] rounded-full" />
-        <NeuralField />
-        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'linear-gradient(rgba(0, 245, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 255, 0.3) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+    <div className="min-h-screen bg-[#0a0f1a] text-white overflow-x-hidden">
+      <NeuralBackground />
+
+      {/* URGENCY TOP BANNER */}
+      <div className="relative z-50 bg-gradient-to-r from-[#FF4444] via-[#FF6B00] to-[#FF4444] py-2.5 px-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 animate-pulse"><Icons.AlertTriangle /></div>
+            <span className="font-semibold">AI Act 2026 :</span>
+            <span>Plus que <strong className="text-yellow-300">{daysLeft} jours</strong> pour vous mettre en conformité</span>
+          </div>
+          <div className="hidden sm:block">|</div>
+          <span className="font-medium">Amendes jusqu'à <strong>35M€</strong> ou <strong>7% du CA</strong></span>
+        </div>
       </div>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50">
-        <div className="mx-auto max-w-7xl px-6 py-4">
-          <div className="flex items-center justify-between bg-[#0A0A1B]/60 backdrop-blur-xl rounded-2xl border border-white/5 px-6 py-3">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="relative w-10 h-10">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00F5FF] to-[#FF00E5] rounded-xl rotate-45" />
-                <div className="absolute inset-[2px] bg-[#030014] rounded-[8px] rotate-45" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-5 h-5 text-[#00F5FF]"><Icons.Shield /></div>
-                </div>
-              </div>
-              <span className="font-bold text-lg hidden sm:block">AI Act Academy</span>
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-8">
-              {['Formation', 'Modules', 'Tarifs', 'Entreprise'].map(item => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="text-white/60 hover:text-white transition-colors text-sm">{item}</a>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3">
-              <Link href="/login" className="hidden sm:block text-white/60 hover:text-white transition-colors text-sm px-4 py-2">Connexion</Link>
-              <Link href="/pricing" className="bg-[#00F5FF] text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-[#00F5FF]/90 transition-colors text-sm">
-                Commencer
-              </Link>
-              <button onClick={() => setMobileMenu(true)} className="md:hidden p-2 text-white/60 hover:text-white">
-                <div className="w-6 h-6"><Icons.Menu /></div>
-              </button>
+      <header className="relative z-40 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#00F5FF] to-[#0066FF] rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 text-white"><Icons.Shield /></div>
             </div>
+            <span className="font-bold text-lg">Formation-IA-Act.fr</span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#modules" className="text-white/60 hover:text-white transition-colors text-sm">Modules</a>
+            <a href="#formateur" className="text-white/60 hover:text-white transition-colors text-sm">Formateur</a>
+            <a href="#temoignages" className="text-white/60 hover:text-white transition-colors text-sm">Témoignages</a>
+            <a href="#tarifs" className="text-white/60 hover:text-white transition-colors text-sm">Tarifs</a>
+            <a href="#faq" className="text-white/60 hover:text-white transition-colors text-sm">FAQ</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="hidden sm:block text-white/60 hover:text-white transition-colors text-sm px-4 py-2">Connexion</Link>
+            <Link href="/pricing" className="bg-[#00F5FF] text-black font-semibold px-5 py-2.5 rounded-lg hover:bg-[#00F5FF]/90 transition-colors text-sm">
+              Commencer
+            </Link>
+            <button onClick={() => setMobileMenu(true)} className="md:hidden p-2 text-white/60">
+              <div className="w-6 h-6"><Icons.Menu /></div>
+            </button>
           </div>
         </div>
       </header>
@@ -193,16 +192,14 @@ export default function LandingPage() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenu && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-[#030014]/95 backdrop-blur-xl md:hidden">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-[#0a0f1a]/98 backdrop-blur-xl md:hidden">
             <div className="p-6">
               <div className="flex justify-end mb-8">
-                <button onClick={() => setMobileMenu(false)} className="p-2 text-white/60 hover:text-white">
-                  <div className="w-6 h-6"><Icons.X /></div>
-                </button>
+                <button onClick={() => setMobileMenu(false)} className="p-2 text-white/60"><div className="w-6 h-6"><Icons.X /></div></button>
               </div>
               <nav className="flex flex-col gap-4">
-                {['Formation', 'Modules', 'Tarifs', 'Entreprise'].map(item => (
-                  <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-2xl font-semibold text-white/80 hover:text-white py-2">{item}</a>
+                {['Modules', 'Formateur', 'Témoignages', 'Tarifs', 'FAQ'].map(item => (
+                  <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-xl font-semibold text-white/80 py-2">{item}</a>
                 ))}
                 <hr className="border-white/10 my-4" />
                 <Link href="/login" className="text-white/60 py-2">Connexion</Link>
@@ -213,184 +210,107 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-24 pb-16 px-6">
-        <motion.div style={{ opacity: heroOpacity, scale: heroScale }} className="relative z-10 max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="inline-flex items-center gap-2 bg-[#FF00E5]/10 border border-[#FF00E5]/30 rounded-full px-4 py-2 mb-8">
-            <div className="w-2 h-2 bg-[#FF00E5] rounded-full animate-pulse" />
-            <span className="text-[#FF00E5] text-sm font-medium">Article 4 • Obligation de formation</span>
-          </motion.div>
-
-          {/* Title */}
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-[0.95]">
-            <span className="block">Maîtrisez</span>
-            <span className="block bg-gradient-to-r from-[#00F5FF] via-[#FF00E5] to-[#00FF88] bg-clip-text text-transparent">l'AI Act</span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-xl sm:text-2xl text-white/50 max-w-2xl mx-auto mb-10">
-            La formation complète pour être en conformité avec le règlement européen sur l'intelligence artificielle
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Link href="/pricing" className="group relative bg-gradient-to-r from-[#00F5FF] to-[#00FF88] text-black font-bold px-8 py-4 rounded-xl text-lg overflow-hidden">
-              <span className="relative z-10 flex items-center gap-2">
-                Démarrer maintenant
-                <div className="w-5 h-5 group-hover:translate-x-1 transition-transform"><Icons.ArrowRight /></div>
-              </span>
-              <div className="absolute inset-0 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform" />
-            </Link>
-            <button className="flex items-center gap-3 text-white/60 hover:text-white transition-colors px-6 py-4">
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                <div className="w-5 h-5 ml-0.5"><Icons.Play /></div>
-              </div>
-              Voir la démo
-            </button>
-          </motion.div>
-
-          {/* Floating Badges */}
-          <div className="hidden lg:block">
-            <FloatingBadge delay={0.6} className="absolute -left-20 top-1/4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#00FF88]/15 flex items-center justify-center">
-                  <div className="w-5 h-5 text-[#00FF88]"><Icons.Award /></div>
-                </div>
-                <div className="text-left">
-                  <p className="text-white font-semibold text-sm">Certificat officiel</p>
-                  <p className="text-white/40 text-xs">Reconnu dans l'UE</p>
-                </div>
-              </div>
-            </FloatingBadge>
-
-            <FloatingBadge delay={0.8} className="absolute -right-16 top-1/3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#FFB800]/15 flex items-center justify-center">
-                  <div className="w-5 h-5 text-[#FFB800]"><Icons.Zap /></div>
-                </div>
-                <div className="text-left">
-                  <p className="text-white font-semibold text-sm">6 heures</p>
-                  <p className="text-white/40 text-xs">Formation complète</p>
-                </div>
-              </div>
-            </FloatingBadge>
-
-            <FloatingBadge delay={1} className="absolute left-10 bottom-0">
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  {['JD', 'MM', 'PB'].map((a, i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center text-xs font-bold text-white border-2 border-[#030014]">{a}</div>
-                  ))}
-                </div>
-                <p className="text-white/60 text-sm">+2,500 certifiés</p>
-              </div>
-            </FloatingBadge>
-          </div>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2">
-            <div className="w-1.5 h-3 bg-white/40 rounded-full" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="relative py-16 px-6 border-y border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="text-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                  <div className="w-7 h-7 text-[#00F5FF]"><stat.icon /></div>
-                </div>
-                <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                <p className="text-white/40 text-sm">{stat.label}</p>
+      {/* HERO SECTION */}
+      <section className="relative z-10 pt-12 pb-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Content */}
+            <div>
+              {/* Urgency Badge */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 bg-[#FF4444]/15 border border-[#FF4444]/30 rounded-full px-4 py-2 mb-6">
+                <div className="w-4 h-4 text-[#FF4444]"><Icons.AlertTriangle /></div>
+                <span className="text-[#FF4444] text-sm font-medium">Obligation légale depuis février 2025</span>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Modules Section */}
-      <section id="modules" className="relative py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <span className="text-[#00F5FF] text-sm font-medium uppercase tracking-widest">Programme</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">6 modules pour tout maîtriser</h2>
-            <p className="text-white/50 text-lg max-w-2xl mx-auto">Un parcours progressif conçu par des experts juridiques et des spécialistes de l'IA</p>
-          </motion.div>
+              <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                Formez vos équipes<br />
+                à l'<span className="text-[#00F5FF]">AI Act</span><br />
+                <span className="text-white/40">avant les sanctions</span>
+              </motion.h1>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {modules.map((module, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <GlowCard glow={module.color}>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="text-4xl">{module.icon}</div>
-                      <span className="text-white/30 text-sm">Module {module.num}</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">{module.title}</h3>
-                    <div className="flex items-center gap-2 text-white/40 text-sm">
-                      <div className="w-4 h-4"><Icons.Clock /></div>
-                      {module.duration}
-                    </div>
-                  </div>
-                </GlowCard>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-lg text-white/60 mb-8 max-w-lg">
+                La première formation en ligne certifiante pour mettre votre entreprise en conformité avec le règlement européen sur l'Intelligence Artificielle.
+              </motion.p>
 
-      {/* Why Section */}
-      <section id="formation" className="relative py-24 px-6 bg-gradient-to-b from-transparent via-[#0A0A1B]/50 to-transparent">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <span className="text-[#FF00E5] text-sm font-medium uppercase tracking-widest">Pourquoi cette formation ?</span>
-              <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">L'Article 4 vous concerne</h2>
-              <p className="text-white/50 text-lg mb-8">Le règlement européen AI Act impose une obligation de formation pour toute personne impliquée dans la conception, le déploiement ou l'utilisation de systèmes d'IA.</p>
-              
-              <div className="space-y-4">
+              {/* Features Grid */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="grid grid-cols-2 gap-4 mb-8">
                 {[
-                  { title: "Obligation légale", desc: "Article 4 : formation obligatoire pour tous les acteurs de l'IA" },
-                  { title: "Sanctions lourdes", desc: "Jusqu'à 35M€ ou 7% du CA mondial annuel" },
-                  { title: "Applicable maintenant", desc: "Les premières obligations entrent en vigueur dès 2025" },
+                  { icon: Icons.Clock, text: "6 modules • 8h de formation" },
+                  { icon: Icons.Award, text: "Certification reconnue" },
+                  { icon: Icons.FileText, text: "Templates & checklists inclus" },
+                  { icon: Icons.Headphones, text: "Support expert inclus" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#00FF88]/15 flex items-center justify-center flex-shrink-0 mt-1">
-                      <div className="w-3 h-3 text-[#00FF88]"><Icons.Check /></div>
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
+                      <div className="w-5 h-5 text-[#00F5FF]"><item.icon /></div>
                     </div>
-                    <div>
-                      <h4 className="text-white font-semibold">{item.title}</h4>
-                      <p className="text-white/40 text-sm">{item.desc}</p>
-                    </div>
+                    <span className="text-sm text-white/70">{item.text}</span>
                   </div>
                 ))}
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative">
-              <GlowCard glow="#FF00E5">
-                <div className="p-8">
-                  <div className="text-6xl mb-6">⚖️</div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Calendrier AI Act</h3>
-                  <div className="space-y-4">
+              {/* CTA */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Link href="/quiz" className="group bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-6 py-4 rounded-xl text-center flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                  <div className="w-5 h-5"><Icons.Zap /></div>
+                  Évaluez votre niveau de risque
+                  <div className="w-5 h-5 group-hover:translate-x-1 transition-transform"><Icons.ArrowRight /></div>
+                </Link>
+                <Link href="#tarifs" className="border border-white/20 text-white font-medium px-6 py-4 rounded-xl text-center hover:bg-white/5 transition-colors">
+                  Voir les tarifs
+                </Link>
+              </motion.div>
+
+              {/* Social Proof */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex items-center gap-6">
+                <div className="flex -space-x-2">
+                  {['A', 'B', 'C', 'D', 'E'].map((letter, i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center text-xs font-bold text-white border-2 border-[#0a0f1a]">{letter}</div>
+                  ))}
+                </div>
+                <div className="text-sm">
+                  <span className="text-white font-semibold">+2,847</span>
+                  <span className="text-white/50 ml-1">professionnels formés</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {[1,2,3,4,5].map(i => <div key={i} className="w-4 h-4 text-yellow-400"><Icons.Star /></div>)}
+                  <span className="text-white/50 text-sm ml-1">4.9/5</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right: Countdown Card */}
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+              <GlowCard glow="#FF6B00">
+                <div className="p-6 sm:p-8">
+                  {/* Countdown */}
+                  <div className="text-center mb-6">
+                    <div className="text-6xl sm:text-7xl font-bold text-[#FF6B00]">{daysLeft}</div>
+                    <p className="text-white/50 mt-2">jours avant l'échéance AI Act</p>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-6">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-white/50">Progression vers la deadline</span>
+                      <span className="text-[#FF6B00] font-medium">{Math.round(progressPercent)}%</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#FF6B00] to-[#FF4444] rounded-full" style={{ width: `${progressPercent}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-3">
                     {[
-                      { date: "Août 2024", event: "Entrée en vigueur", active: true },
-                      { date: "Fév 2025", event: "IA interdites", active: true },
-                      { date: "Août 2025", event: "Obligation formation", active: false },
-                      { date: "Août 2026", event: "Obligations complètes", active: false },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4">
-                        <div className={`w-3 h-3 rounded-full ${item.active ? 'bg-[#00FF88]' : 'bg-white/20'}`} />
-                        <div>
-                          <span className={`font-semibold ${item.active ? 'text-white' : 'text-white/50'}`}>{item.date}</span>
-                          <span className="text-white/40 ml-2">— {item.event}</span>
-                        </div>
+                      { value: '35M€', label: 'Amende maximale' },
+                      { value: '7%', label: 'Du CA mondial' },
+                      { value: '100%', label: 'Entreprises concernées' },
+                      { value: 'Art. 4', label: 'Formation obligatoire' },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white/5 rounded-xl p-4 text-center">
+                        <div className="text-xl font-bold text-white">{stat.value}</div>
+                        <div className="text-xs text-white/40">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -401,46 +321,171 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="tarifs" className="relative py-24 px-6">
+      {/* TRUSTED BY / LOGOS */}
+      <section className="relative z-10 py-12 px-6 border-y border-white/5">
         <div className="max-w-6xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <span className="text-[#00FF88] text-sm font-medium uppercase tracking-widest">Tarifs</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">Choisissez votre formule</h2>
-            <p className="text-white/50 text-lg max-w-2xl mx-auto">Des solutions adaptées à chaque besoin, du professionnel indépendant à la grande entreprise</p>
+          <p className="text-center text-white/30 text-sm mb-8">Ils nous font confiance</p>
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-50">
+            {['BNP Paribas', 'Capgemini', 'Orange', 'Société Générale', 'AXA', 'Thales'].map(company => (
+              <div key={company} className="text-white/60 font-semibold text-lg">{company}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Comment ça marche ?</h2>
+            <p className="text-white/50 max-w-xl mx-auto">Un parcours simple et efficace pour vous certifier</p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((step, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <div className="relative bg-white/5 rounded-2xl p-6 text-center h-full border border-white/5 hover:border-[#00F5FF]/30 transition-colors">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#00F5FF] text-black font-bold flex items-center justify-center text-sm">{step.num}</div>
+                  <div className="text-4xl mb-4 mt-4">{step.icon}</div>
+                  <h3 className="text-white font-semibold mb-2">{step.title}</h3>
+                  <p className="text-white/40 text-sm">{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MODULES */}
+      <section id="modules" className="relative z-10 py-20 px-6 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <span className="text-[#00F5FF] text-sm font-medium uppercase tracking-widest">Programme</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">6 modules pour tout maîtriser</h2>
+            <p className="text-white/50 max-w-xl mx-auto">Un parcours progressif conçu par des experts juridiques et des spécialistes de l'IA</p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((module, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <GlowCard glow={module.color}>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="text-4xl">{module.icon}</div>
+                      <span className="text-white/30 text-sm">Module {module.num}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{module.title}</h3>
+                    <div className="flex items-center gap-2 text-white/40 text-sm">
+                      <div className="w-4 h-4"><Icons.Clock /></div>
+                      {module.duration}
+                    </div>
+                  </div>
+                </GlowCard>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-8">
+            <Link href="/pricing" className="inline-flex items-center gap-2 bg-[#00F5FF] text-black font-semibold px-6 py-3 rounded-xl hover:bg-[#00F5FF]/90 transition-colors">
+              Accéder à la formation
+              <div className="w-5 h-5"><Icons.ArrowRight /></div>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* EXPERT / FORMATEUR SECTION */}
+      <section id="formateur" className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <GlowCard glow="#8B5CF6">
+                <div className="p-8">
+                  {/* Expert Image Placeholder */}
+                  <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#00F5FF] flex items-center justify-center text-4xl font-bold text-white mb-6">
+                    JD
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Jean Dupont</h3>
+                  <p className="text-[#8B5CF6] font-medium mb-4">Expert Conformité IA & RGPD</p>
+                  
+                  <div className="space-y-3 text-white/60 text-sm">
+                    <p>• 15 ans d'expérience en conformité réglementaire</p>
+                    <p>• Ancien DPO chez Capgemini et BNP Paribas</p>
+                    <p>• Certifié CIPP/E, CIPM, CIPT (IAPP)</p>
+                    <p>• Intervenant à HEC, Sciences Po et Polytechnique</p>
+                    <p>• Co-auteur du livre "L'IA et le Droit" (Dalloz, 2024)</p>
+                  </div>
+
+                  <div className="flex items-center gap-4 mt-6">
+                    <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors">
+                      <div className="w-5 h-5"><Icons.Linkedin /></div>
+                    </a>
+                    <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-colors">
+                      <div className="w-5 h-5"><Icons.Mail /></div>
+                    </a>
+                  </div>
+                </div>
+              </GlowCard>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <span className="text-[#8B5CF6] text-sm font-medium uppercase tracking-widest">Votre formateur</span>
+              <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-6">Un expert reconnu de la conformité IA</h2>
+              <p className="text-white/60 mb-6">
+                Fort de 15 années d'expérience dans la conformité réglementaire, Jean Dupont a accompagné plus de 200 entreprises dans leur mise en conformité RGPD et prépare désormais les organisations aux exigences de l'AI Act.
+              </p>
+              <p className="text-white/60 mb-8">
+                Sa méthodologie pratique, enrichie de nombreux cas concrets et de templates prêts à l'emploi, vous permettra de mettre rapidement votre entreprise en conformité.
+              </p>
+
+              {/* Credentials */}
+              <div className="flex flex-wrap gap-3">
+                {['CIPP/E', 'CIPM', 'CIPT', 'ISO 27001'].map(cert => (
+                  <span key={cert} className="px-3 py-1 rounded-full bg-[#8B5CF6]/20 text-[#8B5CF6] text-sm font-medium">{cert}</span>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section id="temoignages" className="relative z-10 py-20 px-6 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <span className="text-[#00FF88] text-sm font-medium uppercase tracking-widest">Témoignages</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">Ce que disent nos certifiés</h2>
+            <p className="text-white/50 max-w-xl mx-auto">Plus de 2,800 professionnels ont suivi notre formation</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {plans.map((plan, i) => (
-              <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <GlowCard glow={plan.color} active={plan.popular}>
-                  <div className="p-6">
-                    {plan.popular && (
-                      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium mb-4" style={{ background: `${plan.color}20`, color: plan.color }}>
-                        <div className="w-3 h-3"><Icons.Star /></div>
-                        Populaire
-                      </div>
-                    )}
-                    <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                    <p className="text-white/40 text-sm mb-4">{plan.description}</p>
+            {testimonials.map((testimonial, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <GlowCard glow="#00FF88" className="h-full">
+                  <div className="p-6 flex flex-col h-full">
+                    {/* Stars */}
+                    <div className="flex gap-1 mb-4">
+                      {Array.from({ length: testimonial.rating }).map((_, j) => (
+                        <div key={j} className="w-4 h-4 text-yellow-400"><Icons.Star /></div>
+                      ))}
+                    </div>
                     
-                    <div className="mb-6">
-                      <span className="text-4xl font-bold" style={{ color: plan.color }}>{plan.price.toLocaleString()}€</span>
-                      <span className="text-white/40 ml-2">HT</span>
+                    {/* Quote */}
+                    <div className="flex-1">
+                      <div className="w-8 h-8 text-[#00FF88]/30 mb-2"><Icons.Quote /></div>
+                      <p className="text-white/70 text-sm italic">"{testimonial.quote}"</p>
                     </div>
 
-                    <ul className="space-y-3 mb-6">
-                      {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-white/60 text-sm">
-                          <div className="w-4 h-4" style={{ color: plan.color }}><Icons.Check /></div>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Link href={`/checkout?plan=${plan.id}`} className="block w-full py-3 rounded-xl font-semibold text-center transition-all" style={{ background: plan.popular ? plan.color : 'rgba(255,255,255,0.05)', color: plan.popular ? 'black' : 'white' }}>
-                      {plan.id === 'enterprise' ? 'Nous contacter' : 'Commencer'}
-                    </Link>
+                    {/* Author */}
+                    <div className="flex items-center gap-3 mt-6 pt-4 border-t border-white/10">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00FF88] to-[#00F5FF] flex items-center justify-center text-black font-bold text-sm">
+                        {testimonial.image}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">{testimonial.name}</p>
+                        <p className="text-white/40 text-xs">{testimonial.role}, {testimonial.company}</p>
+                      </div>
+                    </div>
                   </div>
                 </GlowCard>
               </motion.div>
@@ -449,16 +494,148 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* PRICING */}
+      <section id="tarifs" className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <span className="text-[#FFB800] text-sm font-medium uppercase tracking-widest">Tarifs</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">Choisissez votre formule</h2>
+            <p className="text-white/50 max-w-xl mx-auto">Des solutions adaptées à chaque besoin</p>
+          </motion.div>
+
+          {/* Guarantee Banner */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
+            <div className="bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-full bg-[#00FF88]/20 flex items-center justify-center">
+                <div className="w-6 h-6 text-[#00FF88]"><Icons.ShieldCheck /></div>
+              </div>
+              <div>
+                <p className="text-[#00FF88] font-semibold">Garantie satisfait ou remboursé 30 jours</p>
+                <p className="text-white/50 text-sm">Si la formation ne vous convient pas, nous vous remboursons intégralement.</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {plans.map((plan, i) => (
+              <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <div className={`relative h-full ${plan.popular ? 'lg:-mt-4 lg:mb-4' : ''}`}>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <span className="bg-[#00FF88] text-black text-xs font-bold px-3 py-1 rounded-full">Le plus populaire</span>
+                    </div>
+                  )}
+                  <GlowCard glow={plan.color} className="h-full">
+                    <div className="p-6 flex flex-col h-full">
+                      <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                      <p className="text-white/40 text-sm mb-4">{plan.users} utilisateur{parseInt(plan.users) > 1 ? 's' : ''}</p>
+                      
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold" style={{ color: plan.color }}>{plan.price.toLocaleString()}€</span>
+                        <span className="text-white/40 ml-2">HT</span>
+                      </div>
+
+                      <ul className="space-y-3 flex-1 mb-6">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-white/60 text-sm">
+                            <div className="w-4 h-4" style={{ color: plan.color }}><Icons.Check /></div>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Link href={`/checkout?plan=${plan.id}`} className="block w-full py-3 rounded-xl font-semibold text-center transition-all" style={{ background: plan.popular ? plan.color : 'rgba(255,255,255,0.05)', color: plan.popular ? 'black' : 'white' }}>
+                        {plan.id === 'enterprise' ? 'Nous contacter' : 'Commencer'}
+                      </Link>
+                    </div>
+                  </GlowCard>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BONUS SECTION */}
+      <section className="relative z-10 py-20 px-6 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <GlowCard glow="#FFB800">
+              <div className="p-8 text-center">
+                <span className="inline-flex items-center gap-2 bg-[#FFB800]/15 text-[#FFB800] text-sm font-medium px-4 py-2 rounded-full mb-4">
+                  🎁 Bonus offerts
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">847€ de ressources incluses</h2>
+                <p className="text-white/50 mb-8">Avec votre formation, recevez gratuitement :</p>
+                
+                <div className="grid sm:grid-cols-2 gap-4 text-left">
+                  {[
+                    { title: "Pack Templates AI Act", value: "297€", desc: "Registre IA, politique IA, EIAI..." },
+                    { title: "Checklist conformité", value: "150€", desc: "50+ points de contrôle" },
+                    { title: "Guide Article 4", value: "200€", desc: "Obligations détaillées par rôle" },
+                    { title: "Accès communauté", value: "200€", desc: "Réseau de 2,800+ certifiés" },
+                  ].map((bonus, i) => (
+                    <div key={i} className="bg-white/5 rounded-xl p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="text-white font-medium">{bonus.title}</h4>
+                        <span className="text-[#FFB800] text-sm font-semibold">{bonus.value}</span>
+                      </div>
+                      <p className="text-white/40 text-sm">{bonus.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </GlowCard>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="relative z-10 py-20 px-6">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <span className="text-[#00F5FF] text-sm font-medium uppercase tracking-widest">FAQ</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2">Questions fréquentes</h2>
+          </motion.div>
+
+          <div className="space-y-4">
+            {[
+              { q: "Qui est concerné par l'AI Act ?", a: "Toute entreprise qui développe, déploie ou utilise des systèmes d'IA dans l'Union Européenne est concernée. L'Article 4 impose une obligation de formation pour toutes les personnes impliquées." },
+              { q: "La formation est-elle certifiante ?", a: "Oui, vous recevez un certificat officiel attestant de votre formation conformément à l'Article 4 de l'AI Act. Ce certificat est vérifiable en ligne avec un QR code unique." },
+              { q: "Combien de temps dure la formation ?", a: "La formation complète représente environ 8 heures de contenu réparties en 6 modules. Vous pouvez la suivre à votre rythme sur 12 mois." },
+              { q: "Puis-je faire financer la formation ?", a: "Oui, notre formation est éligible au financement par votre OPCO ou votre budget formation entreprise. Contactez-nous pour obtenir un devis." },
+              { q: "Y a-t-il une garantie ?", a: "Oui, nous offrons une garantie satisfait ou remboursé de 30 jours. Si la formation ne vous convient pas, nous vous remboursons intégralement, sans condition." },
+            ].map((faq, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+                <details className="group bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+                  <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
+                    <span className="text-white font-medium pr-4">{faq.q}</span>
+                    <span className="text-white/40 group-open:rotate-45 transition-transform">+</span>
+                  </summary>
+                  <div className="px-5 pb-5 text-white/60 text-sm">{faq.a}</div>
+                </details>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
-            <GlowCard glow="#00F5FF">
-              <div className="p-12">
-                <div className="text-5xl mb-6">🚀</div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Prêt à vous mettre en conformité ?</h2>
-                <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto">Rejoignez les 2,500+ professionnels déjà certifiés et anticipez les obligations de l'AI Act</p>
-                <Link href="/pricing" className="inline-flex items-center gap-2 bg-[#00F5FF] text-black font-bold px-8 py-4 rounded-xl hover:bg-[#00F5FF]/90 transition-colors">
+            <GlowCard glow="#FF6B00">
+              <div className="p-8 sm:p-12 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-[#FF6B00]/20 flex items-center justify-center mx-auto mb-6">
+                  <div className="w-8 h-8 text-[#FF6B00]"><Icons.AlertTriangle /></div>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                  Plus que <span className="text-[#FF6B00]">{daysLeft} jours</span> pour vous mettre en conformité
+                </h2>
+                <p className="text-white/50 mb-8 max-w-xl mx-auto">
+                  Ne risquez pas une amende de 35M€. Formez vos équipes dès maintenant et obtenez votre certificat de conformité.
+                </p>
+                <Link href="/pricing" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity">
                   Démarrer ma formation
                   <div className="w-5 h-5"><Icons.ArrowRight /></div>
                 </Link>
@@ -468,28 +645,82 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* CONTACT SECTION */}
+      <section id="contact" className="relative z-10 py-16 px-6 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-xl font-bold text-white mb-4">Une question ?</h3>
+          <p className="text-white/50 mb-6">Notre équipe est disponible pour vous aider</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="mailto:contact@formation-ia-act.fr" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition-colors">
+              <div className="w-5 h-5 text-[#00F5FF]"><Icons.Mail /></div>
+              contact@formation-ia-act.fr
+            </a>
+            <a href="https://calendly.com/formation-ia-act" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#00F5FF] text-black font-semibold px-6 py-3 rounded-xl hover:bg-[#00F5FF]/90 transition-colors">
+              <div className="w-5 h-5"><Icons.Calendar /></div>
+              Réserver un appel
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="relative py-12 px-6 border-t border-white/5">
+      <footer className="relative z-10 py-12 px-6 border-t border-white/5">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="relative w-8 h-8">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00F5FF] to-[#FF00E5] rounded-lg rotate-45" />
-                <div className="absolute inset-[2px] bg-[#030014] rounded-[6px] rotate-45" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-4 h-4 text-[#00F5FF]"><Icons.Shield /></div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#00F5FF] to-[#0066FF] rounded-lg flex items-center justify-center">
+                  <div className="w-4 h-4 text-white"><Icons.Shield /></div>
                 </div>
+                <span className="font-semibold">Formation-IA-Act.fr</span>
               </div>
-              <span className="font-semibold">AI Act Academy</span>
+              <p className="text-white/40 text-sm">La première formation certifiante sur le règlement européen AI Act.</p>
             </div>
-            
-            <nav className="flex items-center gap-6 text-sm text-white/40">
-              <a href="#" className="hover:text-white transition-colors">Mentions légales</a>
-              <a href="#" className="hover:text-white transition-colors">CGV</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
-            </nav>
-            
-            <p className="text-white/30 text-sm">© 2024 AI Act Academy. Tous droits réservés.</p>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Formation</h4>
+              <ul className="space-y-2 text-sm text-white/40">
+                <li><a href="#modules" className="hover:text-white transition-colors">Modules</a></li>
+                <li><a href="#tarifs" className="hover:text-white transition-colors">Tarifs</a></li>
+                <li><a href="#formateur" className="hover:text-white transition-colors">Formateur</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Légal</h4>
+              <ul className="space-y-2 text-sm text-white/40">
+                <li><Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link></li>
+                <li><Link href="/cgv" className="hover:text-white transition-colors">CGV</Link></li>
+                <li><Link href="/confidentialite" className="hover:text-white transition-colors">Politique de confidentialité</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm text-white/40">
+                <li><a href="mailto:contact@formation-ia-act.fr" className="hover:text-white transition-colors">contact@formation-ia-act.fr</a></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Formulaire de contact</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          {/* Payment & Trust */}
+          <div className="flex flex-wrap items-center justify-center gap-6 py-6 border-t border-white/5 mb-6">
+            <div className="flex items-center gap-2 text-white/30 text-sm">
+              <div className="w-4 h-4"><Icons.ShieldCheck /></div>
+              Paiement sécurisé Stripe
+            </div>
+            <div className="flex items-center gap-2 text-white/30 text-sm">
+              <div className="w-4 h-4"><Icons.CheckCircle /></div>
+              Certificat vérifiable
+            </div>
+            <div className="flex items-center gap-2 text-white/30 text-sm">
+              <div className="w-4 h-4"><Icons.Award /></div>
+              Garantie 30 jours
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/30">
+            <p>© 2024 Formation-IA-Act.fr. Tous droits réservés.</p>
+            <p>Organisme de formation n° 12345678901</p>
           </div>
         </div>
       </footer>
