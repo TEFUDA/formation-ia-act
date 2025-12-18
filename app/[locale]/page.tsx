@@ -898,52 +898,228 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* BONUS SECTION */}
-      <section className="relative z-10 py-20 px-6">
-        <div className="max-w-4xl mx-auto">
+      {/* BONUS SECTION - MASSIVE VALUE */}
+      <section className="relative z-10 py-20 px-6 overflow-hidden">
+        {/* Background glow for emphasis */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FFB800]/10 blur-[150px] rounded-full" />
+        </div>
+
+        <div className="max-w-6xl mx-auto relative">
+          {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            className="text-center mb-12"
+          >
+            <motion.div 
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-[#FFB800]/20 to-[#FF6B00]/20 border border-[#FFB800]/30 rounded-full px-6 py-3 mb-6"
+              animate={{ boxShadow: ['0 0 20px rgba(255,184,0,0.2)', '0 0 40px rgba(255,184,0,0.4)', '0 0 20px rgba(255,184,0,0.2)'] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span className="text-2xl">🎁</span>
+              <span className="text-[#FFB800] font-bold">BONUS EXCLUSIFS</span>
+              <span className="text-2xl">🎁</span>
+            </motion.div>
+            
+            <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4">
+              <motion.span 
+                className="bg-gradient-to-r from-[#FFB800] via-[#FF6B00] to-[#FFB800] bg-clip-text text-transparent"
+                animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
+                transition={{ duration: 5, repeat: Infinity }}
+                style={{ backgroundSize: '200%' }}
+              >
+                847€
+              </motion.span>
+              {' '}de ressources incluses
+            </h2>
+            <p className="text-white/50 text-lg max-w-2xl mx-auto">
+              Tout ce dont vous avez besoin pour mettre votre entreprise en conformité, <span className="text-[#00FF88] font-semibold">offert avec votre formation</span>
+            </p>
+          </motion.div>
+
+          {/* Main Value Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { title: "Pack Templates", value: 297, icon: "📋", desc: "12 documents professionnels prêts à l'emploi", color: '#00F5FF', items: ['Registre IA', 'Politique IA', 'EIAI', 'Gouvernance'] },
+              { title: "Checklists Complètes", value: 150, icon: "✅", desc: "50+ points de contrôle pour votre conformité", color: '#00FF88', items: ['Audit initial', 'Haut risque', 'Marquage CE', 'Article 4'] },
+              { title: "Guides Experts", value: 200, icon: "📚", desc: "Documentation détaillée par nos experts", color: '#8B5CF6', items: ['Guide AI Act', 'Guide Audit', 'Guide Article 4', 'Cas pratiques'] },
+              { title: "Communauté VIP", value: 200, icon: "👥", desc: "Accès à vie à notre réseau de certifiés", color: '#FF6B00', items: ['Slack privé', 'Webinaires', 'Updates légaux', 'Networking'] },
+            ].map((bonus, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, type: "spring" }}
+              >
+                <HoloCard glow={bonus.color} className="h-full">
+                  <div className="p-5 h-full flex flex-col">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <motion.div 
+                        className="text-4xl"
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                      >
+                        {bonus.icon}
+                      </motion.div>
+                      <div className="text-right">
+                        <div className="text-xs text-white/30 line-through">Valeur</div>
+                        <motion.div 
+                          className="text-xl font-bold"
+                          style={{ color: bonus.color }}
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                        >
+                          {bonus.value}€
+                        </motion.div>
+                      </div>
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="text-white font-bold text-lg mb-2">{bonus.title}</h3>
+                    <p className="text-white/40 text-sm mb-4 flex-1">{bonus.desc}</p>
+                    
+                    {/* Items list */}
+                    <div className="space-y-1.5">
+                      {bonus.items.map((item, j) => (
+                        <motion.div 
+                          key={j}
+                          className="flex items-center gap-2 text-white/50 text-xs"
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3 + j * 0.1 }}
+                        >
+                          <div className="w-3 h-3" style={{ color: bonus.color }}><Icons.Check /></div>
+                          {item}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </HoloCard>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* All 12 Resources Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <HoloCard glow="#FFB800">
-              <div className="p-8 text-center relative overflow-hidden">
-                {/* Decorative orb */}
-                <div className="absolute top-4 right-4">
-                  <NeuralOrb color="#FFB800" size="sm" />
-                </div>
-                
-                <motion.span 
-                  className="inline-flex items-center gap-2 bg-[#FFB800]/10 text-[#FFB800] text-sm font-medium px-4 py-2 rounded-full mb-4"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  🎁 Bonus offerts
-                </motion.span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">847€ de ressources incluses</h2>
-                <p className="text-white/40 mb-8">Avec votre formation, recevez gratuitement :</p>
-                
-                <div className="grid sm:grid-cols-2 gap-4 text-left">
-                  {[
-                    { title: "Pack Templates AI Act", value: "297€", desc: "Registre IA, politique IA, EIAI...", color: '#00F5FF' },
-                    { title: "Checklist conformité", value: "150€", desc: "50+ points de contrôle", color: '#00FF88' },
-                    { title: "Guide Article 4", value: "200€", desc: "Obligations détaillées par rôle", color: '#8B5CF6' },
-                    { title: "Accès communauté", value: "200€", desc: "Réseau de 2,800+ certifiés", color: '#FF6B00' },
-                  ].map((bonus, i) => (
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
                     <motion.div 
-                      key={i} 
-                      className="bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors"
+                      className="w-10 h-10 rounded-xl bg-[#FFB800]/20 flex items-center justify-center"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    >
+                      <span className="text-xl">📦</span>
+                    </motion.div>
+                    <div>
+                      <h4 className="text-white font-bold">12 fichiers professionnels</h4>
+                      <p className="text-white/40 text-sm">Téléchargeables immédiatement après inscription</p>
+                    </div>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-2 bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-full px-4 py-2">
+                    <div className="w-4 h-4 text-[#00FF88]"><Icons.Check /></div>
+                    <span className="text-[#00FF88] text-sm font-medium">Inclus dans toutes les formules</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {[
+                    { name: "Template Registre IA", type: "Excel", icon: "📊", color: "#00FF88" },
+                    { name: "Modèle Politique IA", type: "Word", icon: "📄", color: "#00F5FF" },
+                    { name: "Checklist Conformité", type: "Excel", icon: "✅", color: "#FF6B00" },
+                    { name: "Template Doc Technique", type: "Word", icon: "📋", color: "#8B5CF6" },
+                    { name: "Matrice Risques", type: "Excel", icon: "⚠️", color: "#FF4444" },
+                    { name: "Guide AI Act", type: "PDF", icon: "📚", color: "#00F5FF" },
+                    { name: "Fiche Référent IA", type: "Word", icon: "👤", color: "#FFB800" },
+                    { name: "Plan Audit Type", type: "Excel", icon: "🔍", color: "#00FF88" },
+                    { name: "Tableau Conformité", type: "Excel", icon: "📈", color: "#00F5FF" },
+                    { name: "Guide Audit", type: "PDF", icon: "📖", color: "#8B5CF6" },
+                    { name: "Checklist CE", type: "Excel", icon: "🏷️", color: "#FF4444" },
+                    { name: "Exemples Secteurs", type: "PDF", icon: "🏢", color: "#FFB800" },
+                  ].map((file, i) => (
+                    <motion.div
+                      key={i}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all cursor-default group"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.03 }}
                       whileHover={{ scale: 1.02 }}
                     >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-white font-medium">{bonus.title}</h4>
-                        <span className="text-sm font-bold" style={{ color: bonus.color }}>{bonus.value}</span>
+                      <motion.div 
+                        className="text-xl"
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                      >
+                        {file.icon}
+                      </motion.div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-xs font-medium truncate group-hover:text-[#FFB800] transition-colors">{file.name}</p>
+                        <p className="text-white/30 text-xs">{file.type}</p>
                       </div>
-                      <p className="text-white/30 text-sm">{bonus.desc}</p>
                     </motion.div>
                   ))}
                 </div>
               </div>
             </HoloCard>
+          </motion.div>
+
+          {/* Total Value Banner */}
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="relative overflow-hidden rounded-2xl">
+              {/* Animated gradient background */}
+              <motion.div 
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(90deg, #FFB800, #FF6B00, #FF4444, #FF6B00, #FFB800)' }}
+                animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+              />
+              
+              <div className="relative px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4 text-center sm:text-left">
+                  <motion.div 
+                    className="text-5xl"
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  >
+                    💎
+                  </motion.div>
+                  <div>
+                    <p className="text-black/70 text-sm font-medium">Valeur totale des bonus</p>
+                    <motion.p 
+                      className="text-3xl sm:text-4xl font-black text-black"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      847€ → OFFERTS
+                    </motion.p>
+                  </div>
+                </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link 
+                    href="/pricing" 
+                    className="inline-flex items-center gap-2 bg-black text-white font-bold px-8 py-4 rounded-xl hover:bg-black/80 transition-colors"
+                  >
+                    Obtenir les bonus
+                    <div className="w-5 h-5"><Icons.ArrowRight /></div>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
