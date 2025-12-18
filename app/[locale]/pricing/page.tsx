@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, User, Users, Building2, ArrowRight, CreditCard, Shield, Zap } from 'lucide-react';
+import { Check, User, Users, Building2, ArrowRight, CreditCard, Shield, Zap, Gift } from 'lucide-react';
 import Link from 'next/link';
 
 const plans = [
@@ -68,6 +68,15 @@ const plans = [
 
 export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<string>('equipe');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePayment = () => {
+    setIsProcessing(true);
+    // Simule un délai de paiement puis redirige
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -88,8 +97,9 @@ export default function PricingPage() {
       <main className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-medium px-4 py-1 rounded-full mb-4">
-              🎁 12 ressources offertes (847€ de valeur)
+            <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 text-sm font-medium px-4 py-2 rounded-full mb-4">
+              <Gift className="w-4 h-4" />
+              12 ressources offertes (847€ de valeur)
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Choisissez votre formule
@@ -163,14 +173,24 @@ export default function PricingPage() {
           transition={{ delay: 0.4 }}
           className="max-w-md mx-auto"
         >
-          <Link
-            href="/login"
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold py-4 px-8 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-3 text-lg shadow-lg shadow-emerald-500/25"
+          <button
+            onClick={handlePayment}
+            disabled={isProcessing}
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold py-4 px-8 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-3 text-lg shadow-lg shadow-emerald-500/25 disabled:opacity-50"
           >
-            <CreditCard className="w-6 h-6" />
-            Payer {plans.find(p => p.id === selectedPlan)?.price.toLocaleString('fr-FR')}€ HT
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+            {isProcessing ? (
+              <>
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Traitement en cours...
+              </>
+            ) : (
+              <>
+                <CreditCard className="w-6 h-6" />
+                Payer {plans.find(p => p.id === selectedPlan)?.price.toLocaleString('fr-FR')}€ HT
+                <ArrowRight className="w-5 h-5" />
+              </>
+            )}
+          </button>
           
           <div className="flex items-center justify-center gap-6 mt-6 text-sm text-slate-400">
             <div className="flex items-center gap-2">
