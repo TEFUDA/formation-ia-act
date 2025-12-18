@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import DevButtons from '@/components/DevButtons'
+import DevTools from '@/components/DevTools'
 import '../globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -20,27 +20,14 @@ export default async function LocaleLayout({
   params: { locale: string }
 }) {
   const messages = await getMessages()
-// app/[locale]/layout.tsx
 
-import DevTools from '@/app/components/DevTools';
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <DevTools />  {/* ← Ajoute ça */}
-      </body>
-    </html>
-  );
-}
   return (
     <html lang={locale} className="dark">
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
           {children}
-          <DevButtons />
         </NextIntlClientProvider>
+        <DevTools />
       </body>
     </html>
   )
