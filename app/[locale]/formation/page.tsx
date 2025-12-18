@@ -313,7 +313,7 @@ export default function FormationPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-white/5">
+            <div className="p-4 border-t border-white/5 space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-white/40">XP à gagner</span>
                 <span className="text-yellow-400 font-bold flex items-center gap-1">
@@ -321,6 +321,15 @@ export default function FormationPage() {
                   {currentModule.xp}
                 </span>
               </div>
+              
+              {/* Resources Link */}
+              <button 
+                onClick={() => router.push('/dashboard#ressources')} 
+                className="w-full flex items-center gap-2 p-3 bg-[#FFB800]/10 hover:bg-[#FFB800]/20 border border-[#FFB800]/20 rounded-xl text-[#FFB800] text-sm font-medium transition-colors"
+              >
+                <span className="text-lg">📦</span>
+                <span>12 ressources à télécharger</span>
+              </button>
             </div>
           </motion.aside>
         )}
