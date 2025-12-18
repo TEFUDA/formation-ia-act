@@ -1,1833 +1,874 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import {
-  Users, UserPlus, Mail, Search,
-  CheckCircle, Clock, AlertCircle, Trophy, TrendingUp,
-  Download, RefreshCw, X, Send, Trash2, Shield,
-  Building2, Crown, BarChart3, Award,
-  BookOpen, Target, Zap, ChevronDown, LogOut,
-  Settings, Copy, Check, Eye, UserMinus, Bell,
-  Sparkles, ArrowUpRight, CreditCard, Star
-} from 'lucide-react';
-import Link from 'next/link';
 
-// Types
-interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  role: 'admin' | 'employee';
-  status: 'active' | 'inactive' | 'completed' | 'not_started';
-  progress: number;
-  modulesCompleted: number;
-  averageQuizScore: number;
-  lastActivity: string;
-  certificateIssued: boolean;
-  certificateDate?: string;
-  certificateId?: string;
-  invitedAt: string;
-}
+// Icons as simple SVG components for cleaner code
+const IconShield = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
 
-interface Invitation {
-  id: string;
-  email: string;
-  sentAt: string;
-  expiresAt: string;
-  status: 'pending' | 'expired';
-}
+const IconPlay = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+);
 
-interface CompanyData {
-  name: string;
-  plan: 'equipe' | 'enterprise';
-  seats: number;
-  usedSeats: number;
-  planPrice: number;
-}
+const IconCheck = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
 
-// Plans configuration
-const PLANS = {
-  equipe: {
-    name: 'Équipe',
-    price: 2000,
-    seats: 5,
-    color: 'cyan'
-  },
-  enterprise: {
-    name: 'Enterprise',
-    price: 18000,
-    seats: 50,
-    color: 'purple'
-  }
-};
+const IconLock = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
 
-// Données admin simulées
-const adminData = {
-  id: 'admin-123',
+const IconFlame = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <path d="M12 2c0 5-4 6-4 10a4 4 0 0 0 8 0c0-4-4-5-4-10z"/>
+  </svg>
+);
+
+const IconZap = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+
+const IconAward = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+  </svg>
+);
+
+const IconUsers = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+// User data
+const userData = {
   name: 'Jean',
   lastName: 'Dupont',
-  email: 'jean.dupont@acme.com',
   avatar: 'JD',
+  role: 'admin' as const,
+  streak: 7,
+  xp: 1250,
+  level: 4,
 };
 
-// Données entreprise simulées - Plan Équipe par défaut
-const initialCompanyData: CompanyData = {
-  name: 'Acme Corporation',
-  plan: 'equipe', // Changer à 'enterprise' pour tester
-  seats: 5, // 5 pour equipe, 50 pour enterprise
-  usedSeats: 4,
-  planPrice: 2000,
-};
-
-const initialTeamMembers: TeamMember[] = [
-  {
-    id: '1',
-    name: 'Jean Dupont',
-    email: 'jean.dupont@acme.com',
-    avatar: 'JD',
-    role: 'admin',
-    status: 'completed',
+// Modules with neural theme
+const modules = [
+  { 
+    id: 1, 
+    title: "Fondamentaux de l'AI Act",
+    subtitle: "Origines • Objectifs • Calendrier",
+    duration: "45 min",
+    lessons: 5,
+    xp: 150,
+    completed: true, 
     progress: 100,
-    modulesCompleted: 6,
-    averageQuizScore: 92,
-    lastActivity: 'Il y a 2 heures',
-    certificateIssued: true,
-    certificateDate: '2024-01-28',
-    certificateId: 'CERT-2024-001',
-    invitedAt: '2024-01-15',
+    quizScore: 92,
+    color: '#00F5FF',
+    neuralNodes: 12,
   },
-  {
-    id: '2',
-    name: 'Marie Martin',
-    email: 'marie.martin@acme.com',
-    avatar: 'MM',
-    role: 'employee',
-    status: 'completed',
+  { 
+    id: 2, 
+    title: "Classification des Risques",
+    subtitle: "4 niveaux • Interdictions • Obligations",
+    duration: "1h",
+    lessons: 6,
+    xp: 200,
+    completed: true, 
     progress: 100,
-    modulesCompleted: 6,
-    averageQuizScore: 95,
-    lastActivity: 'Il y a 1 jour',
-    certificateIssued: true,
-    certificateDate: '2024-01-25',
-    certificateId: 'CERT-2024-002',
-    invitedAt: '2024-01-16',
+    quizScore: 88,
+    color: '#00FF88',
+    neuralNodes: 18,
   },
-  {
-    id: '3',
-    name: 'Pierre Bernard',
-    email: 'pierre.bernard@acme.com',
-    avatar: 'PB',
-    role: 'employee',
-    status: 'active',
-    progress: 67,
-    modulesCompleted: 4,
-    averageQuizScore: 78,
-    lastActivity: 'Il y a 3 jours',
-    certificateIssued: false,
-    invitedAt: '2024-01-20',
+  { 
+    id: 3, 
+    title: "Cartographie des Systèmes",
+    subtitle: "Audit • Registre • Impact",
+    duration: "1h15",
+    lessons: 7,
+    xp: 250,
+    completed: false, 
+    progress: 57,
+    currentLesson: 5,
+    quizScore: null,
+    color: '#FF00E5',
+    neuralNodes: 24,
   },
-  {
-    id: '4',
-    name: 'Sophie Leroy',
-    email: 'sophie.leroy@acme.com',
-    avatar: 'SL',
-    role: 'employee',
-    status: 'active',
-    progress: 33,
-    modulesCompleted: 2,
-    averageQuizScore: 82,
-    lastActivity: 'Il y a 5 jours',
-    certificateIssued: false,
-    invitedAt: '2024-01-22',
+  { 
+    id: 4, 
+    title: "Gouvernance IA",
+    subtitle: "Politique • Référent • Comité",
+    duration: "1h",
+    lessons: 5,
+    xp: 200,
+    completed: false, 
+    progress: 0,
+    quizScore: null,
+    color: '#FFB800',
+    neuralNodes: 15,
+  },
+  { 
+    id: 5, 
+    title: "Systèmes Haut Risque",
+    subtitle: "Documentation • Marquage CE",
+    duration: "1h30",
+    lessons: 8,
+    xp: 300,
+    completed: false, 
+    progress: 0,
+    quizScore: null,
+    color: '#FF4444',
+    neuralNodes: 30,
+  },
+  { 
+    id: 6, 
+    title: "Audit & Conformité",
+    subtitle: "Contrôles • Sanctions • Amélioration",
+    duration: "1h",
+    lessons: 6,
+    xp: 250,
+    completed: false, 
+    progress: 0,
+    quizScore: null,
+    color: '#8B5CF6',
+    neuralNodes: 20,
   },
 ];
 
-const initialInvitations: Invitation[] = [
-  { id: 'inv-1', email: 'lucas.petit@acme.com', sentAt: '25 Jan 2024', expiresAt: '01 Fév 2024', status: 'pending' },
-];
-
-export default function AdminDashboardPage() {
-  const router = useRouter();
+// Neural Network Background Component
+const NeuralBackground = () => {
+  const [nodes, setNodes] = useState<{x: number, y: number, size: number, delay: number}[]>([]);
   
-  // State
-  const [activeTab, setActiveTab] = useState<'overview' | 'team' | 'invitations' | 'certificates'>('overview');
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showMemberModal, setShowMemberModal] = useState<TeamMember | null>(null);
-  const [showRemoveConfirm, setShowRemoveConfirm] = useState<string | null>(null);
-  const [showCancelInviteConfirm, setShowCancelInviteConfirm] = useState<string | null>(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [showCertificatePreview, setShowCertificatePreview] = useState<TeamMember | null>(null);
-  
-  // Data state
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
-  const [invitations, setInvitations] = useState<Invitation[]>(initialInvitations);
-  const [companyData, setCompanyData] = useState<CompanyData>(initialCompanyData);
-  
-  // Form state
-  const [inviteEmails, setInviteEmails] = useState<string[]>(['']);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterRole, setFilterRole] = useState<string>('all');
-  
-  // UI state
-  const [isInviting, setIsInviting] = useState(false);
-  const [inviteSuccess, setInviteSuccess] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
-  const [resendingId, setResendingId] = useState<string | null>(null);
-  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
-  const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
-  const [downloadingCertificates, setDownloadingCertificates] = useState<string[]>([]);
-
-  // Calculs
-  const currentPlan = PLANS[companyData.plan];
-  const maxSeats = currentPlan.seats;
-  const seatsRemaining = maxSeats - companyData.usedSeats;
-  const pendingInvitationsCount = invitations.filter(i => i.status === 'pending').length;
-  
-  // Membres avec certificat
-  const certifiedMembers = teamMembers.filter(m => m.certificateIssued);
-  
-  // Stats
-  const stats = {
-    totalMembers: teamMembers.length,
-    activeMembersThisWeek: teamMembers.filter(m => m.status === 'active' || m.status === 'completed').length,
-    averageProgress: teamMembers.length > 0 ? Math.round(teamMembers.reduce((acc, m) => acc + m.progress, 0) / teamMembers.length) : 0,
-    averageQuizScore: teamMembers.length > 0 ? Math.round(teamMembers.reduce((acc, m) => acc + m.averageQuizScore, 0) / teamMembers.length) : 0,
-    certificatesIssued: certifiedMembers.length,
-    membersCompleted: teamMembers.filter(m => m.status === 'completed').length,
-    seatsRemaining,
-    pendingInvitations: pendingInvitationsCount,
-  };
-
-  // Filtered members
-  const filteredMembers = teamMembers.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          member.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || member.status === filterStatus;
-    const matchesRole = filterRole === 'all' || member.role === filterRole;
-    return matchesSearch && matchesStatus && matchesRole;
-  });
-
-  // Notification
-  const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
-  // Status badge
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Terminé</span>;
-      case 'active':
-        return <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full flex items-center gap-1"><Clock className="w-3 h-3" /> En cours</span>;
-      case 'inactive':
-        return <span className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded-full flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Inactif</span>;
-      default:
-        return <span className="px-2 py-1 bg-slate-500/20 text-slate-400 text-xs rounded-full">Non commencé</span>;
-    }
-  };
-
-  // Email validation
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validEmailsCount = inviteEmails.filter(e => isValidEmail(e)).length;
-
-  // ===== ACTIONS =====
-
-  const handleAddEmailField = () => {
-    if (inviteEmails.length < seatsRemaining) {
-      setInviteEmails([...inviteEmails, '']);
-    }
-  };
-
-  const handleRemoveEmailField = (index: number) => {
-    if (inviteEmails.length > 1) {
-      setInviteEmails(inviteEmails.filter((_, i) => i !== index));
-    }
-  };
-
-  const handleEmailChange = (index: number, value: string) => {
-    const newEmails = [...inviteEmails];
-    newEmails[index] = value;
-    setInviteEmails(newEmails);
-  };
-
-  const handleOpenInviteModal = () => {
-    if (seatsRemaining === 0) {
-      // Si plus de places, proposer l'upgrade
-      if (companyData.plan === 'equipe') {
-        setShowUpgradeModal(true);
-      } else {
-        showNotification('error', 'Toutes vos places sont utilisées. Contactez-nous pour augmenter votre quota.');
-      }
-    } else {
-      setShowInviteModal(true);
-    }
-  };
-
-  const handleInvite = async () => {
-    const validEmails = inviteEmails.filter(e => isValidEmail(e));
-    if (validEmails.length === 0) return;
-
-    // Vérifier qu'on ne dépasse pas la limite
-    if (validEmails.length > seatsRemaining) {
-      showNotification('error', `Vous ne pouvez inviter que ${seatsRemaining} personne(s) avec votre forfait actuel.`);
-      return;
-    }
-
-    setIsInviting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const newInvitations: Invitation[] = validEmails.map((email, i) => ({
-      id: `inv-new-${Date.now()}-${i}`,
-      email,
-      sentAt: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-      status: 'pending' as const,
+  useEffect(() => {
+    const generatedNodes = Array.from({ length: 50 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 3 + 1,
+      delay: Math.random() * 5,
     }));
-    
-    setInvitations([...newInvitations, ...invitations]);
-    setCompanyData(prev => ({ ...prev, usedSeats: prev.usedSeats + validEmails.length }));
-    setInviteSuccess(true);
-    
-    setTimeout(() => {
-      setShowInviteModal(false);
-      setInviteEmails(['']);
-      setInviteSuccess(false);
-      setIsInviting(false);
-      showNotification('success', `${validEmails.length} invitation${validEmails.length > 1 ? 's' : ''} envoyée${validEmails.length > 1 ? 's' : ''}`);
-    }, 1500);
-  };
-
-  const handleResendInvite = async (invitation: Invitation) => {
-    setResendingId(invitation.id);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setInvitations(prev => prev.map(inv => 
-      inv.id === invitation.id 
-        ? { 
-            ...inv, 
-            sentAt: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-            status: 'pending' as const
-          }
-        : inv
-    ));
-    
-    setResendingId(null);
-    setResendSuccess(invitation.id);
-    setTimeout(() => setResendSuccess(null), 2000);
-    showNotification('success', `Invitation renvoyée à ${invitation.email}`);
-  };
-
-  const handleCancelInvite = async (id: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const invitation = invitations.find(i => i.id === id);
-    setInvitations(prev => prev.filter(inv => inv.id !== id));
-    setCompanyData(prev => ({ ...prev, usedSeats: Math.max(prev.usedSeats - 1, teamMembers.length) }));
-    setShowCancelInviteConfirm(null);
-    showNotification('success', `Invitation annulée pour ${invitation?.email}`);
-  };
-
-  const handleRemoveMember = async (memberId: string) => {
-    const member = teamMembers.find(m => m.id === memberId);
-    if (member?.role === 'admin') {
-      showNotification('error', 'Impossible de supprimer un administrateur');
-      return;
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setTeamMembers(prev => prev.filter(m => m.id !== memberId));
-    setCompanyData(prev => ({ ...prev, usedSeats: prev.usedSeats - 1 }));
-    setShowRemoveConfirm(null);
-    setShowMemberModal(null);
-    showNotification('success', `${member?.name} a été retiré de l'équipe`);
-  };
-
-  const handleCopyEmail = (email: string) => {
-    navigator.clipboard.writeText(email);
-    setCopiedEmail(email);
-    setTimeout(() => setCopiedEmail(null), 2000);
-  };
-
-  const handleExportData = () => {
-    const data = teamMembers.map(m => ({
-      Nom: m.name,
-      Email: m.email,
-      Role: m.role,
-      Statut: m.status,
-      Progression: `${m.progress}%`,
-      Modules: `${m.modulesCompleted}/6`,
-      'Score Quiz': `${m.averageQuizScore}%`,
-      Certificat: m.certificateIssued ? 'Oui' : 'Non',
-      'Date Certificat': m.certificateDate || '-',
-      'ID Certificat': m.certificateId || '-',
-    }));
-    
-    const csv = [
-      Object.keys(data[0]).join(','),
-      ...data.map(row => Object.values(row).join(','))
-    ].join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `equipe-formation-ia-act-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    
-    showNotification('success', 'Export téléchargé');
-  };
-
-  const handleSendReminders = async () => {
-    const inactiveMembers = teamMembers.filter(m => m.status === 'inactive' || m.status === 'not_started');
-    if (inactiveMembers.length === 0) {
-      showNotification('info', 'Aucun membre inactif à relancer');
-      return;
-    }
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    showNotification('success', `Rappel envoyé à ${inactiveMembers.length} membre${inactiveMembers.length > 1 ? 's' : ''}`);
-  };
-
-  // Télécharger un certificat
-  const handleDownloadCertificate = async (member: TeamMember) => {
-    if (!member.certificateIssued) return;
-    
-    setDownloadingCertificates(prev => [...prev, member.id]);
-    
-    // Simuler le téléchargement
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // En production: appeler une API pour générer le PDF
-    showNotification('success', `Certificat de ${member.name} téléchargé`);
-    
-    setDownloadingCertificates(prev => prev.filter(id => id !== member.id));
-  };
-
-  // Télécharger tous les certificats
-  const handleDownloadAllCertificates = async () => {
-    if (certifiedMembers.length === 0) {
-      showNotification('info', 'Aucun certificat à télécharger');
-      return;
-    }
-    
-    setDownloadingCertificates(certifiedMembers.map(m => m.id));
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    showNotification('success', `${certifiedMembers.length} certificat${certifiedMembers.length > 1 ? 's' : ''} téléchargé${certifiedMembers.length > 1 ? 's' : ''} (ZIP)`);
-    
-    setDownloadingCertificates([]);
-  };
-
-  // Upgrade vers Enterprise
-  const handleUpgrade = () => {
-    // En production: rediriger vers Stripe
-    showNotification('info', 'Redirection vers le paiement...');
-    setTimeout(() => {
-      setCompanyData(prev => ({
-        ...prev,
-        plan: 'enterprise',
-        seats: 50,
-        planPrice: 18000,
-      }));
-      setShowUpgradeModal(false);
-      showNotification('success', 'Félicitations ! Vous êtes passé au plan Enterprise (50 places)');
-    }, 1500);
-  };
-
-  const handleLogout = () => {
-    router.push('/');
-  };
+    setNodes(generatedNodes);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#0f172a]">
-      {/* Notification Toast */}
-      <AnimatePresence>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 ${
-              notification.type === 'success' 
-                ? 'bg-emerald-500 text-white' 
-                : notification.type === 'error'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-cyan-500 text-white'
-            }`}
-          >
-            {notification.type === 'success' ? <CheckCircle className="w-5 h-5" /> : 
-             notification.type === 'error' ? <AlertCircle className="w-5 h-5" /> :
-             <Sparkles className="w-5 h-5" />}
-            {notification.message}
-          </motion.div>
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Gradient mesh background */}
+      <div className="absolute inset-0 bg-[#030014]" />
+      
+      {/* Organic gradient blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#00F5FF]/5 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#FF00E5]/5 blur-[150px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+      <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] rounded-full bg-[#00FF88]/5 blur-[100px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '4s' }} />
+      
+      {/* Neural nodes */}
+      <svg className="absolute inset-0 w-full h-full opacity-30">
+        {nodes.map((node, i) => (
+          <g key={i}>
+            <circle
+              cx={`${node.x}%`}
+              cy={`${node.y}%`}
+              r={node.size}
+              fill="#00F5FF"
+              opacity="0.6"
+            >
+              <animate
+                attributeName="opacity"
+                values="0.2;0.8;0.2"
+                dur={`${3 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="r"
+                values={`${node.size};${node.size * 1.5};${node.size}`}
+                dur={`${4 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          </g>
+        ))}
+        {/* Connection lines */}
+        {nodes.slice(0, 20).map((node, i) => {
+          const nextNode = nodes[(i + 1) % 20];
+          return (
+            <line
+              key={`line-${i}`}
+              x1={`${node.x}%`}
+              y1={`${node.y}%`}
+              x2={`${nextNode.x}%`}
+              y2={`${nextNode.y}%`}
+              stroke="url(#neuralGradient)"
+              strokeWidth="0.5"
+              opacity="0.2"
+            >
+              <animate
+                attributeName="opacity"
+                values="0.1;0.3;0.1"
+                dur={`${5 + node.delay}s`}
+                repeatCount="indefinite"
+              />
+            </line>
+          );
+        })}
+        <defs>
+          <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00F5FF" />
+            <stop offset="50%" stopColor="#FF00E5" />
+            <stop offset="100%" stopColor="#00FF88" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Scan line effect */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div 
+          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent"
+          style={{
+            animation: 'scanline 8s linear infinite',
+          }}
+        />
+      </div>
+
+      {/* Grid overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      <style jsx>{`
+        @keyframes scanline {
+          0% { transform: translateY(-100vh); }
+          100% { transform: translateY(100vh); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Holographic Card Component
+const HoloCard = ({ children, className = '', glow = '#00F5FF', hover = true }: { 
+  children: React.ReactNode, 
+  className?: string,
+  glow?: string,
+  hover?: boolean 
+}) => (
+  <motion.div
+    whileHover={hover ? { scale: 1.02, y: -4 } : {}}
+    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+    className={`relative group ${className}`}
+  >
+    {/* Glow effect */}
+    <div 
+      className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+      style={{ background: `${glow}20` }}
+    />
+    
+    {/* Holographic border */}
+    <div 
+      className="absolute -inset-[1px] rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity"
+      style={{
+        background: `linear-gradient(135deg, ${glow}40, transparent 40%, transparent 60%, ${glow}40)`,
+      }}
+    />
+    
+    {/* Main card */}
+    <div className="relative bg-[#0A0A1B]/80 backdrop-blur-xl rounded-2xl border border-white/5 overflow-hidden">
+      {/* Inner glow */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity"
+        style={{ background: `radial-gradient(circle at 50% 0%, ${glow}, transparent 70%)` }}
+      />
+      
+      {/* Noise texture */}
+      <div className="absolute inset-0 opacity-[0.015]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+      }} />
+      
+      <div className="relative">{children}</div>
+    </div>
+  </motion.div>
+);
+
+// Liquid Progress Bar
+const LiquidProgress = ({ progress, color }: { progress: number, color: string }) => (
+  <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: `${progress}%` }}
+      transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+      className="absolute inset-y-0 left-0 rounded-full"
+      style={{ 
+        background: `linear-gradient(90deg, ${color}, ${color}88)`,
+        boxShadow: `0 0 20px ${color}60, inset 0 0 10px rgba(255,255,255,0.2)`,
+      }}
+    >
+      {/* Liquid wave effect */}
+      <div className="absolute inset-0 overflow-hidden rounded-full">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)`,
+            animation: 'liquidWave 2s linear infinite',
+          }}
+        />
+      </div>
+    </motion.div>
+    <style jsx>{`
+      @keyframes liquidWave {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+    `}</style>
+  </div>
+);
+
+// Neural Orb Component (for modules)
+const NeuralOrb = ({ color, progress, completed, size = 'md' }: { 
+  color: string, 
+  progress: number, 
+  completed: boolean,
+  size?: 'sm' | 'md' | 'lg'
+}) => {
+  const sizes = { sm: 40, md: 56, lg: 80 };
+  const s = sizes[size];
+  
+  return (
+    <div className="relative" style={{ width: s, height: s }}>
+      {/* Outer glow */}
+      <div 
+        className="absolute inset-0 rounded-full blur-lg opacity-50"
+        style={{ background: color }}
+      />
+      
+      {/* Progress ring */}
+      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="rgba(255,255,255,0.1)"
+          strokeWidth="4"
+        />
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke={color}
+          strokeWidth="4"
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: progress / 100 }}
+          transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
+          style={{
+            strokeDasharray: '283',
+            filter: `drop-shadow(0 0 6px ${color})`,
+          }}
+        />
+      </svg>
+      
+      {/* Inner orb */}
+      <div 
+        className="absolute inset-2 rounded-full flex items-center justify-center"
+        style={{ 
+          background: `radial-gradient(circle at 30% 30%, ${color}40, ${color}10)`,
+          border: `1px solid ${color}40`,
+        }}
+      >
+        {completed ? (
+          <div className="w-5 h-5 text-white">
+            <IconCheck />
+          </div>
+        ) : progress > 0 ? (
+          <span className="text-white font-bold text-sm">{progress}%</span>
+        ) : (
+          <div className="w-4 h-4 text-white/60">
+            <IconLock />
+          </div>
         )}
-      </AnimatePresence>
+      </div>
+      
+      {/* Pulse effect for active */}
+      {progress > 0 && !completed && (
+        <div 
+          className="absolute inset-0 rounded-full animate-ping opacity-20"
+          style={{ background: color, animationDuration: '2s' }}
+        />
+      )}
+    </div>
+  );
+};
 
+// Stats Orb (for header stats)
+const StatsOrb = ({ icon, value, label, color }: { 
+  icon: React.ReactNode, 
+  value: string | number, 
+  label: string,
+  color: string 
+}) => (
+  <div className="flex items-center gap-3">
+    <div 
+      className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+      style={{ 
+        background: `linear-gradient(135deg, ${color}20, ${color}05)`,
+        border: `1px solid ${color}30`,
+        boxShadow: `0 0 20px ${color}10`,
+      }}
+    >
+      <div className="w-5 h-5" style={{ color }}>{icon}</div>
+    </div>
+    <div>
+      <div className="text-white font-bold text-lg leading-none">{value}</div>
+      <div className="text-white/40 text-xs mt-0.5">{label}</div>
+    </div>
+  </div>
+);
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const [showMenu, setShowMenu] = useState(false);
+  const [hoveredModule, setHoveredModule] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculations
+  const completedModules = modules.filter(m => m.completed).length;
+  const totalProgress = Math.round(modules.reduce((acc, m) => acc + m.progress, 0) / modules.length);
+  const currentModule = modules.find(m => !m.completed && m.progress > 0) || modules.find(m => !m.completed);
+  const totalXP = modules.reduce((acc, m) => acc + m.xp, 0);
+  const earnedXP = modules.filter(m => m.completed).reduce((acc, m) => acc + m.xp, 0);
+  const isAdmin = userData.role === 'admin';
+
+  const handleStartModule = (moduleId: number) => {
+    router.push(`/formation?module=${moduleId}&lesson=1`);
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <div className="min-h-screen relative">
+      <NeuralBackground />
+      
       {/* Header */}
-      <header className="bg-[#0f172a]/95 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+      <header className="relative z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <div className="relative w-12 h-12">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#00F5FF] to-[#FF00E5] rounded-xl rotate-45 transform-gpu" />
+                <div className="absolute inset-[2px] bg-[#030014] rounded-[10px] rotate-45" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 text-[#00F5FF]">
+                    <IconShield />
+                  </div>
+                </div>
               </div>
-              <span className="text-lg font-bold text-white hidden sm:block">Formation AI Act</span>
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg px-3 py-1.5 text-cyan-400 text-sm font-medium transition-colors"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">Ma formation</span>
-              </Link>
-
-              {/* Plan Badge */}
-              <div className={`flex items-center gap-2 ${
-                companyData.plan === 'enterprise' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-cyan-500/10 border-cyan-500/30'
-              } border rounded-full px-3 py-1.5`}>
-                <Crown className={`w-4 h-4 ${companyData.plan === 'enterprise' ? 'text-purple-400' : 'text-cyan-400'}`} />
-                <span className={`text-sm font-medium hidden sm:inline ${companyData.plan === 'enterprise' ? 'text-purple-400' : 'text-cyan-400'}`}>
-                  {currentPlan.name}
-                </span>
+              <div>
+                <h1 className="text-white font-semibold tracking-tight">AI Act Academy</h1>
+                <p className="text-white/30 text-xs tracking-widest uppercase">Neural Learning System</p>
               </div>
+            </motion.div>
 
-              {/* Profile Menu */}
+            {/* Stats */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="hidden md:flex items-center gap-8"
+            >
+              <StatsOrb 
+                icon={<IconFlame />} 
+                value={userData.streak} 
+                label="Jours" 
+                color="#FF6B00"
+              />
+              <StatsOrb 
+                icon={<IconZap />} 
+                value={`${earnedXP}`} 
+                label="XP" 
+                color="#FFB800"
+              />
+              <StatsOrb 
+                icon={<IconAward />} 
+                value={`${completedModules}/6`} 
+                label="Modules" 
+                color="#00FF88"
+              />
+            </motion.div>
+
+            {/* Profile */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-4"
+            >
+              {isAdmin && (
+                <button
+                  onClick={() => router.push('/admin')}
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-sm font-medium hover:bg-[#8B5CF6]/20 transition-colors"
+                >
+                  <div className="w-4 h-4"><IconUsers /></div>
+                  Admin
+                </button>
+              )}
+              
               <div className="relative">
                 <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-slate-800/50 rounded-lg p-1 transition-colors"
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="relative w-12 h-12 rounded-full overflow-hidden group"
                 >
-                  <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {adminData.avatar}
+                  {/* Avatar ring */}
+                  <div className="absolute -inset-[2px] bg-gradient-to-r from-[#00F5FF] via-[#FF00E5] to-[#00FF88] rounded-full animate-spin-slow opacity-60 group-hover:opacity-100 transition-opacity" style={{ animationDuration: '4s' }} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">{userData.avatar}</span>
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 hidden sm:block transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
-                  {showProfileMenu && (
+                  {showMenu && (
                     <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
+                      <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-12 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden"
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="absolute right-0 top-16 z-50 w-72"
                       >
-                        <div className="p-4 border-b border-slate-700">
-                          <p className="text-white font-semibold">{adminData.name} {adminData.lastName}</p>
-                          <p className="text-slate-400 text-sm truncate">{adminData.email}</p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              companyData.plan === 'enterprise' ? 'bg-purple-500/20 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'
-                            }`}>
-                              {currentPlan.name}
-                            </span>
-                            <span className="text-slate-500 text-xs">{companyData.usedSeats}/{maxSeats} places</span>
-                          </div>
-                        </div>
-                        <div className="p-2">
-                          <Link
-                            href="/dashboard"
-                            onClick={() => setShowProfileMenu(false)}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
-                          >
-                            <BookOpen className="w-5 h-5 text-cyan-400" />
-                            <span>Ma formation</span>
-                          </Link>
-                          {companyData.plan === 'equipe' && (
+                        <HoloCard glow="#00F5FF" hover={false}>
+                          <div className="p-4">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center border border-white/10">
+                                <span className="text-white font-bold">{userData.avatar}</span>
+                              </div>
+                              <div>
+                                <p className="text-white font-semibold">{userData.name} {userData.lastName}</p>
+                                <p className="text-white/40 text-sm">Niveau {userData.level}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-3" />
+                            
                             <button
-                              onClick={() => { setShowProfileMenu(false); setShowUpgradeModal(true); }}
-                              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-purple-400 hover:bg-purple-500/10 transition-colors"
+                              onClick={() => router.push('/')}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors"
                             >
-                              <Star className="w-5 h-5" />
-                              <span>Passer à Enterprise</span>
-                              <ArrowUpRight className="w-4 h-4 ml-auto" />
+                              <div className="w-5 h-5"><IconLogout /></div>
+                              Déconnexion
                             </button>
-                          )}
-                          <button
-                            onClick={() => setShowProfileMenu(false)}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
-                          >
-                            <Settings className="w-5 h-5" />
-                            <span>Paramètres</span>
-                          </button>
-                          <hr className="my-2 border-slate-700" />
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-                          >
-                            <LogOut className="w-5 h-5" />
-                            <span>Déconnexion</span>
-                          </button>
-                        </div>
+                          </div>
+                        </HoloCard>
                       </motion.div>
                     </>
                   )}
                 </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Building2 className="w-6 h-6 text-cyan-400" />
-                <h1 className="text-2xl font-bold text-white">{companyData.name}</h1>
-              </div>
-              <p className="text-slate-400">
-                Gérez votre équipe et suivez leur progression
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Seats Counter */}
-              <div className={`bg-slate-800/50 border rounded-xl px-4 py-2 ${
-                seatsRemaining === 0 ? 'border-orange-500/50' : 'border-slate-700/50'
-              }`}>
-                <div className="flex items-center gap-2">
-                  <Users className={`w-5 h-5 ${seatsRemaining === 0 ? 'text-orange-400' : 'text-cyan-400'}`} />
-                  <span className="text-white font-bold">{companyData.usedSeats}/{maxSeats}</span>
-                  <span className="text-slate-400 text-sm">places</span>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-12"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Bienvenue, {userData.name}
+            <span className="inline-block ml-3 animate-wave">👋</span>
+          </h2>
+          <p className="text-white/50 text-lg max-w-2xl">
+            Poursuivez votre parcours de conformité. Chaque module maîtrisé vous rapproche de la certification AI Act.
+          </p>
+        </motion.div>
+
+        {/* Progress Overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-12"
+        >
+          <HoloCard glow="#00F5FF">
+            <div className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div>
+                  <h3 className="text-white/50 text-sm uppercase tracking-widest mb-2">Progression Globale</h3>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl font-bold text-white">{totalProgress}%</span>
+                    <span className="text-white/30">complété</span>
+                  </div>
                 </div>
-                {seatsRemaining === 0 && companyData.plan === 'equipe' && (
-                  <p className="text-orange-400 text-xs mt-1">Limite atteinte</p>
-                )}
-              </div>
-
-              {/* Upgrade Button (si plan equipe et limite atteinte) */}
-              {companyData.plan === 'equipe' && seatsRemaining <= 1 && (
-                <button
-                  onClick={() => setShowUpgradeModal(true)}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
-                >
-                  <Star className="w-5 h-5" />
-                  <span className="hidden sm:inline">Passer à 50 places</span>
-                  <span className="sm:hidden">Upgrade</span>
-                </button>
-              )}
-              
-              <button
-                onClick={handleExportData}
-                className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors"
-              >
-                <Download className="w-5 h-5" />
-                <span className="hidden sm:inline">Exporter</span>
-              </button>
-              
-              <button
-                onClick={handleOpenInviteModal}
-                className={`font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-all ${
-                  seatsRemaining === 0 
-                    ? 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white'
-                }`}
-              >
-                <UserPlus className="w-5 h-5" />
-                Inviter
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-slate-800 pb-4 overflow-x-auto">
-          {[
-            { id: 'overview', label: 'Vue d\'ensemble', icon: BarChart3 },
-            { id: 'team', label: 'Équipe', icon: Users, badge: teamMembers.length },
-            { id: 'certificates', label: 'Certificats', icon: Award, badge: certifiedMembers.length },
-            { id: 'invitations', label: 'Invitations', icon: Mail, badge: stats.pendingInvitations },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'bg-cyan-500/20 text-cyan-400'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-              {tab.badge !== undefined && tab.badge > 0 && (
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  tab.id === 'certificates' ? 'bg-emerald-500 text-white' :
-                  tab.id === 'invitations' && tab.badge > 0 ? 'bg-orange-500 text-white' : 
-                  'bg-slate-700 text-slate-300'
-                }`}>
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <AnimatePresence mode="wait">
-          {/* Overview Tab */}
-          {activeTab === 'overview' && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {/* Plan Info Banner */}
-              <div className={`${
-                companyData.plan === 'enterprise' 
-                  ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20' 
-                  : 'bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-cyan-500/20'
-              } border rounded-2xl p-4 mb-6`}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      companyData.plan === 'enterprise' ? 'bg-purple-500/20' : 'bg-cyan-500/20'
-                    }`}>
-                      <Crown className={`w-6 h-6 ${companyData.plan === 'enterprise' ? 'text-purple-400' : 'text-cyan-400'}`} />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Plan {currentPlan.name}</h3>
-                      <p className="text-slate-400 text-sm">
-                        {companyData.usedSeats}/{maxSeats} places utilisées • {seatsRemaining} disponible{seatsRemaining > 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  {companyData.plan === 'equipe' && (
-                    <button
-                      onClick={() => setShowUpgradeModal(true)}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-semibold px-4 py-2 rounded-xl flex items-center gap-2 transition-all text-sm"
-                    >
-                      <Star className="w-4 h-4" />
-                      Passer à Enterprise (50 places)
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-cyan-400" />
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-white">{stats.activeMembersThisWeek}</div>
-                  <p className="text-slate-500 text-sm mt-1">Membres actifs</p>
-                </div>
-
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <Target className="w-5 h-5 text-emerald-400" />
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-white">{stats.averageProgress}%</div>
-                  <p className="text-slate-500 text-sm mt-1">Progression moyenne</p>
-                </div>
-
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-yellow-400" />
-                    </div>
-                  </div>
-                  <div className={`text-3xl font-bold ${stats.averageQuizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
-                    {stats.averageQuizScore}%
-                  </div>
-                  <p className="text-slate-500 text-sm mt-1">Score moyen quiz</p>
-                </div>
-
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                      <Award className="w-5 h-5 text-purple-400" />
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-white">{stats.certificatesIssued}</div>
-                  <p className="text-slate-500 text-sm mt-1">Certificats délivrés</p>
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                <button
-                  onClick={handleSendReminders}
-                  className="bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/50 rounded-xl p-5 text-left transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
-                      <Bell className="w-6 h-6 text-orange-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Envoyer des rappels</h3>
-                      <p className="text-slate-400 text-sm">Relancer les membres inactifs</p>
-                    </div>
-                  </div>
-                </button>
                 
-                <button
-                  onClick={() => setActiveTab('certificates')}
-                  className="bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/50 rounded-xl p-5 text-left transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
-                      <Award className="w-6 h-6 text-emerald-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Certificats</h3>
-                      <p className="text-slate-400 text-sm">{certifiedMembers.length} disponible{certifiedMembers.length > 1 ? 's' : ''}</p>
-                    </div>
+                <div className="flex items-center gap-8">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#00FF88]">{completedModules}</div>
+                    <div className="text-white/30 text-sm">Modules</div>
                   </div>
-                </button>
-
-                <button
-                  onClick={handleExportData}
-                  className="bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/50 rounded-xl p-5 text-left transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                      <Download className="w-6 h-6 text-cyan-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold">Exporter les données</h3>
-                      <p className="text-slate-400 text-sm">Télécharger un rapport CSV</p>
-                    </div>
+                  <div className="h-12 w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#FFB800]">{earnedXP}</div>
+                    <div className="text-white/30 text-sm">XP gagnés</div>
                   </div>
-                </button>
-              </div>
-
-              {/* Progress Chart */}
-              <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 mb-8">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-cyan-400" />
-                  Progression par module
-                </h3>
-                <div className="grid grid-cols-6 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((moduleNum) => {
-                    const completedCount = teamMembers.filter(m => m.modulesCompleted >= moduleNum).length;
-                    const percentage = teamMembers.length > 0 ? (completedCount / teamMembers.length) * 100 : 0;
-                    return (
-                      <div key={moduleNum} className="text-center">
-                        <div className="h-32 bg-slate-700/50 rounded-lg relative overflow-hidden mb-2">
-                          <motion.div 
-                            initial={{ height: 0 }}
-                            animate={{ height: `${percentage}%` }}
-                            transition={{ duration: 0.8, delay: moduleNum * 0.1 }}
-                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-500 to-cyan-400"
-                          />
-                        </div>
-                        <p className="text-slate-400 text-xs">M{moduleNum}</p>
-                        <p className="text-white font-medium text-sm">{completedCount}/{teamMembers.length}</p>
-                      </div>
-                    );
-                  })}
+                  <div className="h-12 w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#FF6B00]">{userData.streak}</div>
+                    <div className="text-white/30 text-sm">Série</div>
+                  </div>
                 </div>
               </div>
-
-              {/* Recent Activity */}
-              <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
-                  Activité récente
-                </h3>
-                <div className="space-y-4">
-                  {teamMembers.slice(0, 5).map((member) => (
+              
+              <LiquidProgress progress={totalProgress} color="#00F5FF" />
+              
+              {/* Module indicators */}
+              <div className="flex justify-between mt-4">
+                {modules.map((m, i) => (
+                  <div key={i} className="flex flex-col items-center">
                     <div 
-                      key={member.id} 
-                      className="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0 cursor-pointer hover:bg-slate-800/30 -mx-2 px-2 rounded-lg transition-colors"
-                      onClick={() => setShowMemberModal(member)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {member.avatar}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-white font-medium">{member.name}</p>
-                            {member.role === 'admin' && <Crown className="w-4 h-4 text-yellow-400" />}
-                            {member.certificateIssued && <Award className="w-4 h-4 text-emerald-400" />}
-                          </div>
-                          <p className="text-slate-500 text-sm">{member.lastActivity}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-white font-medium">{member.progress}%</p>
-                        <p className="text-slate-500 text-sm">{member.modulesCompleted}/6 modules</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Team Tab */}
-          {activeTab === 'team' && (
-            <motion.div
-              key="team"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {/* Search and Filters */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher par nom ou email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl pl-10 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="all">Tous les statuts</option>
-                  <option value="active">En cours</option>
-                  <option value="completed">Terminé</option>
-                  <option value="inactive">Inactif</option>
-                  <option value="not_started">Non commencé</option>
-                </select>
-                <select
-                  value={filterRole}
-                  onChange={(e) => setFilterRole(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                >
-                  <option value="all">Tous les rôles</option>
-                  <option value="admin">Admin</option>
-                  <option value="employee">Employé</option>
-                </select>
-              </div>
-
-              <p className="text-slate-400 text-sm mb-4">
-                {filteredMembers.length} membre{filteredMembers.length > 1 ? 's' : ''} trouvé{filteredMembers.length > 1 ? 's' : ''}
-              </p>
-
-              {/* Team Members Grid */}
-              <div className="grid gap-4">
-                {filteredMembers.map((member) => (
-                  <div
-                    key={member.id}
-                    className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-5 hover:border-slate-600 transition-all"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-                          {member.avatar}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-white font-semibold">{member.name}</h4>
-                            {member.role === 'admin' && <Crown className="w-4 h-4 text-yellow-400" />}
-                            {member.certificateIssued && <Award className="w-4 h-4 text-emerald-400" />}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-slate-400 text-sm">{member.email}</p>
-                            <button onClick={() => handleCopyEmail(member.email)} className="text-slate-500 hover:text-white">
-                              {copiedEmail === member.email ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4">
-                        {getStatusBadge(member.status)}
-                        
-                        <div className="text-center">
-                          <p className="text-white font-bold">{member.progress}%</p>
-                          <p className="text-slate-500 text-xs">Progression</p>
-                        </div>
-                        
-                        <div className="text-center">
-                          <p className="text-white font-bold">{member.modulesCompleted}/6</p>
-                          <p className="text-slate-500 text-xs">Modules</p>
-                        </div>
-                        
-                        <div className="text-center">
-                          <p className={`font-bold ${member.averageQuizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
-                            {member.averageQuizScore}%
-                          </p>
-                          <p className="text-slate-500 text-xs">Quiz</p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {member.certificateIssued && (
-                            <button
-                              onClick={() => handleDownloadCertificate(member)}
-                              disabled={downloadingCertificates.includes(member.id)}
-                              className="p-2 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors disabled:opacity-50"
-                              title="Télécharger le certificat"
-                            >
-                              {downloadingCertificates.includes(member.id) ? (
-                                <div className="w-5 h-5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
-                              ) : (
-                                <Download className="w-5 h-5" />
-                              )}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => setShowMemberModal(member)}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all ${
-                            member.status === 'completed' ? 'bg-emerald-500' : 'bg-cyan-500'
-                          }`}
-                          style={{ width: `${member.progress}%` }}
-                        />
-                      </div>
-                    </div>
+                      className="w-3 h-3 rounded-full transition-all"
+                      style={{ 
+                        background: m.completed ? m.color : m.progress > 0 ? `${m.color}50` : 'rgba(255,255,255,0.1)',
+                        boxShadow: m.completed ? `0 0 10px ${m.color}` : 'none',
+                      }}
+                    />
+                    <span className="text-white/30 text-xs mt-1">M{m.id}</span>
                   </div>
                 ))}
-
-                {filteredMembers.length === 0 && (
-                  <div className="text-center py-12 text-slate-400">
-                    <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucun membre trouvé</p>
-                  </div>
-                )}
               </div>
-            </motion.div>
-          )}
+            </div>
+          </HoloCard>
+        </motion.div>
 
-          {/* Certificates Tab */}
-          {activeTab === 'certificates' && (
-            <motion.div
-              key="certificates"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {/* Download All Banner */}
-              {certifiedMembers.length > 0 && (
-                <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                      <Award className="w-6 h-6 text-emerald-400" />
+        {/* Continue Learning */}
+        {currentModule && totalProgress < 100 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mb-12"
+          >
+            <h3 className="text-white/50 text-sm uppercase tracking-widest mb-4">Reprendre la Formation</h3>
+            
+            <HoloCard glow={currentModule.color}>
+              <div className="p-6 md:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                  <NeuralOrb 
+                    color={currentModule.color} 
+                    progress={currentModule.progress} 
+                    completed={false}
+                    size="lg"
+                  />
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span 
+                        className="px-2 py-1 rounded text-xs font-medium"
+                        style={{ 
+                          background: `${currentModule.color}20`,
+                          color: currentModule.color,
+                        }}
+                      >
+                        Module {currentModule.id}
+                      </span>
+                      <span className="text-white/30 text-sm">{currentModule.duration}</span>
                     </div>
-                    <div>
-                      <h3 className="text-white font-semibold text-lg">{certifiedMembers.length} certificat{certifiedMembers.length > 1 ? 's' : ''} disponible{certifiedMembers.length > 1 ? 's' : ''}</h3>
-                      <p className="text-slate-400 text-sm">Téléchargez les certificats de vos employés certifiés</p>
+                    <h4 className="text-2xl font-bold text-white mb-1">{currentModule.title}</h4>
+                    <p className="text-white/40">{currentModule.subtitle}</p>
+                    
+                    <div className="mt-4">
+                      <LiquidProgress progress={currentModule.progress} color={currentModule.color} />
+                      <div className="flex justify-between mt-2 text-sm">
+                        <span className="text-white/40">{currentModule.currentLesson || 1}/{currentModule.lessons} leçons</span>
+                        <span style={{ color: currentModule.color }}>{currentModule.xp} XP</span>
+                      </div>
                     </div>
                   </div>
+
                   <button
-                    onClick={handleDownloadAllCertificates}
-                    disabled={downloadingCertificates.length > 0}
-                    className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                    onClick={() => handleStartModule(currentModule.id)}
+                    className="relative group px-8 py-4 rounded-xl font-semibold text-white overflow-hidden"
+                    style={{ background: currentModule.color }}
                   >
-                    {downloadingCertificates.length > 0 ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Téléchargement...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-5 h-5" />
-                        Tout télécharger (ZIP)
-                      </>
-                    )}
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
+                    <div className="relative flex items-center gap-2">
+                      <div className="w-5 h-5"><IconPlay /></div>
+                      Continuer
+                    </div>
                   </button>
                 </div>
-              )}
-
-              {/* Certified Members List */}
-              {certifiedMembers.length > 0 ? (
-                <div className="grid gap-4">
-                  {certifiedMembers.map((member) => (
-                    <div
-                      key={member.id}
-                      className="bg-slate-800/30 border border-emerald-500/20 rounded-xl p-5 hover:border-emerald-500/40 transition-all"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                              {member.avatar}
-                            </div>
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                              <Award className="w-4 h-4 text-white" />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-white font-semibold text-lg">{member.name}</h4>
-                              {member.role === 'admin' && <Crown className="w-4 h-4 text-yellow-400" />}
-                            </div>
-                            <p className="text-slate-400 text-sm">{member.email}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-6">
-                          <div className="text-center">
-                            <p className="text-emerald-400 font-bold text-xl">{member.averageQuizScore}%</p>
-                            <p className="text-slate-500 text-xs">Score final</p>
-                          </div>
-                          
-                          <div className="text-center">
-                            <p className="text-white font-medium">{member.certificateDate}</p>
-                            <p className="text-slate-500 text-xs">Date d'obtention</p>
-                          </div>
-                          
-                          <div className="text-center">
-                            <p className="text-slate-300 font-mono text-sm">{member.certificateId}</p>
-                            <p className="text-slate-500 text-xs">ID Certificat</p>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setShowCertificatePreview(member)}
-                              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-                              title="Prévisualiser"
-                            >
-                              <Eye className="w-5 h-5" />
-                            </button>
-                            <button
-                              onClick={() => handleDownloadCertificate(member)}
-                              disabled={downloadingCertificates.includes(member.id)}
-                              className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
-                            >
-                              {downloadingCertificates.includes(member.id) ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              ) : (
-                                <Download className="w-5 h-5" />
-                              )}
-                              PDF
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award className="w-10 h-10 text-slate-600" />
-                  </div>
-                  <h3 className="text-white font-semibold text-xl mb-2">Aucun certificat pour le moment</h3>
-                  <p className="text-slate-400 max-w-md mx-auto">
-                    Les certificats seront disponibles ici lorsque vos employés auront terminé 100% de la formation avec un score minimum de 80% aux quiz.
-                  </p>
-                </div>
-              )}
-
-              {/* Pending Members (not yet certified) */}
-              {teamMembers.filter(m => !m.certificateIssued).length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-orange-400" />
-                    En attente de certification ({teamMembers.filter(m => !m.certificateIssued).length})
-                  </h3>
-                  <div className="grid gap-3">
-                    {teamMembers.filter(m => !m.certificateIssued).map((member) => (
-                      <div
-                        key={member.id}
-                        className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            {member.avatar}
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{member.name}</p>
-                            <p className="text-slate-500 text-sm">{member.progress}% complété</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="w-32 h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-cyan-500 rounded-full"
-                              style={{ width: `${member.progress}%` }}
-                            />
-                          </div>
-                          <span className="text-slate-400 text-sm">{100 - member.progress}% restant</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* Invitations Tab */}
-          {activeTab === 'invitations' && (
-            <motion.div
-              key="invitations"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {/* Stats */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
-                  <p className="text-slate-400 text-sm">Places totales</p>
-                  <p className="text-2xl font-bold text-white">{maxSeats}</p>
-                </div>
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
-                  <p className="text-slate-400 text-sm">Places utilisées</p>
-                  <p className="text-2xl font-bold text-cyan-400">{companyData.usedSeats}</p>
-                </div>
-                <div className={`bg-slate-800/30 border rounded-xl p-4 ${seatsRemaining === 0 ? 'border-orange-500/50' : 'border-slate-700/50'}`}>
-                  <p className="text-slate-400 text-sm">Places disponibles</p>
-                  <p className={`text-2xl font-bold ${seatsRemaining === 0 ? 'text-orange-400' : 'text-emerald-400'}`}>{seatsRemaining}</p>
-                </div>
-                <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
-                  <p className="text-slate-400 text-sm">En attente</p>
-                  <p className="text-2xl font-bold text-orange-400">{stats.pendingInvitations}</p>
-                </div>
               </div>
+            </HoloCard>
+          </motion.div>
+        )}
 
-              {/* Upgrade Banner (si limite atteinte et plan equipe) */}
-              {seatsRemaining === 0 && companyData.plan === 'equipe' && (
-                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-5 mb-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                        <Star className="w-6 h-6 text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold">Besoin de plus de places ?</h3>
-                        <p className="text-slate-400 text-sm">Passez au plan Enterprise pour 50 places au lieu de 5</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setShowUpgradeModal(true)}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition-all"
-                    >
-                      <ArrowUpRight className="w-5 h-5" />
-                      Passer à Enterprise
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Pending Invitations */}
-              <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 mb-6">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-orange-400" />
-                  Invitations en attente
-                </h3>
-                
-                {invitations.filter(i => i.status === 'pending').length > 0 ? (
-                  <div className="space-y-3">
-                    {invitations.filter(i => i.status === 'pending').map((invitation) => (
-                      <div
-                        key={invitation.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-800/50 rounded-lg"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
-                            <Mail className="w-5 h-5 text-orange-400" />
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{invitation.email}</p>
-                            <p className="text-slate-500 text-sm">Envoyée le {invitation.sentAt} • Expire le {invitation.expiresAt}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {resendSuccess === invitation.id ? (
-                            <span className="text-emerald-400 text-sm flex items-center gap-1">
-                              <CheckCircle className="w-4 h-4" /> Renvoyée
-                            </span>
-                          ) : (
-                            <button 
-                              onClick={() => handleResendInvite(invitation)}
-                              disabled={resendingId === invitation.id}
-                              className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
-                              title="Renvoyer"
-                            >
-                              {resendingId === invitation.id ? (
-                                <div className="w-5 h-5 border-2 border-slate-400/30 border-t-cyan-400 rounded-full animate-spin" />
-                              ) : (
-                                <RefreshCw className="w-5 h-5" />
-                              )}
-                            </button>
-                          )}
-                          <button 
-                            onClick={() => setShowCancelInviteConfirm(invitation.id)}
-                            className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
-                            title="Annuler"
+        {/* All Modules */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h3 className="text-white/50 text-sm uppercase tracking-widest mb-6">Tous les Modules</h3>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((module, index) => {
+              const isLocked = index > 0 && !modules[index - 1].completed && module.progress === 0;
+              const isCurrent = currentModule?.id === module.id;
+              
+              return (
+                <motion.div
+                  key={module.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  onHoverStart={() => !isLocked && setHoveredModule(module.id)}
+                  onHoverEnd={() => setHoveredModule(null)}
+                >
+                  <HoloCard 
+                    glow={module.color} 
+                    hover={!isLocked}
+                    className={isLocked ? 'opacity-40' : ''}
+                  >
+                    <div className="p-6">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <NeuralOrb 
+                          color={module.color} 
+                          progress={module.progress} 
+                          completed={module.completed}
+                        />
+                        <div className="text-right">
+                          <span 
+                            className="text-xs font-medium"
+                            style={{ color: module.color }}
                           >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+                            +{module.xp} XP
+                          </span>
+                          <p className="text-white/30 text-xs">{module.duration}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-400 text-center py-8">Aucune invitation en attente</p>
-                )}
-              </div>
 
-              {/* Invite Button */}
-              <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-white font-semibold mb-1">Inviter de nouveaux membres</h3>
-                    <p className="text-slate-400 text-sm">
-                      {seatsRemaining > 0 
-                        ? `Vous pouvez encore inviter ${seatsRemaining} personne${seatsRemaining > 1 ? 's' : ''}`
-                        : companyData.plan === 'equipe'
-                          ? 'Passez à Enterprise pour inviter plus de membres'
-                          : 'Toutes vos places sont utilisées'
-                      }
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleOpenInviteModal}
-                    className={`font-semibold px-6 py-3 rounded-xl flex items-center gap-2 transition-all ${
-                      seatsRemaining === 0 && companyData.plan === 'equipe'
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white'
-                        : seatsRemaining === 0
-                          ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white'
-                    }`}
-                  >
-                    {seatsRemaining === 0 && companyData.plan === 'equipe' ? (
-                      <>
-                        <Star className="w-5 h-5" />
-                        Passer à Enterprise
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-5 h-5" />
-                        Inviter
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      {/* Content */}
+                      <div className="mb-4">
+                        <span className="text-white/30 text-xs">Module {module.id}</span>
+                        <h4 className="text-white font-semibold text-lg mt-1">{module.title}</h4>
+                        <p className="text-white/40 text-sm mt-1">{module.subtitle}</p>
+                      </div>
+
+                      {/* Progress */}
+                      <div className="mb-4">
+                        <LiquidProgress progress={module.progress} color={module.color} />
+                        <div className="flex justify-between mt-2 text-xs">
+                          <span className="text-white/30">{module.lessons} leçons</span>
+                          {module.quizScore && (
+                            <span className="text-[#00FF88]">Quiz: {module.quizScore}%</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <button
+                        onClick={() => !isLocked && handleStartModule(module.id)}
+                        disabled={isLocked}
+                        className="w-full py-3 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2"
+                        style={{
+                          background: module.completed 
+                            ? 'rgba(255,255,255,0.05)' 
+                            : isLocked 
+                              ? 'rgba(255,255,255,0.02)'
+                              : `${module.color}20`,
+                          color: module.completed 
+                            ? 'rgba(255,255,255,0.5)' 
+                            : isLocked 
+                              ? 'rgba(255,255,255,0.2)'
+                              : module.color,
+                          border: `1px solid ${module.completed ? 'rgba(255,255,255,0.1)' : isLocked ? 'rgba(255,255,255,0.05)' : `${module.color}30`}`,
+                        }}
+                      >
+                        {isLocked ? (
+                          <>
+                            <div className="w-4 h-4"><IconLock /></div>
+                            Verrouillé
+                          </>
+                        ) : module.completed ? (
+                          <>
+                            <div className="w-4 h-4"><IconCheck /></div>
+                            Revoir
+                          </>
+                        ) : isCurrent ? (
+                          <>
+                            <div className="w-4 h-4"><IconPlay /></div>
+                            Continuer
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-4 h-4"><IconPlay /></div>
+                            Commencer
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </HoloCard>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       </main>
 
-      {/* ===== MODALS ===== */}
-
-      {/* Invite Modal */}
-      <AnimatePresence>
-        {showInviteModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => !isInviting && setShowInviteModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {inviteSuccess ? (
-                <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="w-8 h-8 text-emerald-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Invitations envoyées !</h3>
-                  <p className="text-slate-400">
-                    {validEmailsCount} invitation{validEmailsCount > 1 ? 's' : ''} envoyée{validEmailsCount > 1 ? 's' : ''} avec succès
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-white">Inviter des membres</h3>
-                    <button onClick={() => setShowInviteModal(false)} className="text-slate-400 hover:text-white">
-                      <X className="w-6 h-6" />
-                    </button>
-                  </div>
-
-                  <div className="bg-slate-700/30 rounded-lg p-3 mb-4 flex items-center justify-between">
-                    <span className="text-slate-300 text-sm">Places disponibles</span>
-                    <span className={`font-bold ${seatsRemaining <= 1 ? 'text-orange-400' : 'text-emerald-400'}`}>{seatsRemaining}</span>
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    {inviteEmails.map((email, index) => (
-                      <div key={index} className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                          <input
-                            type="email"
-                            placeholder="email@entreprise.com"
-                            value={email}
-                            onChange={(e) => handleEmailChange(index, e.target.value)}
-                            className={`w-full bg-slate-700/50 border rounded-xl pl-10 pr-10 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                              email && !isValidEmail(email) ? 'border-orange-500' : 'border-slate-600'
-                            }`}
-                          />
-                          {email && isValidEmail(email) && (
-                            <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400" />
-                          )}
-                        </div>
-                        {inviteEmails.length > 1 && (
-                          <button
-                            onClick={() => handleRemoveEmailField(index)}
-                            className="p-3 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-xl transition-colors"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {inviteEmails.length < seatsRemaining && (
-                    <button
-                      onClick={handleAddEmailField}
-                      className="w-full py-2 border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-xl text-slate-400 hover:text-cyan-400 flex items-center justify-center gap-2 transition-colors mb-4"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      Ajouter un email
-                    </button>
-                  )}
-
-                  <div className="bg-slate-700/30 rounded-lg p-3 mb-4">
-                    <p className="text-slate-300 text-sm">
-                      📧 Un email d'invitation sera envoyé avec un lien pour rejoindre la formation. L'invitation expire après 7 jours.
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={handleInvite}
-                    disabled={validEmailsCount === 0 || isInviting}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
-                  >
-                    {isInviting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Envoi en cours...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Envoyer {validEmailsCount > 0 ? `${validEmailsCount} invitation${validEmailsCount > 1 ? 's' : ''}` : ''}
-                      </>
-                    )}
-                  </button>
-                </>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Upgrade Modal */}
-      <AnimatePresence>
-        {showUpgradeModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowUpgradeModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-purple-500/30 rounded-2xl p-6 max-w-lg w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Star className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Passez à Enterprise</h3>
-                <p className="text-slate-400">
-                  Débloquez 50 places pour former toute votre équipe
-                </p>
-              </div>
-
-              {/* Comparison */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-slate-700/30 rounded-xl p-4 border border-slate-600">
-                  <p className="text-slate-400 text-sm mb-1">Votre plan actuel</p>
-                  <p className="text-white font-bold text-lg">Équipe</p>
-                  <p className="text-cyan-400 font-bold text-2xl mt-2">2 000€</p>
-                  <p className="text-slate-500 text-sm">5 places</p>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl p-4 border border-purple-500/30">
-                  <p className="text-purple-400 text-sm mb-1">Recommandé</p>
-                  <p className="text-white font-bold text-lg">Enterprise</p>
-                  <p className="text-purple-400 font-bold text-2xl mt-2">18 000€</p>
-                  <p className="text-slate-300 text-sm">50 places</p>
-                </div>
-              </div>
-
-              {/* Benefits */}
-              <div className="bg-slate-700/30 rounded-xl p-4 mb-6">
-                <h4 className="text-white font-semibold mb-3">Ce que vous obtenez :</h4>
-                <ul className="space-y-2">
-                  {[
-                    '50 places au lieu de 5 (+45 places)',
-                    'Économie de 360€ par personne',
-                    'Support prioritaire dédié',
-                    'Tableau de bord avancé',
-                    'Rapports de conformité personnalisés'
-                  ].map((benefit, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-slate-300 text-sm">
-                      <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Price difference */}
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-6 text-center">
-                <p className="text-slate-300 text-sm">Montant à payer</p>
-                <p className="text-emerald-400 font-bold text-3xl">16 000€</p>
-                <p className="text-slate-400 text-sm">(18 000€ - 2 000€ déjà payés)</p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowUpgradeModal(false)}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl transition-colors"
-                >
-                  Plus tard
-                </button>
-                <button
-                  onClick={handleUpgrade}
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
-                >
-                  <CreditCard className="w-5 h-5" />
-                  Passer à Enterprise
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Certificate Preview Modal */}
-      <AnimatePresence>
-        {showCertificatePreview && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowCertificatePreview(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-2xl p-8 max-w-2xl w-full text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Certificate Design */}
-              <div className="border-4 border-double border-slate-300 rounded-xl p-8">
-                <Award className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-slate-800 mb-2">Certificat de Conformité</h2>
-                <h3 className="text-xl text-blue-600 mb-6">AI Act - Article 4</h3>
-                
-                <p className="text-slate-600 mb-2">Ce certificat atteste que</p>
-                <p className="text-3xl font-bold text-slate-900 mb-4">{showCertificatePreview.name}</p>
-                
-                <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                  a suivi avec succès la formation complète sur le Règlement Européen 
-                  sur l'Intelligence Artificielle (AI Act) et possède les compétences 
-                  requises par l'Article 4.
-                </p>
-                
-                <div className="flex items-center justify-center gap-8 text-sm text-slate-500 mb-6">
-                  <div>
-                    <p className="font-medium text-slate-700">Score final</p>
-                    <p className="text-emerald-600 font-bold">{showCertificatePreview.averageQuizScore}%</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-700">Date</p>
-                    <p>{showCertificatePreview.certificateDate}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-700">ID</p>
-                    <p className="font-mono">{showCertificatePreview.certificateId}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-6">
-                <button
-                  onClick={() => setShowCertificatePreview(null)}
-                  className="px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition-colors"
-                >
-                  Fermer
-                </button>
-                <button
-                  onClick={() => {
-                    handleDownloadCertificate(showCertificatePreview);
-                    setShowCertificatePreview(null);
-                  }}
-                  className="px-6 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-xl flex items-center gap-2 transition-colors"
-                >
-                  <Download className="w-5 h-5" />
-                  Télécharger PDF
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Member Detail Modal */}
-      <AnimatePresence>
-        {showMemberModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowMemberModal(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-lg w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                      {showMemberModal.avatar}
-                    </div>
-                    {showMemberModal.certificateIssued && (
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                        <Award className="w-4 h-4 text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl font-bold text-white">{showMemberModal.name}</h3>
-                      {showMemberModal.role === 'admin' && <Crown className="w-5 h-5 text-yellow-400" />}
-                    </div>
-                    <p className="text-slate-400">{showMemberModal.email}</p>
-                    {getStatusBadge(showMemberModal.status)}
-                  </div>
-                </div>
-                <button onClick={() => setShowMemberModal(null)} className="text-slate-400 hover:text-white">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-slate-700/30 rounded-xl p-4 text-center">
-                  <p className="text-3xl font-bold text-white">{showMemberModal.progress}%</p>
-                  <p className="text-slate-500 text-sm">Progression</p>
-                </div>
-                <div className="bg-slate-700/30 rounded-xl p-4 text-center">
-                  <p className="text-3xl font-bold text-white">{showMemberModal.modulesCompleted}/6</p>
-                  <p className="text-slate-500 text-sm">Modules</p>
-                </div>
-                <div className="bg-slate-700/30 rounded-xl p-4 text-center">
-                  <p className={`text-3xl font-bold ${showMemberModal.averageQuizScore >= 80 ? 'text-emerald-400' : 'text-orange-400'}`}>
-                    {showMemberModal.averageQuizScore}%
-                  </p>
-                  <p className="text-slate-500 text-sm">Quiz</p>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="mb-6">
-                <div className="h-3 bg-slate-700/50 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full ${showMemberModal.status === 'completed' ? 'bg-emerald-500' : 'bg-cyan-500'}`}
-                    style={{ width: `${showMemberModal.progress}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between py-2 border-b border-slate-700/50">
-                  <span className="text-slate-400">Rôle</span>
-                  <span className="text-white capitalize">{showMemberModal.role}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-700/50">
-                  <span className="text-slate-400">Dernière activité</span>
-                  <span className="text-white">{showMemberModal.lastActivity}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-slate-700/50">
-                  <span className="text-slate-400">Invité le</span>
-                  <span className="text-white">{showMemberModal.invitedAt}</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-slate-400">Certificat</span>
-                  {showMemberModal.certificateIssued ? (
-                    <span className="text-emerald-400 flex items-center gap-1">
-                      <CheckCircle className="w-4 h-4" /> {showMemberModal.certificateDate}
-                    </span>
-                  ) : (
-                    <span className="text-slate-500">Non obtenu</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                {showMemberModal.certificateIssued && (
-                  <button
-                    onClick={() => handleDownloadCertificate(showMemberModal)}
-                    disabled={downloadingCertificates.includes(showMemberModal.id)}
-                    className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                  >
-                    {downloadingCertificates.includes(showMemberModal.id) ? (
-                      <div className="w-5 h-5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
-                    ) : (
-                      <Download className="w-5 h-5" />
-                    )}
-                    Certificat
-                  </button>
-                )}
-                <button
-                  onClick={() => handleCopyEmail(showMemberModal.email)}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                >
-                  {copiedEmail === showMemberModal.email ? (
-                    <>
-                      <Check className="w-5 h-5 text-emerald-400" />
-                      Copié !
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-5 h-5" />
-                      Copier email
-                    </>
-                  )}
-                </button>
-                {showMemberModal.role !== 'admin' && (
-                  <button
-                    onClick={() => setShowRemoveConfirm(showMemberModal.id)}
-                    className="bg-red-500/20 hover:bg-red-500/30 text-red-400 py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <UserMinus className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Remove Member Confirm Modal */}
-      <AnimatePresence>
-        {showRemoveConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
-            onClick={() => setShowRemoveConfirm(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-6 h-6 text-red-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white text-center mb-2">Retirer ce membre ?</h3>
-              <p className="text-slate-400 text-center mb-6">
-                Cette action libérera une place dans votre forfait.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowRemoveConfirm(null)}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl transition-colors"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={() => handleRemoveMember(showRemoveConfirm)}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition-colors"
-                >
-                  Retirer
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Cancel Invitation Confirm Modal */}
-      <AnimatePresence>
-        {showCancelInviteConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
-            onClick={() => setShowCancelInviteConfirm(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-orange-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white text-center mb-2">Annuler cette invitation ?</h3>
-              <p className="text-slate-400 text-center mb-6">
-                Le lien sera désactivé et la place libérée.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowCancelInviteConfirm(null)}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl transition-colors"
-                >
-                  Garder
-                </button>
-                <button
-                  onClick={() => handleCancelInvite(showCancelInviteConfirm)}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl transition-colors"
-                >
-                  Annuler
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Custom Styles */}
+      <style jsx global>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 4s linear infinite;
+        }
+        @keyframes wave {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(20deg); }
+          75% { transform: rotate(-20deg); }
+        }
+        .animate-wave {
+          animation: wave 1s ease-in-out infinite;
+          transform-origin: 70% 70%;
+        }
+      `}</style>
     </div>
   );
 }
