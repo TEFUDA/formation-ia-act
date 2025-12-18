@@ -103,6 +103,91 @@ const HoloCard = ({ children, glow = '#00F5FF', className = '' }: { children: Re
   </motion.div>
 );
 
+// Sticky CTA Bar Component
+const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: number, spotsLeft: number }) => (
+  <AnimatePresence>
+    {show && (
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 safe-area-inset-bottom"
+      >
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left: Urgency info - Hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <motion.span 
+                  className="text-2xl"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  ⏰
+                </motion.span>
+                <div>
+                  <p className="text-white font-semibold text-sm">Plus que {daysLeft} jours</p>
+                  <p className="text-white/40 text-xs">avant les contrôles AI Act</p>
+                </div>
+              </div>
+              <div className="h-8 w-px bg-white/10" />
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  className="w-2 h-2 rounded-full bg-[#FF4444]"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span className="text-white/60 text-sm">
+                  <span className="text-[#FFB800] font-semibold">{spotsLeft} places</span> au tarif actuel
+                </span>
+              </div>
+            </div>
+
+            {/* Mobile: Compact info */}
+            <div className="flex sm:hidden items-center gap-2">
+              <motion.span 
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                🔥
+              </motion.span>
+              <div>
+                <p className="text-white font-semibold text-sm">{spotsLeft} places restantes</p>
+                <p className="text-white/40 text-xs">{daysLeft}j avant deadline</p>
+              </div>
+            </div>
+
+            {/* Right: CTA Button */}
+            <div className="flex items-center gap-3">
+              <div className="hidden md:block text-right">
+                <p className="text-white/40 text-xs line-through">750€</p>
+                <p className="text-white font-bold">500€ HT</p>
+              </div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link 
+                  href="/checkout?plan=solo"
+                  className="flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap"
+                >
+                  <span className="hidden sm:inline">Démarrer la formation</span>
+                  <span className="sm:hidden">Commencer</span>
+                  <motion.div 
+                    className="w-4 h-4"
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <Icons.ArrowRight />
+                  </motion.div>
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
 // Exit Intent Popup (Peep Laja)
 const ExitIntentPopup = () => {
   const [show, setShow] = useState(false);
@@ -211,9 +296,22 @@ export default function LandingPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [daysLeft, setDaysLeft] = useState(227);
   const [spotsLeft] = useState(7);
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   useEffect(() => {
     setDaysLeft(calculateDaysUntil());
+  }, []);
+
+  // Sticky CTA visibility on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show after scrolling past hero (roughly 600px)
+      const shouldShow = window.scrollY > 600;
+      setShowStickyCTA(shouldShow);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const progressPercent = Math.max(0, Math.min(100, ((365 * 2 - daysLeft) / (365 * 2)) * 100));
@@ -222,6 +320,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0A0A1B] text-white overflow-x-hidden">
       <NeuralBackground />
       <ExitIntentPopup />
+      <StickyCTA show={showStickyCTA} daysLeft={daysLeft} spotsLeft={spotsLeft} />
 
       {/* URGENCY TOP BANNER */}
       <motion.div 
@@ -1182,7 +1281,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-12 px-6 border-t border-white/5">
+      <footer className="relative z-10 py-12 px-6 border-t border-white/5 pb-24 sm:pb-12">
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
