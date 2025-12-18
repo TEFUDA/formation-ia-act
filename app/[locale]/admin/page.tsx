@@ -61,9 +61,15 @@ const PLANS = {
 // Mock Data
 const adminData = { name: 'Jean', lastName: 'Dupont', avatar: 'JD' };
 
-const initialCompanyData = {
+interface CompanyData {
+  name: string;
+  plan: 'equipe' | 'enterprise';
+  usedSeats: number;
+}
+
+const initialCompanyData: CompanyData = {
   name: 'Acme Corporation',
-  plan: 'equipe' as const,
+  plan: 'equipe',
   usedSeats: 4,
 };
 
