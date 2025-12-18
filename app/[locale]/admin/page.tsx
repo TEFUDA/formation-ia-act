@@ -168,7 +168,10 @@ const AvatarRing = ({ initials, color, size = 'md', certified = false }: { initi
   const sizes = { sm: 'w-8 h-8 text-xs', md: 'w-10 h-10 text-sm', lg: 'w-14 h-14 text-lg' };
   return (
     <div className="relative">
-      <div className={`${sizes[size]} rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center text-white font-bold ring-2`} style={{ ringColor: `${color}50` }}>
+      <div 
+        className={`${sizes[size]} rounded-full bg-gradient-to-br from-[#1a1a3a] to-[#0a0a1b] flex items-center justify-center text-white font-bold`} 
+        style={{ boxShadow: `0 0 0 2px ${color}50` }}
+      >
         {initials}
       </div>
       {certified && (
