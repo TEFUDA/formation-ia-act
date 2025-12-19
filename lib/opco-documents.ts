@@ -42,29 +42,28 @@ interface FormationInfo {
 // Infos de l'organisme de formation (à personnaliser)
 const ORGANISME = {
   name: "Formation-IA-Act.fr",
-  legalName: "FORMATION IA ACT SAS", // À adapter
-  address: "123 Rue de la Conformité",
-  postalCode: "75001",
-  city: "Paris",
-  siret: "123 456 789 00001", // À adapter
-  tva: "FR12345678901", // À adapter
+  legalName: "MODERNEE",
+  address: "125 rue du moulin",
+  postalCode: "80000",
+  city: "Amiens",
+  siret: "943 258 996", 
   qualiopi: "2024/12345-FR", // À adapter
   email: "contact@formation-ia-act.fr",
-  phone: "01 23 45 67 89",
+  phone: "06 01 05 37 53",
   website: "https://formation-ia-act.fr",
   rcs: "Paris B 123 456 789", // À adapter
-  capital: "10 000", // À adapter
+  capital: "500",
   nda: "11 75 12345 67", // Numéro de déclaration d'activité
 };
 
 // Infos de la formation
 const FORMATION: FormationInfo = {
   title: "Formation AI Act - Conformité Article 4",
-  duration: "8 heures (réparties sur 6 modules)",
+  duration: "4 heures (réparties sur 6 modules)",
   modules: [
-    { title: "Module 1 - Fondamentaux de l'AI Act", duration: "45 min" },
-    { title: "Module 2 - Classification des Risques IA", duration: "1h" },
-    { title: "Module 3 - Cartographie des Systèmes IA", duration: "1h15" },
+    { title: "Module 1 - Fondamentaux de l'AI Act", duration: "25 min" },
+    { title: "Module 2 - Classification des Risques IA", duration: "25 min" },
+    { title: "Module 3 - Cartographie des Systèmes IA", duration: "55 min" },
     { title: "Module 4 - Gouvernance IA en Entreprise", duration: "1h" },
     { title: "Module 5 - Systèmes à Haut Risque", duration: "1h30" },
     { title: "Module 6 - Audit & Mise en Conformité", duration: "1h30" },
