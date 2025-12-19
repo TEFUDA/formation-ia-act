@@ -2,16 +2,6 @@
 // Routes pour générer et télécharger les documents PDF individuels
 
 import { NextRequest, NextResponse } from 'next/server';
-
-// Note: Pour la génération PDF côté serveur, plusieurs options:
-// 1. puppeteer (lourd mais complet)
-// 2. @react-pdf/renderer (React-based)
-// 3. pdfkit (Node.js natif)
-// 4. jspdf avec canvas (nécessite polyfills)
-
-// Pour cet exemple, on utilise une approche simplifiée
-// En production, vous pouvez utiliser puppeteer ou un service comme DocRaptor
-
 import PDFDocument from 'pdfkit';
 
 // Infos de l'organisme
@@ -30,16 +20,25 @@ const ORGANISME = {
   nda: "11 75 12345 67",
 };
 
-const PLANS = {
-  solo: { name: "Solo", priceHT: 500, users: 1 },
-  equipe: { name: "Équipe", priceHT: 2000, users: 5 },
-  enterprise: { name: "Enterprise", priceHT: 18000, users: 50 },
-};
+// Helper: Convertir le PDF en Uint8Array (compatible avec NextResponse)
+async function generatePDF(
+  buildPDF: (doc: InstanceType<typeof PDFDocument>) => void
+): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 50 });
+    const chunks: Buffer[] = [];
 
-// GET /api/opco-documents/convention?invoice=XXX
-// GET /api/opco-documents/invoice?invoice=XXX
-// GET /api/opco-documents/programme
-// GET /api/opco-documents/attestation?invoice=XXX
+    doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+    doc.on('end', () => {
+      const buffer = Buffer.concat(chunks);
+      resolve(new Uint8Array(buffer));
+    });
+    doc.on('error', reject);
+
+    buildPDF(doc);
+    doc.end();
+  });
+}
 
 export async function GET(
   request: NextRequest,
@@ -47,76 +46,62 @@ export async function GET(
 ) {
   const { type } = params;
   const searchParams = request.nextUrl.searchParams;
-  const invoiceNumber = searchParams.get('invoice');
+  const invoiceNumber = searchParams.get('invoice') || 'FA-2024-000001';
 
-  // Vérifier l'authentification (récupérer l'utilisateur depuis la session)
-  // const session = await getServerSession(authOptions);
-  // if (!session) {
-  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  // }
-
-  // Récupérer les infos client depuis la BDD basé sur le numéro de facture
-  // const purchase = await prisma.purchase.findUnique({ where: { invoiceNumber } });
-
-  // Pour cet exemple, on utilise des données de test
+  // Données de test (en production, récupérer depuis la BDD)
   const mockClient = {
     firstName: "Jean",
     lastName: "Dupont",
     email: "jean.dupont@example.com",
     company: "Ma Société SAS",
     siret: "987 654 321 00001",
-    address: "456 Avenue des Champs",
-    postalCode: "75008",
-    city: "Paris",
   };
 
   const mockPurchase = {
-    planId: 'solo' as const,
     planName: "Solo",
     priceHT: 500,
     priceTTC: 600,
     tva: 100,
     users: 1,
-    invoiceNumber: invoiceNumber || 'FA-2024-123456',
+    invoiceNumber,
     purchaseDate: new Date(),
     accessEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   };
 
   try {
-    let pdfBuffer: Buffer;
+    let pdfData: Uint8Array;
     let filename: string;
 
     switch (type) {
       case 'convention':
-        pdfBuffer = await generateConventionPDF(mockClient, mockPurchase);
-        filename = `convention-${mockPurchase.invoiceNumber}.pdf`;
+        pdfData = await generateConventionPDF(mockClient, mockPurchase);
+        filename = `convention-${invoiceNumber}.pdf`;
         break;
 
       case 'invoice':
-        pdfBuffer = await generateInvoicePDF(mockClient, mockPurchase);
-        filename = `facture-${mockPurchase.invoiceNumber}.pdf`;
+        pdfData = await generateInvoicePDF(mockClient, mockPurchase);
+        filename = `facture-${invoiceNumber}.pdf`;
         break;
 
       case 'programme':
-        pdfBuffer = await generateProgrammePDF();
+        pdfData = await generateProgrammePDF();
         filename = 'programme-formation-ai-act.pdf';
         break;
 
       case 'attestation':
         const score = parseInt(searchParams.get('score') || '85');
-        pdfBuffer = await generateAttestationPDF(mockClient, mockPurchase, new Date(), score);
-        filename = `attestation-${mockPurchase.invoiceNumber}.pdf`;
+        pdfData = await generateAttestationPDF(mockClient, mockPurchase, new Date(), score);
+        filename = `attestation-${invoiceNumber}.pdf`;
         break;
 
       default:
         return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
     }
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfData, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
-        'Content-Length': pdfBuffer.length.toString(),
       },
     });
 
@@ -130,27 +115,22 @@ export async function GET(
 }
 
 // ============================================
-// GÉNÉRATION CONVENTION PDF (avec pdfkit)
+// GÉNÉRATION CONVENTION PDF
 // ============================================
-async function generateConventionPDF(client: any, purchase: any): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks: Buffer[] = [];
-
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-
+async function generateConventionPDF(client: any, purchase: any): Promise<Uint8Array> {
+  return generatePDF((doc) => {
     // En-tête
     doc.rect(0, 0, doc.page.width, 80).fill('#0A0A1B');
     doc.fillColor('#FFFFFF')
        .fontSize(18)
+       .font('Helvetica-Bold')
        .text(ORGANISME.name, 50, 25, { align: 'center' });
     doc.fontSize(10)
+       .font('Helvetica')
        .text(`Organisme certifié Qualiopi - N° ${ORGANISME.qualiopi}`, 50, 50, { align: 'center' });
 
     doc.fillColor('#000000');
-    doc.moveDown(3);
+    doc.y = 100;
 
     // Titre
     doc.fontSize(16)
@@ -227,25 +207,17 @@ async function generateConventionPDF(client: any, purchase: any): Promise<Buffer
          doc.page.height - 50,
          { align: 'center' }
        );
-
-    doc.end();
   });
 }
 
 // ============================================
 // GÉNÉRATION FACTURE PDF
 // ============================================
-async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks: Buffer[] = [];
-
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-
+async function generateInvoicePDF(client: any, purchase: any): Promise<Uint8Array> {
+  return generatePDF((doc) => {
     // En-tête
     doc.rect(0, 0, doc.page.width, 100).fill('#0A0A1B');
+    
     doc.fillColor('#FFFFFF')
        .fontSize(24)
        .font('Helvetica-Bold')
@@ -271,7 +243,6 @@ async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
     doc.moveDown(0.5);
     doc.fontSize(9).font('Helvetica');
     
-    // Émetteur
     const emitterY = doc.y;
     doc.text(ORGANISME.legalName, 50);
     doc.text(ORGANISME.address, 50);
@@ -279,13 +250,8 @@ async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
     doc.text(`SIRET : ${ORGANISME.siret}`, 50);
     doc.text(`TVA : ${ORGANISME.tva}`, 50);
 
-    // Client
     doc.y = emitterY;
     doc.text(client.company || `${client.firstName} ${client.lastName}`, 350);
-    if (client.address) {
-      doc.text(client.address, 350);
-      doc.text(`${client.postalCode} ${client.city}`, 350);
-    }
     if (client.siret) doc.text(`SIRET : ${client.siret}`, 350);
     doc.text(client.email, 350);
 
@@ -298,10 +264,8 @@ async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
        .font('Helvetica-Bold')
        .fontSize(9);
     doc.text('DÉSIGNATION', 55, tableTop + 8);
-    doc.text('QTÉ', 300, tableTop + 8, { align: 'center' });
-    doc.text('P.U. HT', 380, tableTop + 8, { align: 'center' });
-    doc.text('TOTAL HT', 480, tableTop + 8, { align: 'right' });
-
+    doc.text('TOTAL HT', doc.page.width - 55, tableTop + 8, { align: 'right' });
+    
     // Ligne produit
     doc.font('Helvetica').fontSize(9);
     const lineY = tableTop + 35;
@@ -309,25 +273,20 @@ async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
     doc.fillColor('#666666').fontSize(8);
     doc.text(`${purchase.users} utilisateur(s) - Accès 12 mois`, 55, lineY + 12);
     doc.fillColor('#000000').fontSize(9);
-    doc.text(`${purchase.users}`, 300, lineY, { align: 'center' });
-    doc.text(`${(purchase.priceHT / purchase.users).toFixed(2)} €`, 380, lineY, { align: 'center' });
-    doc.text(`${purchase.priceHT.toFixed(2)} €`, 480, lineY, { align: 'right' });
-
-    // Ligne séparation
-    doc.moveTo(50, lineY + 40).lineTo(doc.page.width - 50, lineY + 40).stroke('#cccccc');
+    doc.text(`${purchase.priceHT.toFixed(2)} €`, doc.page.width - 55, lineY, { align: 'right' });
 
     // Totaux
-    const totalsY = lineY + 60;
-    doc.text('Total HT :', 380, totalsY);
-    doc.text(`${purchase.priceHT.toFixed(2)} €`, 480, totalsY, { align: 'right' });
+    const totalsY = lineY + 50;
+    doc.text('Total HT :', 400, totalsY);
+    doc.text(`${purchase.priceHT.toFixed(2)} €`, doc.page.width - 55, totalsY, { align: 'right' });
     
-    doc.text('TVA (20%) :', 380, totalsY + 15);
-    doc.text(`${purchase.tva.toFixed(2)} €`, 480, totalsY + 15, { align: 'right' });
+    doc.text('TVA (20%) :', 400, totalsY + 15);
+    doc.text(`${purchase.tva.toFixed(2)} €`, doc.page.width - 55, totalsY + 15, { align: 'right' });
     
-    doc.rect(370, totalsY + 30, 175, 25).fill('#00FF88');
+    doc.rect(390, totalsY + 28, doc.page.width - 440, 25).fill('#00FF88');
     doc.fillColor('#000000').font('Helvetica-Bold').fontSize(11);
-    doc.text('Total TTC :', 380, totalsY + 38);
-    doc.text(`${purchase.priceTTC.toFixed(2)} €`, 480, totalsY + 38, { align: 'right' });
+    doc.text('Total TTC :', 400, totalsY + 36);
+    doc.text(`${purchase.priceTTC.toFixed(2)} €`, doc.page.width - 55, totalsY + 36, { align: 'right' });
 
     // Mention paiement
     doc.fillColor('#059669').font('Helvetica-Bold').fontSize(10);
@@ -336,39 +295,29 @@ async function generateInvoicePDF(client: any, purchase: any): Promise<Buffer> {
     doc.text(`Paiement reçu le ${purchase.purchaseDate.toLocaleDateString('fr-FR')} par carte bancaire`, 50, totalsY + 85);
 
     // Infos OPCO
-    doc.rect(50, totalsY + 110, doc.page.width - 100, 60).fill('#fafafa');
+    doc.rect(50, totalsY + 110, doc.page.width - 100, 50).fill('#fafafa');
     doc.fillColor('#000000').font('Helvetica-Bold').fontSize(9);
     doc.text('Informations pour votre OPCO :', 60, totalsY + 120);
     doc.font('Helvetica').fontSize(8);
     doc.text(`• Organisme certifié Qualiopi N° ${ORGANISME.qualiopi}`, 60, totalsY + 135);
     doc.text(`• N° de déclaration d'activité : ${ORGANISME.nda}`, 60, totalsY + 148);
-    doc.text('• Durée de formation : 8 heures', 60, totalsY + 161);
 
     // Pied de page
     doc.fontSize(7).fillColor('#888888');
     doc.text(
       `${ORGANISME.legalName} - SIRET ${ORGANISME.siret} - TVA ${ORGANISME.tva}`,
       50,
-      doc.page.height - 40,
+      doc.page.height - 30,
       { align: 'center' }
     );
-
-    doc.end();
   });
 }
 
 // ============================================
 // GÉNÉRATION PROGRAMME PDF
 // ============================================
-async function generateProgrammePDF(): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks: Buffer[] = [];
-
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-
+async function generateProgrammePDF(): Promise<Uint8Array> {
+  return generatePDF((doc) => {
     // En-tête
     doc.rect(0, 0, doc.page.width, 80).fill('#0A0A1B');
     doc.fillColor('#FFFFFF')
@@ -442,11 +391,9 @@ async function generateProgrammePDF(): Promise<Buffer> {
     doc.text(
       `${ORGANISME.name} - Qualiopi N° ${ORGANISME.qualiopi} - NDA ${ORGANISME.nda}`,
       50,
-      doc.page.height - 40,
+      doc.page.height - 30,
       { align: 'center' }
     );
-
-    doc.end();
   });
 }
 
@@ -458,15 +405,8 @@ async function generateAttestationPDF(
   purchase: any,
   completionDate: Date,
   score: number
-): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks: Buffer[] = [];
-
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-
+): Promise<Uint8Array> {
+  return generatePDF((doc) => {
     // Bordure décorative
     doc.rect(15, 15, doc.page.width - 30, doc.page.height - 30)
        .lineWidth(2)
@@ -474,10 +414,11 @@ async function generateAttestationPDF(
 
     // En-tête
     doc.fillColor('#666666').fontSize(12).font('Helvetica');
-    doc.text(ORGANISME.name, { align: 'center' });
+    doc.text(ORGANISME.name, 50, 40, { align: 'center' });
     doc.fontSize(9);
     doc.text(`Organisme certifié Qualiopi - N° ${ORGANISME.qualiopi}`, { align: 'center' });
     doc.text(`N° de déclaration d'activité : ${ORGANISME.nda}`, { align: 'center' });
+
     doc.moveDown(3);
 
     // Titre
@@ -485,6 +426,7 @@ async function generateAttestationPDF(
     doc.text('ATTESTATION', { align: 'center' });
     doc.fontSize(14);
     doc.text('DE FIN DE FORMATION', { align: 'center' });
+
     doc.moveDown(2);
 
     // Corps
@@ -492,13 +434,14 @@ async function generateAttestationPDF(
     doc.text('Je soussigné(e), représentant de l\'organisme de formation', { align: 'center' });
     doc.font('Helvetica-Bold').text(ORGANISME.legalName, { align: 'center' });
     doc.font('Helvetica').text('atteste que :', { align: 'center' });
+
     doc.moveDown(1.5);
 
     // Nom participant
-    doc.rect(100, doc.y, doc.page.width - 200, 30).fill('#f0f7ff');
     doc.fillColor('#0066CC').fontSize(16).font('Helvetica-Bold');
     doc.text(`${client.firstName} ${client.lastName}`, { align: 'center' });
-    doc.moveDown(1.5);
+
+    doc.moveDown(1);
 
     // Détails
     doc.fillColor('#000000').fontSize(11).font('Helvetica');
@@ -507,21 +450,23 @@ async function generateAttestationPDF(
       doc.moveDown(0.5);
     }
     doc.text('a suivi et validé avec succès la formation :', { align: 'center' });
+
     doc.moveDown(1);
 
     // Formation
-    doc.rect(80, doc.y, doc.page.width - 160, 35).fill('#0A0A1B');
-    doc.fillColor('#FFFFFF').fontSize(12).font('Helvetica-Bold');
+    doc.fontSize(12).font('Helvetica-Bold');
     doc.text('Formation AI Act - Conformité Article 4', { align: 'center' });
-    doc.moveDown(2);
+
+    doc.moveDown(1.5);
 
     // Infos
-    doc.fillColor('#000000').fontSize(10).font('Helvetica');
-    doc.text(`Durée : 8 heures`);
-    doc.text(`Période : du ${purchase.purchaseDate.toLocaleDateString('fr-FR')} au ${completionDate.toLocaleDateString('fr-FR')}`);
-    doc.text('Modalité : Formation en ligne (e-learning)');
-    doc.text(`Évaluation : Quiz validé avec ${score}% de réussite`);
-    doc.moveDown(2);
+    doc.fontSize(10).font('Helvetica');
+    doc.text(`Durée : 8 heures`, { align: 'center' });
+    doc.text(`Période : du ${purchase.purchaseDate.toLocaleDateString('fr-FR')} au ${completionDate.toLocaleDateString('fr-FR')}`, { align: 'center' });
+    doc.text('Modalité : Formation en ligne (e-learning)', { align: 'center' });
+    doc.text(`Évaluation : Quiz validé avec ${score}% de réussite`, { align: 'center' });
+
+    doc.moveDown(3);
 
     // Signature
     doc.text(`Fait à ${ORGANISME.city}, le ${new Date().toLocaleDateString('fr-FR')}`, { align: 'right' });
@@ -534,10 +479,8 @@ async function generateAttestationPDF(
     doc.text(
       `${ORGANISME.legalName} - SIRET ${ORGANISME.siret} - NDA ${ORGANISME.nda}`,
       50,
-      doc.page.height - 50,
+      doc.page.height - 40,
       { align: 'center' }
     );
-
-    doc.end();
   });
 }
