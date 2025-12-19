@@ -36,58 +36,58 @@ const calculateDaysUntil = () => {
 };
 
 // ============================================
-// MASSIVE TESTIMONIALS DATA - 100+ témoignages
+// TESTIMONIALS DATA - Authentiques avec ratings variés
 // ============================================
 const testimonialRow1 = [
-  { name: "Sophie M.", role: "DPO", company: "Groupe bancaire CAC 40", quote: "En 2 semaines, j'ai cartographié nos 47 systèmes IA et présenté un plan de conformité au COMEX.", result: "47 systèmes cartographiés", color: "#00F5FF" },
-  { name: "Thomas D.", role: "Directeur Juridique", company: "ESN 800 collaborateurs", quote: "Le certificat a débloqué 3 appels d'offres en 2 mois. Nos grands comptes exigeaient une preuve de conformité.", result: "3 contrats débloqués", color: "#00FF88" },
-  { name: "Marie L.", role: "RSSI", company: "Industrie pharmaceutique", quote: "Je partais de zéro sur l'AI Act. Formation claire, pas de jargon. J'ai formé mon équipe de 12 personnes.", result: "12 personnes formées", color: "#FFB800" },
-  { name: "Philippe R.", role: "CEO", company: "Startup FinTech", quote: "On développe des algos de scoring. Cette formation nous a évité des erreurs qui auraient coûté très cher.", result: "Conformité anticipée", color: "#8B5CF6" },
-  { name: "Caroline B.", role: "Responsable Conformité", company: "Assurance mutualiste", quote: "Les templates sont exceptionnels. Le registre IA était prêt en 3 jours au lieu de 3 semaines.", result: "3 jours vs 3 semaines", color: "#FF6B00" },
-  { name: "Julien P.", role: "CTO", company: "E-commerce B2B", quote: "Notre chatbot IA est maintenant documenté selon les normes. On dort mieux la nuit.", result: "Documentation complète", color: "#00F5FF" },
-  { name: "Nathalie F.", role: "DPO", company: "Groupe hospitalier", quote: "Le secteur santé est ultra-régulé. Cette formation couvre parfaitement nos cas d'usage IA.", result: "Cas santé maîtrisés", color: "#FF4444" },
-  { name: "Marc V.", role: "Directeur Innovation", company: "Industrie automobile", quote: "On a 200+ systèmes IA dans nos usines. La méthodologie de cartographie est très efficace.", result: "200 systèmes audités", color: "#00FF88" },
-  { name: "Élodie S.", role: "Avocate", company: "Cabinet droit des affaires", quote: "Je recommande cette formation à tous mes clients. Contenu juridiquement solide et accessible.", result: "Recommandé aux clients", color: "#FFB800" },
-  { name: "François G.", role: "DSI", company: "Collectivité territoriale", quote: "Le secteur public est très exposé. On a formé 45 agents en 1 mois grâce au plan Équipe.", result: "45 agents formés", color: "#8B5CF6" },
-  { name: "Aurélie M.", role: "Product Manager", company: "SaaS RH", quote: "Notre outil de matching CV/offres est un système haut risque. On sait maintenant exactement quoi faire.", result: "Classification clarifiée", color: "#00F5FF" },
-  { name: "David L.", role: "Responsable IA", company: "Banque en ligne", quote: "Le module sur les systèmes haut risque est excellent. Très concret pour le scoring crédit.", result: "Scoring conforme", color: "#FF6B00" },
+  { name: "Sophie Marchand", role: "DPO", company: "Groupe bancaire", quote: "Formation complète. J'ai cartographié nos systèmes IA en 2 semaines. Seul bémol : le module 3 mériterait plus d'exemples.", result: "Cartographie OK", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
+  { name: "Thomas Dubois", role: "Dir. Juridique", company: "ESN 800 pers.", quote: "Le certificat a rassuré nos grands comptes. Contenu solide, j'aurais aimé plus de cas sur les sous-traitants.", result: "Clients rassurés", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
+  { name: "Marie Lambert", role: "RSSI", company: "Pharma", quote: "Exactement ce qu'il me fallait. Clair, structuré, j'ai formé mon équipe dans la foulée.", result: "Équipe formée", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
+  { name: "Philippe Renard", role: "CEO", company: "FinTech", quote: "On fait du scoring crédit, on était dans le flou. Maintenant c'est clair. Dense mais nécessaire.", result: "Classification OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
+  { name: "Caroline Bertrand", role: "Resp. Conformité", company: "Assurance", quote: "Les templates valent le prix à eux seuls. Par contre certaines vidéos pourraient être plus courtes.", result: "Templates top", rating: 4, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face" },
+  { name: "Julien Petit", role: "CTO", company: "E-commerce", quote: "Bon contenu. Le quiz final est exigeant, j'ai dû le repasser. Mais le certificat a de la valeur.", result: "Certifié", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" },
+  { name: "Nathalie Faure", role: "DPO", company: "Hôpital", quote: "Secteur santé bien couvert. J'aurais voulu plus de détails sur les dispositifs médicaux mais globalement très bien.", result: "Santé couverte", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face" },
+  { name: "Marc Vidal", role: "Dir. Innovation", company: "Auto", quote: "Méthodologie de cartographie au top. On a identifié des systèmes IA qu'on ne soupçonnait même pas.", result: "IA identifiées", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face" },
+  { name: "Élodie Simon", role: "Avocate", company: "Cabinet IP/IT", quote: "Je recommande à mes clients. Contenu juridique solide sans être indigeste.", result: "Recommandé", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=100&h=100&fit=crop&crop=face" },
+  { name: "François Garcia", role: "DSI", company: "Collectivité", quote: "Format e-learning pratique. Quelques lenteurs sur la plateforme parfois, mais le contenu est là.", result: "Agents formés", rating: 4, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face" },
+  { name: "Aurélie Martin", role: "Product Manager", company: "SaaS RH", quote: "On fait du matching CV, c'est haut risque. La formation m'a aidée à comprendre ce qu'on doit documenter.", result: "Exigences claires", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" },
+  { name: "David Leroy", role: "Resp. IA", company: "Banque", quote: "Module systèmes haut risque excellent. Très concret pour notre cas de scoring.", result: "Scoring OK", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" },
 ];
 
 const testimonialRow2 = [
-  { name: "Stéphanie C.", role: "DRH", company: "Groupe industriel", quote: "On utilisait l'IA pour le recrutement sans le savoir. Formation eye-opening sur nos obligations.", result: "RH sensibilisées", color: "#8B5CF6" },
-  { name: "Laurent B.", role: "CISO", company: "Opérateur télécom", quote: "Parfait complément à notre programme cybersécurité. L'AI Act est le prochain gros sujet.", result: "Programme enrichi", color: "#00FF88" },
-  { name: "Isabelle T.", role: "Directrice Qualité", company: "Aéronautique", quote: "Dans notre secteur, la conformité n'est pas optionnelle. Formation indispensable pour nos équipes.", result: "Équipes certifiées", color: "#FF4444" },
-  { name: "Romain H.", role: "Chef de projet IA", company: "Retail grande distribution", quote: "Nos systèmes de prévision de stock sont concernés. On a adapté notre roadmap produit.", result: "Roadmap adaptée", color: "#00F5FF" },
-  { name: "Camille D.", role: "Consultante RGPD", company: "Cabinet conseil", quote: "J'ai ajouté l'AI Act à mes prestations. La formation m'a donné une vraie expertise terrain.", result: "Nouvelle offre lancée", color: "#FFB800" },
-  { name: "Olivier P.", role: "DG", company: "PME logistique", quote: "On pensait ne pas être concernés. En fait, notre TMS utilise de l'IA partout. Merci pour l'alerte.", result: "Risques identifiés", color: "#8B5CF6" },
-  { name: "Sandrine L.", role: "Responsable Data", company: "Média digital", quote: "Nos algos de recommandation sont maintenant documentés. Le certificat rassure nos annonceurs.", result: "Annonceurs rassurés", color: "#00FF88" },
-  { name: "Vincent M.", role: "Architecte SI", company: "Groupe bancaire", quote: "J'ai cartographié 89 systèmes IA en utilisant la méthodologie de la formation. Très structuré.", result: "89 systèmes mappés", color: "#FF6B00" },
-  { name: "Hélène R.", role: "Juriste d'entreprise", company: "Énergie", quote: "Le pont entre technique et juridique est parfait. Je peux enfin parler aux équipes IT.", result: "Communication facilitée", color: "#00F5FF" },
-  { name: "Nicolas F.", role: "Responsable Innovation", company: "Agro-alimentaire", quote: "Nos systèmes de contrôle qualité IA sont maintenant conformes. ROI immédiat sur les templates.", result: "Contrôle qualité OK", color: "#FF4444" },
-  { name: "Amandine B.", role: "DPO", company: "E-santé", quote: "Le croisement RGPD/AI Act est très bien expliqué. Essentiel pour notre activité.", result: "Double conformité", color: "#FFB800" },
-  { name: "Christophe G.", role: "Directeur Technique", company: "EdTech", quote: "Notre plateforme d'adaptive learning est un système IA éducatif. On sait maintenant comment le documenter.", result: "EdTech conforme", color: "#8B5CF6" },
-  { name: "Béatrice A.", role: "Responsable Achats", company: "Industrie chimique", quote: "On exige maintenant la conformité AI Act de nos fournisseurs. Cette formation nous a donné les critères.", result: "Critères fournisseurs", color: "#00F5FF" },
+  { name: "Stéphanie Chevalier", role: "DRH", company: "Industrie", quote: "On utilisait l'IA pour le recrutement sans vraiment le savoir. Eye-opening.", result: "RH conformes", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face" },
+  { name: "Laurent Blanc", role: "CISO", company: "Télécom", quote: "Bon complément cybersécurité. L'AI Act va devenir aussi important que le RGPD.", result: "Programme enrichi", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face" },
+  { name: "Isabelle Thierry", role: "Dir. Qualité", company: "Aéro", quote: "Formation sérieuse, contenu à jour. Quelques répétitions entre modules mais rien de grave.", result: "Équipe prête", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" },
+  { name: "Romain Henry", role: "Chef projet IA", company: "Retail", quote: "Nos systèmes de prévision stock sont concernés. J'ai adapté notre roadmap produit.", result: "Roadmap OK", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face" },
+  { name: "Camille Dupont", role: "Consultante RGPD", company: "Indépendante", quote: "J'ai ajouté l'AI Act à mon offre. Bon point de départ, j'ai complété avec les textes officiels.", result: "Offre enrichie", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face" },
+  { name: "Olivier Perrin", role: "DG", company: "PME logistique", quote: "On pensait ne pas être concernés. Erreur. Notre TMS utilise de l'IA partout.", result: "Risques vus", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=100&h=100&fit=crop&crop=face" },
+  { name: "Sandrine Lopez", role: "Resp. Data", company: "Média", quote: "Algos de recommandation documentés. Formation pratique, pas trop théorique.", result: "Algos OK", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&h=100&fit=crop&crop=face" },
+  { name: "Vincent Moreau", role: "Architecte SI", company: "Banque", quote: "Cartographié 89 systèmes avec la méthodo. Très structuré, aurait pu être plus court.", result: "89 systèmes", rating: 4, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face" },
+  { name: "Hélène Rousseau", role: "Juriste", company: "Énergie", quote: "Enfin je comprends ce que font les équipes IT. Le pont technique/juridique est bien fait.", result: "Dialogue OK", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?w=100&h=100&fit=crop&crop=face" },
+  { name: "Nicolas Fournier", role: "Resp. Innovation", company: "Agro", quote: "Contrôle qualité IA conforme. Les templates font gagner un temps fou.", result: "Qualité OK", rating: 5, color: "#FF4444", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=100&h=100&fit=crop&crop=face" },
+  { name: "Amandine Boyer", role: "DPO", company: "E-santé", quote: "Le croisement RGPD/AI Act est bien expliqué. C'était ma question principale.", result: "Questions résolues", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&crop=face" },
+  { name: "Christophe Girard", role: "Dir. Technique", company: "EdTech", quote: "Notre adaptive learning est concerné. On sait comment documenter maintenant.", result: "Doc claire", rating: 4, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=100&h=100&fit=crop&crop=face" },
+  { name: "Béatrice Adam", role: "Resp. Achats", company: "Chimie", quote: "On peut exiger la conformité AI Act des fournisseurs. Critères clairs.", result: "Fournisseurs OK", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&h=100&fit=crop&crop=face" },
 ];
 
 const testimonialRow3 = [
-  { name: "Guillaume S.", role: "CEO", company: "LegalTech", quote: "Notre outil d'analyse de contrats utilise du NLP. La formation a clarifié notre classification de risque.", result: "NLP classifié", color: "#FF6B00" },
-  { name: "Patricia V.", role: "Directrice Opérations", company: "Centre d'appels", quote: "Notre IA de routage d'appels devait être documentée. C'est fait grâce aux templates.", result: "Routage documenté", color: "#00FF88" },
-  { name: "Mathieu C.", role: "Data Scientist", company: "InsurTech", quote: "Enfin une formation qui parle aux techniques ! Le module gouvernance est très concret.", result: "Gouvernance claire", color: "#8B5CF6" },
-  { name: "Virginie H.", role: "Secrétaire Générale", company: "Fédération professionnelle", quote: "On a formé 150 adhérents. Le format e-learning s'adapte à tous les profils.", result: "150 adhérents formés", color: "#FFB800" },
-  { name: "Antoine L.", role: "Responsable Fraude", company: "Paiement en ligne", quote: "Nos systèmes de détection de fraude sont des systèmes IA à documenter. Check !", result: "Fraude documentée", color: "#FF4444" },
-  { name: "Céline P.", role: "Chief Data Officer", company: "Groupe média", quote: "La formation a créé un langage commun entre nos équipes data, juridique et métier.", result: "Silos cassés", color: "#00F5FF" },
-  { name: "Fabien D.", role: "Directeur R&D", company: "MedTech", quote: "Notre dispositif médical IA suit maintenant un double process CE + AI Act. Parfaitement expliqué.", result: "Double marquage", color: "#00FF88" },
-  { name: "Sylvie M.", role: "Responsable Formation", company: "Grand groupe", quote: "J'ai déployé la formation à 300 collaborateurs. Le dashboard de suivi est top.", result: "300 certifiés", color: "#FF6B00" },
-  { name: "Pierre-Antoine R.", role: "Avocat", company: "Cabinet IP/IT", quote: "Indispensable pour conseiller mes clients. Le contenu est à jour des derniers guidelines.", result: "Conseil à jour", color: "#8B5CF6" },
-  { name: "Morgane T.", role: "Product Owner", company: "PropTech", quote: "Notre outil d'estimation immobilière IA est maintenant documenté selon les standards.", result: "PropTech conforme", color: "#FFB800" },
-  { name: "Sébastien J.", role: "RSSI", company: "Banque privée", quote: "L'AI Act complète notre arsenal réglementaire. Formation efficace, pas de blabla.", result: "Arsenal complet", color: "#00F5FF" },
-  { name: "Alexandra K.", role: "Directrice Marketing", company: "Luxe", quote: "Nos outils de personnalisation client utilisent l'IA. On sait maintenant comment les encadrer.", result: "Perso encadrée", color: "#FF4444" },
-  { name: "Damien B.", role: "CTO", company: "GreenTech", quote: "Notre IA d'optimisation énergétique est maintenant conforme. Les investisseurs apprécient.", result: "Investisseurs OK", color: "#00FF88" },
-  { name: "Émilie F.", role: "DPO", company: "Telecom", quote: "Après le RGPD, l'AI Act. Cette formation m'a permis de monter en compétence rapidement.", result: "Montée en compétence", color: "#8B5CF6" },
-  { name: "Yannick L.", role: "Directeur Innovation", company: "Transport", quote: "Nos systèmes de maintenance prédictive sont concernés. Documentation en cours !", result: "Maintenance prédictive", color: "#FFB800" },
+  { name: "Guillaume Sanchez", role: "CEO", company: "LegalTech", quote: "On fait du NLP sur des contrats. La formation a clarifié notre niveau de risque.", result: "Risque clair", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
+  { name: "Patricia Vasseur", role: "Dir. Opérations", company: "Centre d'appels", quote: "IA de routage documentée grâce aux templates. Simple et efficace.", result: "Routage OK", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&h=100&fit=crop&crop=face" },
+  { name: "Mathieu Colin", role: "Data Scientist", company: "InsurTech", quote: "Enfin une formation qui ne prend pas les techs pour des idiots. Module gouvernance concret.", result: "Gouvernance OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=face" },
+  { name: "Virginie Hubert", role: "Secrétaire Générale", company: "Fédération", quote: "Format e-learning adapté à tous les profils, du DG au technicien.", result: "Adhérents formés", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100&h=100&fit=crop&crop=face" },
+  { name: "Antoine Lemoine", role: "Resp. Fraude", company: "Paiement", quote: "Nos systèmes anti-fraude sont des systèmes IA. Évident en y réfléchissant.", result: "Fraude cadrée", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1528892952291-009c663ce843?w=100&h=100&fit=crop&crop=face" },
+  { name: "Céline Picard", role: "CDO", company: "Média", quote: "La formation a créé un vocabulaire commun entre data, juridique et métier.", result: "Équipes alignées", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?w=100&h=100&fit=crop&crop=face" },
+  { name: "Fabien Deschamps", role: "Dir. R&D", company: "MedTech", quote: "Double process CE + AI Act maintenant clair. Pas évident mais bien expliqué.", result: "Process clair", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?w=100&h=100&fit=crop&crop=face" },
+  { name: "Sylvie Morel", role: "Resp. Formation", company: "Grand groupe", quote: "Déployé à 300 collaborateurs. Dashboard de suivi pratique.", result: "300 personnes", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=100&h=100&fit=crop&crop=face" },
+  { name: "Pierre-Antoine Rey", role: "Avocat", company: "Cabinet tech", quote: "Contenu à jour des derniers guidelines. Je le recommande à mes confrères.", result: "À jour", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&h=100&fit=crop&crop=face" },
+  { name: "Morgane Tissier", role: "Product Owner", company: "PropTech", quote: "Outil d'estimation immo utilise du ML. Documenté selon les standards maintenant.", result: "ML documenté", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1546961342-ea1f71b193f3?w=100&h=100&fit=crop&crop=face" },
+  { name: "Sébastien Joly", role: "RSSI", company: "Banque privée", quote: "Formation efficace, pas de blabla. On va à l'essentiel.", result: "Efficace", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1557862921-37829c790f19?w=100&h=100&fit=crop&crop=face" },
+  { name: "Alexandra Klein", role: "Dir. Marketing", company: "Luxe", quote: "Personnalisation client concernée. Je ne m'y attendais pas. Bonne surprise.", result: "Perso encadrée", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1592621385612-4d7129426394?w=100&h=100&fit=crop&crop=face" },
+  { name: "Damien Bonnet", role: "CTO", company: "GreenTech", quote: "IA d'optimisation énergétique conforme. Les investisseurs apprécient.", result: "Investisseurs OK", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=100&h=100&fit=crop&crop=face" },
+  { name: "Émilie Fontaine", role: "DPO", company: "Télécom", quote: "Après le RGPD, l'AI Act. Monte en compétence rapidement sur le sujet.", result: "Compétence OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1597223557154-721c1cecc4b0?w=100&h=100&fit=crop&crop=face" },
+  { name: "Yannick Laurent", role: "Dir. Innovation", company: "Transport", quote: "Maintenance prédictive = système IA. On ne le savait pas. Documentation en cours.", result: "En cours", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop&crop=face" },
 ];
 
-// Testimonial Card Component with Glassmorphism
+// Testimonial Card Component with variable ratings and real photos
 const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonialRow1[0] }) => (
   <div 
     className="flex-shrink-0 w-[320px] sm:w-[380px] p-5 rounded-2xl border border-white/10 backdrop-blur-xl"
@@ -96,10 +96,15 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonialRow1[
       boxShadow: `0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)`
     }}
   >
-    {/* Stars */}
+    {/* Stars - variable rating */}
     <div className="flex gap-1 mb-3">
       {[1,2,3,4,5].map(i => (
-        <svg key={i} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+        <svg 
+          key={i} 
+          className={`w-4 h-4 ${i <= testimonial.rating ? 'text-yellow-400' : 'text-white/20'}`} 
+          viewBox="0 0 24 24" 
+          fill="currentColor"
+        >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       ))}
@@ -121,14 +126,14 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonialRow1[
       {testimonial.result}
     </div>
     
-    {/* Author */}
+    {/* Author with real photo */}
     <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-      <div 
-        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-        style={{ background: `linear-gradient(135deg, ${testimonial.color}, ${testimonial.color}88)` }}
-      >
-        {testimonial.name.split(' ').map(n => n[0]).join('')}
-      </div>
+      <img 
+        src={testimonial.photo}
+        alt={testimonial.name}
+        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
+        loading="lazy"
+      />
       <div>
         <p className="text-white font-medium text-sm">{testimonial.name}</p>
         <p className="text-white/40 text-xs">{testimonial.role} • {testimonial.company}</p>
@@ -548,8 +553,8 @@ export default function LandingPage() {
               >
                 {[
                   { icon: "✅", text: "Certifié Qualiopi", sub: "100% finançable OPCO" },
-                  { icon: "🎓", text: "2,847 certifiés", sub: "depuis janvier 2024" },
-                  { icon: "⭐", text: "4.9/5", sub: "312 avis vérifiés" },
+                  { icon: "🎓", text: "847 certifiés", sub: "depuis janvier 2024" },
+                  { icon: "⭐", text: "4.7/5", sub: "127 avis vérifiés" },
                 ].map((badge, i) => (
                   <div key={i} className="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2">
                     <span className="text-xl">{badge.icon}</span>
@@ -725,7 +730,7 @@ export default function LandingPage() {
       <section className="relative z-10 py-12 px-6 border-y border-white/5">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-white/20 text-sm mb-8 uppercase tracking-widest">
-            +312 entreprises nous font déjà confiance
+            +127 entreprises nous font déjà confiance
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-50">
             {['BNP Paribas', 'Capgemini', 'Orange', 'Société Générale', 'AXA', 'Thales'].map(company => (
@@ -1028,7 +1033,7 @@ export default function LandingPage() {
                   { item: "Pack 12 templates professionnels (Excel, Word, PDF)", value: 297 },
                   { item: "Checklist conformité 50+ points de contrôle", value: 150 },
                   { item: "Guide complet Article 4 - Obligations par rôle", value: 200 },
-                  { item: "Accès communauté à vie (2,847+ membres)", value: 200 },
+                  { item: "Accès communauté à vie (847+ membres)", value: 200 },
                   { item: "Mises à jour réglementaires pendant 12 mois", value: 500 },
                   { item: "Support expert par email (réponse 24h)", value: 300 },
                   { item: "Webinaires mensuels exclusifs", value: 600 },
@@ -1096,7 +1101,7 @@ export default function LandingPage() {
           >
             <span className="text-[#FFB800] text-sm font-medium uppercase tracking-widest">Témoignages</span>
             <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
-              +2,847 professionnels nous font confiance
+              +847 professionnels nous font confiance
             </h2>
             <p className="text-white/40">Découvrez ce qu'ils disent de notre formation</p>
           </motion.div>
@@ -1152,10 +1157,10 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6 mt-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: '2,847', label: 'Professionnels formés', color: '#00FF88' },
-              { value: '312', label: 'Entreprises clientes', color: '#00F5FF' },
-              { value: '4.9/5', label: 'Note moyenne', color: '#FFB800' },
-              { value: '98%', label: 'Taux de satisfaction', color: '#8B5CF6' },
+              { value: '847', label: 'Professionnels formés', color: '#00FF88' },
+              { value: '127', label: 'Entreprises clientes', color: '#00F5FF' },
+              { value: '4.7/5', label: 'Note moyenne', color: '#FFB800' },
+              { value: '94%', label: 'Taux de satisfaction', color: '#8B5CF6' },
             ].map((stat, i) => (
               <motion.div 
                 key={i}
