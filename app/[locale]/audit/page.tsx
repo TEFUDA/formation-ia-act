@@ -44,7 +44,7 @@ const auditPlans = [
       'Call de restitution',
     ],
     cta: 'Commencer l\'audit',
-    stripeLink: 'https://buy.stripe.com/AUDIT_STARTER', // À remplacer
+    stripeLink: '/audit/questionnaire?plan=starter', // À remplacer
   },
   {
     id: 'pro',
@@ -69,7 +69,7 @@ const auditPlans = [
       'Audit multi-sites',
     ],
     cta: 'Choisir Pro',
-    stripeLink: 'https://buy.stripe.com/AUDIT_PRO', // À remplacer
+    stripeLink: '/audit/questionnaire?plan=pro', // À remplacer
   },
   {
     id: 'enterprise',
@@ -93,7 +93,7 @@ const auditPlans = [
     ],
     notIncluded: [],
     cta: 'Demander un devis',
-    stripeLink: 'https://buy.stripe.com/AUDIT_ENTERPRISE', // À remplacer
+    stripeLink: '/audit/questionnaire?plan=enterprise', // À remplacer
   },
 ];
 
