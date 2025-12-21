@@ -54,7 +54,7 @@ const packs = [
       'Support email',
     ],
     cta: 'Acheter le pack Essentiel',
-    stripeLink: 'https://buy.stripe.com/XXXXXX', // À remplacer
+    stripeLink: 'https://buy.stripe.com/7sY00b8dqdJN21i5oR3AY05', // À remplacer
   },
   {
     id: 'complet',
@@ -74,7 +74,7 @@ const packs = [
       'Accès aux futures ressources',
     ],
     cta: 'Acheter le pack Complet',
-    stripeLink: 'https://buy.stripe.com/YYYYYY', // À remplacer
+    stripeLink: 'https://buy.stripe.com/eVq14f51e0X1cFW18B3AY04', // À remplacer
   },
   {
     id: 'bundle',
@@ -94,7 +94,7 @@ const packs = [
       'Mises à jour à vie',
     ],
     cta: 'Acheter le Bundle',
-    stripeLink: 'https://buy.stripe.com/ZZZZZZ', // À remplacer
+    stripeLink: 'https://buy.stripe.com/fZudR151e2158pGbNf3AY03', // À remplacer
     badge: 'MEILLEURE OFFRE',
   },
 ];
