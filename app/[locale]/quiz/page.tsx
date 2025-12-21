@@ -463,24 +463,63 @@ export default function QuizPage() {
 
                     {/* Recommendation */}
                     <div className="border-t border-white/10 pt-6">
-                      <h3 className="text-white font-semibold mb-3">💡 Notre recommandation</h3>
+                      <h3 className="text-white font-semibold mb-3">💡 Nos solutions pour vous mettre en conformité</h3>
                       <p className="text-white/60 text-sm mb-6">
                         {risk.percentage > 50 
-                          ? "Au vu de votre score, nous vous recommandons fortement de former vos équipes à l'AI Act avant les premiers contrôles. Notre formation certifiante vous permet d'être en conformité en moins de 2 semaines."
-                          : "Même avec un score modéré, la certification permet de prouver votre conformité en cas de contrôle et rassure vos clients et partenaires."
+                          ? "Au vu de votre score, une action rapide est nécessaire. Choisissez la solution adaptée à vos besoins :"
+                          : "Même avec un score modéré, la documentation et/ou la certification prouvent votre conformité en cas de contrôle."
                         }
                       </p>
 
-                      {/* CTA */}
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Link 
-                          href="/pricing"
-                          className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold rounded-xl"
-                        >
-                          Voir les formules de formation
-                          <div className="w-5 h-5"><Icons.ArrowRight /></div>
-                        </Link>
-                      </motion.div>
+                      {/* Dual CTA */}
+                      <div className="space-y-4">
+                        {/* CTA 1: Formation */}
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link 
+                            href="/pricing"
+                            className="flex items-center justify-between w-full p-4 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold rounded-xl group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl">🎓</span>
+                              <div className="text-left">
+                                <p className="font-bold">Formation Certifiante</p>
+                                <p className="text-white/80 text-sm font-normal">6 modules + Certificat officiel</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-white/80 text-sm">À partir de 500€</span>
+                              <div className="w-5 h-5 group-hover:translate-x-1 transition-transform"><Icons.ArrowRight /></div>
+                            </div>
+                          </Link>
+                        </motion.div>
+
+                        {/* Separator */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1 h-px bg-white/10" />
+                          <span className="text-white/30 text-sm">ou</span>
+                          <div className="flex-1 h-px bg-white/10" />
+                        </div>
+
+                        {/* CTA 2: Templates */}
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Link 
+                            href="/templates"
+                            className="flex items-center justify-between w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#00F5FF]/50 text-white rounded-xl group transition-all"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl">📦</span>
+                              <div className="text-left">
+                                <p className="font-bold">Pack Templates</p>
+                                <p className="text-white/60 text-sm font-normal">12 documents prêts à l'emploi</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[#00F5FF] font-semibold">299€</span>
+                              <div className="w-5 h-5 text-white/40 group-hover:text-[#00F5FF] group-hover:translate-x-1 transition-all"><Icons.ArrowRight /></div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      </div>
 
                       {/* Trust badges */}
                       <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-white/40 text-xs">
