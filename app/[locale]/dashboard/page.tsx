@@ -849,96 +849,129 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* Resources Section */}
+        {/* Upsell Offers Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
           className="mt-12"
-          id="ressources"
+          id="offres"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-white/50 text-sm uppercase tracking-widest">Ressources Téléchargeables</h3>
-            <span className="text-[#FFB800] text-sm font-medium">🎁 847€ de bonus inclus</span>
+            <h3 className="text-white/50 text-sm uppercase tracking-widest">Offres Complémentaires</h3>
+            <span className="text-[#00FF88] text-sm font-medium">🚀 Accélérez votre conformité</span>
           </div>
           
-          <HoloCard glow="#FFB800">
-            <div className="p-6">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { name: "Template Registre IA", type: "Excel", size: "245 KB", icon: "📊", category: "Template", color: "#00FF88", file: "template-registre-ia.xlsx" },
-                  { name: "Modèle Politique IA", type: "Word", size: "128 KB", icon: "📄", category: "Template", color: "#00F5FF", file: "modele-politique-ia.docx" },
-                  { name: "Checklist Êtes-vous Concerné", type: "Excel", size: "89 KB", icon: "✅", category: "Checklist", color: "#FF6B00", file: "checklist-etes-vous-concerne.xlsx" },
-                  { name: "Template Documentation Technique", type: "Word", size: "156 KB", icon: "📋", category: "Template", color: "#8B5CF6", file: "template-documentation-technique.docx" },
-                  { name: "Matrice Classification Risques", type: "Excel", size: "178 KB", icon: "⚠️", category: "Outil", color: "#FF4444", file: "matrice-classification-risques.xlsx" },
-                  { name: "Guide AI Act Synthèse", type: "PDF", size: "2.1 MB", icon: "📚", category: "Guide", color: "#00F5FF", file: "guide-ai-act-synthese.pdf" },
-                  { name: "Fiche Poste Référent IA", type: "Word", size: "134 KB", icon: "👤", category: "Template", color: "#FFB800", file: "fiche-poste-referent-ia.docx" },
-                  { name: "Plan Audit Type", type: "Excel", size: "198 KB", icon: "🔍", category: "Template", color: "#00FF88", file: "plan-audit-type.xlsx" },
-                  { name: "Tableau Bord Conformité IA", type: "Excel", size: "312 KB", icon: "📈", category: "Outil", color: "#00F5FF", file: "tableau-bord-conformite-ia.xlsx" },
-                  { name: "Guide Audit Pas à Pas", type: "PDF", size: "1.8 MB", icon: "📖", category: "Guide", color: "#8B5CF6", file: "guide-audit-pas-a-pas.pdf" },
-                  { name: "Checklist Marquage CE", type: "Excel", size: "95 KB", icon: "🏷️", category: "Checklist", color: "#FF4444", file: "checklist-marquage-ce.xlsx" },
-                  { name: "Exemples Secteurs Activité", type: "PDF", size: "850 KB", icon: "🏢", category: "Guide", color: "#FFB800", file: "exemples-secteurs-activite.pdf" },
-                ].map((resource, i) => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Upsell 1: Templates */}
+            <HoloCard glow="#00F5FF">
+              <div className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-[#00F5FF]/10 flex items-center justify-center text-3xl flex-shrink-0">
+                    📦
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg mb-1">Pack Templates Complet</h4>
+                    <p className="text-white/50 text-sm">12 documents prêts à l'emploi pour votre conformité</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mb-6">
+                  {[
+                    "Registre IA & Politique d'utilisation",
+                    "Matrices de classification des risques",
+                    "Documentation technique & Checklists",
+                    "Guides d'audit pas à pas",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 text-white/60 text-sm">
+                      <svg className="w-4 h-4 text-[#00F5FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-white/40 line-through text-sm">900€</span>
+                    <span className="text-2xl font-bold text-[#00F5FF] ml-2">599€</span>
+                  </div>
                   <motion.a
-                    key={i}
-                    href={`/resources/${resource.file}`}
-                    download={resource.file}
+                    href="/templates"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-xl text-left transition-colors group border border-white/5 hover:border-white/10 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#00F5FF] text-black font-semibold rounded-xl text-sm flex items-center gap-2"
                   >
-                    <div 
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                      style={{ background: `${resource.color}15` }}
-                    >
-                      {resource.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-white font-medium text-sm truncate group-hover:text-[#FFB800] transition-colors">
-                        {resource.name}
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span 
-                          className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: `${resource.color}20`, color: resource.color }}
-                        >
-                          {resource.category}
-                        </span>
-                        <span className="text-white/30 text-xs">{resource.type} • {resource.size}</span>
-                      </div>
-                    </div>
-                    <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-[#FFB800]/20 flex items-center justify-center text-white/30 group-hover:text-[#FFB800] transition-colors flex-shrink-0">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                    </div>
+                    Voir les packs
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
                   </motion.a>
-                ))}
-              </div>
-
-              {/* Download All Button */}
-              <div className="mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-center sm:text-left">
-                  <p className="text-white font-medium">Télécharger tout le pack</p>
-                  <p className="text-white/40 text-sm">12 fichiers • 8.2 MB au total</p>
                 </div>
-                <a 
-                  href="/resources/pack-complet-ai-act.zip"
-                  download="pack-complet-ai-act.zip"
-                  className="flex items-center gap-2 px-6 py-3 bg-[#FFB800] hover:bg-[#FFB800]/90 text-black font-semibold rounded-xl transition-colors"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                  Tout télécharger (ZIP)
-                </a>
               </div>
-            </div>
-          </HoloCard>
+            </HoloCard>
+
+            {/* Upsell 2: Audit Automatisé */}
+            <HoloCard glow="#8B5CF6">
+              <div className="p-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-2xl bg-[#8B5CF6]/10 flex items-center justify-center text-3xl flex-shrink-0">
+                    🔍
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-white font-bold text-lg">Audit Automatisé</h4>
+                      <span className="bg-[#8B5CF6]/20 text-[#8B5CF6] text-xs font-bold px-2 py-0.5 rounded-full">NOUVEAU</span>
+                    </div>
+                    <p className="text-white/50 text-sm">Évaluez votre niveau de conformité en 15 minutes</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mb-6">
+                  {[
+                    "30 questions d'analyse approfondie",
+                    "Score de conformité détaillé",
+                    "Rapport PDF personnalisé 30 pages",
+                    "Plan d'action prioritaire",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2 text-white/60 text-sm">
+                      <svg className="w-4 h-4 text-[#8B5CF6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-white/40 text-sm">À partir de</span>
+                    <span className="text-2xl font-bold text-[#8B5CF6] ml-2">499€</span>
+                  </div>
+                  <motion.a
+                    href="/audit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-5 py-2.5 bg-[#8B5CF6] text-white font-semibold rounded-xl text-sm flex items-center gap-2"
+                  >
+                    Découvrir
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </motion.a>
+                </div>
+              </div>
+            </HoloCard>
+          </div>
+
+          {/* Info note */}
+          <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/5">
+            <p className="text-white/50 text-sm text-center">
+              💡 <span className="text-white/70">Conseil :</span> Combinez la formation avec les templates et l'audit pour une conformité complète. 
+              <a href="/templates" className="text-[#00F5FF] hover:underline ml-1">Voir le Bundle à 799€</a>
+            </p>
+          </div>
         </motion.div>
       </main>
 
