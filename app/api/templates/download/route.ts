@@ -34,9 +34,10 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('token');
   const file = searchParams.get('file');
 
-  if (!token) {
-    return NextResponse.json({ error: 'Token manquant' }, { status: 401 });
-  }
+  // MODE TEST: Token désactivé (remettre en prod)
+// if (!token) {
+//   return NextResponse.json({ error: 'Token manquant' }, { status: 401 });
+// }
 
   const templates = TEMPLATES_BY_PACK[pack] || TEMPLATES_BY_PACK.complet;
 
