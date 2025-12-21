@@ -54,7 +54,7 @@ export default function Page() {
           <div className="bg-white/10 rounded-lg p-4 mb-8">
             <h3 className="font-bold mb-4">Vos fichiers :</h3>
             {files.map((f, i) => (
-              
+              <a
                 key={i}
                 href={"/resources/" + f}
                 download
