@@ -330,6 +330,8 @@ export default function AuditResultsPage() {
 
   const highRiskFlags = results?.highRiskFlags || [];
   const profile = results?.profile || { name: 'Votre entreprise', sector: '', size: '' };
+  const totalQuestions = results?.totalQuestions || (plan === 'enterprise' ? 150 : plan === 'pro' ? 80 : 40);
+  const completedAt = results?.completedAt || new Date().toISOString();
   const recommendations = getRecommendations(categoryScores, highRiskFlags);
   const actionPlan = getActionPlan(score, plan);
 
@@ -357,8 +359,8 @@ export default function AuditResultsPage() {
           categoryScores,
           highRiskFlags,
           answers: {},
-          totalQuestions: plan === 'enterprise' ? 150 : plan === 'pro' ? 80 : 40,
-          completedAt: new Date().toISOString(),
+          totalQuestions,
+          completedAt,
         }),
       });
       
@@ -477,8 +479,969 @@ export default function AuditResultsPage() {
   };
 
   const downloadTemplates = () => {
-    // In production, this would download a zip of templates
-    alert(`Téléchargement du pack de ${plan === 'enterprise' ? '12' : '3'} templates...\n\nCette fonctionnalité sera connectée au serveur en production.`);
+    // Generate HTML templates pack
+    const templatesHTML = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pack Templates AI Act - ${profile.name || 'Entreprise'}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; padding: 40px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { color: #8B5CF6; margin-bottom: 30px; text-align: center; }
+    .template { background: white; border-radius: 12px; padding: 30px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .template h2 { color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .template p { color: #666; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+    th { background: #8B5CF6; color: white; }
+    .note { background: #f0f9ff; border-left: 4px solid #00F5FF; padding: 15px; margin: 15px 0; font-size: 14px; }
+    @media print { .no-print { display: none; } body { background: white; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ Pack Templates AI Act</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 40px;">
+      ${plan === 'enterprise' ? '12' : '3'} templates prêts à l'emploi pour ${profile.name || 'votre organisation'}
+    </p>
+
+    <!-- Template 1: Registre IA -->
+    <div class="template">
+      <h2>📋 Template 1 : Registre des Systèmes IA</h2>
+      <p>Inventaire complet de tous vos systèmes d'intelligence artificielle conformément à l'Article 49.</p>
+      <table>
+        <tr><th>ID</th><th>Nom du système</th><th>Fournisseur</th><th>Département</th><th>Classification</th><th>Responsable</th><th>Date déploiement</th></tr>
+        <tr><td>IA-001</td><td>[Nom]</td><td>[Fournisseur]</td><td>[Département]</td><td>☐ Minimal ☐ Limité ☐ Haut</td><td>[Nom]</td><td>[Date]</td></tr>
+        <tr><td>IA-002</td><td></td><td></td><td></td><td>☐ Minimal ☐ Limité ☐ Haut</td><td></td><td></td></tr>
+        <tr><td>IA-003</td><td></td><td></td><td></td><td>☐ Minimal ☐ Limité ☐ Haut</td><td></td><td></td></tr>
+      </table>
+      <div class="note">💡 À mettre à jour à chaque nouveau système ou modification majeure</div>
+    </div>
+
+    <!-- Template 2: Fiche Système -->
+    <div class="template">
+      <h2>📄 Template 2 : Fiche Descriptive Système IA</h2>
+      <table>
+        <tr><th style="width:30%">Champ</th><th>Information</th></tr>
+        <tr><td>Nom du système</td><td></td></tr>
+        <tr><td>Version</td><td></td></tr>
+        <tr><td>Fournisseur</td><td></td></tr>
+        <tr><td>Date de mise en service</td><td></td></tr>
+        <tr><td>Responsable interne</td><td></td></tr>
+        <tr><td>Finalité / Usage prévu</td><td></td></tr>
+        <tr><td>Données en entrée</td><td></td></tr>
+        <tr><td>Données en sortie</td><td></td></tr>
+        <tr><td>Classification risque</td><td>☐ Minimal ☐ Limité ☐ Haut risque ☐ Inacceptable</td></tr>
+        <tr><td>Base légale RGPD</td><td></td></tr>
+        <tr><td>Limites connues</td><td></td></tr>
+      </table>
+    </div>
+
+    <!-- Template 3: Politique IA -->
+    <div class="template">
+      <h2>📜 Template 3 : Politique d'Utilisation de l'IA</h2>
+      <h3 style="margin: 20px 0 10px;">1. Objet</h3>
+      <p>La présente politique définit les règles d'utilisation des systèmes d'intelligence artificielle au sein de ${profile.name || '[Nom de l\'entreprise]'}.</p>
+      
+      <h3 style="margin: 20px 0 10px;">2. Champ d'application</h3>
+      <p>Cette politique s'applique à l'ensemble des collaborateurs utilisant des systèmes IA dans le cadre de leurs fonctions.</p>
+      
+      <h3 style="margin: 20px 0 10px;">3. Principes directeurs</h3>
+      <ul style="margin-left: 20px;">
+        <li>Transparence : Informer les personnes concernées de l'utilisation de l'IA</li>
+        <li>Équité : S'assurer que les systèmes IA ne génèrent pas de discriminations</li>
+        <li>Responsabilité : Maintenir une supervision humaine appropriée</li>
+        <li>Sécurité : Protéger les données et les systèmes</li>
+      </ul>
+      
+      <h3 style="margin: 20px 0 10px;">4. Usages autorisés</h3>
+      <p>[Lister les usages autorisés]</p>
+      
+      <h3 style="margin: 20px 0 10px;">5. Usages interdits</h3>
+      <p>[Lister les usages interdits]</p>
+      
+      <h3 style="margin: 20px 0 10px;">6. Processus de validation</h3>
+      <p>Tout nouveau système IA doit être validé par le Référent IA avant déploiement.</p>
+      
+      <div class="note">Date d'entrée en vigueur : [Date] | Prochaine révision : [Date + 1 an]</div>
+    </div>
+
+    ${plan === 'enterprise' || plan === 'pro' ? `
+    <!-- Template 4: Checklist Classification -->
+    <div class="template">
+      <h2>✅ Template 4 : Checklist Classification des Risques</h2>
+      <p>Vérifiez si votre système IA est à haut risque selon l'Annexe III :</p>
+      <table>
+        <tr><th>Critère</th><th>Oui/Non</th><th>Commentaire</th></tr>
+        <tr><td>Utilisé dans le recrutement ou la gestion RH ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Évalue la solvabilité ou le scoring crédit ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Utilisé dans l'éducation pour l'admission/évaluation ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Utilisé dans la santé pour le diagnostic ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Utilisé dans la justice ou forces de l'ordre ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Utilisé pour la reconnaissance biométrique ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+        <tr><td>Impacte l'accès aux services essentiels ?</td><td>☐ Oui ☐ Non</td><td></td></tr>
+      </table>
+      <div class="note">⚠️ Si au moins une réponse est "Oui", votre système est potentiellement à haut risque</div>
+    </div>
+
+    <!-- Template 5: FRIA -->
+    <div class="template">
+      <h2>⚖️ Template 5 : Évaluation d'Impact (FRIA)</h2>
+      <h3>Fundamental Rights Impact Assessment</h3>
+      <table>
+        <tr><th style="width:30%">Section</th><th>Contenu</th></tr>
+        <tr><td>Système concerné</td><td></td></tr>
+        <tr><td>Date de l'évaluation</td><td></td></tr>
+        <tr><td>Responsable</td><td></td></tr>
+        <tr><td>Description du système</td><td></td></tr>
+        <tr><td>Finalité</td><td></td></tr>
+        <tr><td>Droits fondamentaux impactés</td><td>☐ Dignité ☐ Vie privée ☐ Non-discrimination ☐ Liberté d'expression ☐ Autre: ___</td></tr>
+        <tr><td>Mesures de mitigation</td><td></td></tr>
+        <tr><td>Risque résiduel</td><td>☐ Faible ☐ Moyen ☐ Élevé</td></tr>
+        <tr><td>Décision</td><td>☐ Approuvé ☐ Approuvé avec réserves ☐ Rejeté</td></tr>
+      </table>
+    </div>
+
+    <!-- Template 6: Plan Formation -->
+    <div class="template">
+      <h2>🎓 Template 6 : Plan de Formation Article 4</h2>
+      <table>
+        <tr><th>Profil</th><th>Formation requise</th><th>Durée</th><th>Échéance</th><th>Statut</th></tr>
+        <tr><td>Direction</td><td>Sensibilisation AI Act</td><td>2h</td><td></td><td>☐</td></tr>
+        <tr><td>Managers</td><td>AI Act & Management</td><td>4h</td><td></td><td>☐</td></tr>
+        <tr><td>Utilisateurs IA</td><td>Utilisation responsable IA</td><td>3h</td><td></td><td>☐</td></tr>
+        <tr><td>Équipes RH</td><td>IA et recrutement</td><td>4h</td><td></td><td>☐</td></tr>
+        <tr><td>Équipes tech</td><td>Documentation technique IA</td><td>8h</td><td></td><td>☐</td></tr>
+      </table>
+    </div>
+    ` : ''}
+
+    <p style="text-align: center; margin-top: 40px; color: #666;">
+      <br>Généré par Formation-IA-Act.fr<br>
+      <button onclick="window.print()" class="no-print" style="margin-top: 20px; padding: 15px 30px; background: #8B5CF6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+        🖨️ Imprimer / Sauvegarder en PDF
+      </button>
+    </p>
+  </div>
+</body>
+</html>
+    `;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(templatesHTML);
+      printWindow.document.close();
+    }
+  };
+
+  // Generate PowerPoint COMEX (Enterprise)
+  const generatePowerPointCOMEX = () => {
+    const pptHTML = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Présentation COMEX - Conformité AI Act</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; }
+    .slide { width: 100%; max-width: 960px; height: 540px; margin: 20px auto; background: linear-gradient(135deg, #1a1a2e, #0f0f23); border-radius: 12px; padding: 50px; color: white; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.3); page-break-after: always; }
+    .slide-title { background: linear-gradient(135deg, #8B5CF6, #00F5FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 36px; font-weight: 700; margin-bottom: 30px; }
+    .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .slide h2 { font-size: 28px; margin-bottom: 20px; color: #00F5FF; }
+    .slide p, .slide li { font-size: 18px; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .slide ul { margin-left: 30px; }
+    .slide li { margin: 10px 0; }
+    .metric { display: flex; justify-content: space-around; margin: 30px 0; }
+    .metric-box { text-align: center; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+    .metric-value { font-size: 48px; font-weight: 800; color: #00FF88; }
+    .metric-label { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 10px; }
+    .highlight { background: rgba(139, 92, 246, 0.2); padding: 20px; border-radius: 8px; border-left: 4px solid #8B5CF6; margin: 20px 0; }
+    .timeline { display: flex; justify-content: space-between; margin: 30px 0; }
+    .timeline-item { text-align: center; flex: 1; }
+    .timeline-date { font-size: 14px; color: #00F5FF; font-weight: 600; }
+    .timeline-event { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 5px; }
+    .risk-matrix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+    .risk-item { padding: 15px; border-radius: 8px; font-size: 14px; }
+    .risk-high { background: rgba(255, 68, 68, 0.2); border: 1px solid #FF4444; }
+    .risk-med { background: rgba(255, 184, 0, 0.2); border: 1px solid #FFB800; }
+    .risk-low { background: rgba(0, 255, 136, 0.2); border: 1px solid #00FF88; }
+    .logo { position: absolute; bottom: 20px; right: 30px; font-size: 12px; color: rgba(255,255,255,0.4); }
+    .slide-number { position: absolute; bottom: 20px; left: 30px; font-size: 12px; color: rgba(255,255,255,0.4); }
+    @media print { .slide { page-break-after: always; box-shadow: none; margin: 0; } body { background: white; } }
+    .print-btn { position: fixed; top: 20px; right: 20px; padding: 15px 30px; background: #8B5CF6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; z-index: 1000; }
+    @media print { .print-btn { display: none; } }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimer / Exporter PDF</button>
+
+  <!-- Slide 1: Cover -->
+  <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+    <div style="font-size: 64px; margin-bottom: 30px;">🛡️</div>
+    <h1 class="slide-title" style="font-size: 48px;">Conformité AI Act</h1>
+    <p style="font-size: 24px; color: rgba(255,255,255,0.7);">Présentation au Comité Exécutif</p>
+    <p style="margin-top: 40px; color: rgba(255,255,255,0.5);">${profile.name || 'Organisation'} • ${new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+  </div>
+
+  <!-- Slide 2: Agenda -->
+  <div class="slide">
+    <h1 class="slide-title">Agenda</h1>
+    <div class="slide-content">
+      <ul style="font-size: 22px;">
+        <li>1. Contexte réglementaire AI Act</li>
+        <li>2. Résultats de l'audit de conformité</li>
+        <li>3. Analyse des risques</li>
+        <li>4. Recommandations prioritaires</li>
+        <li>5. Plan d'action et budget</li>
+        <li>6. Gouvernance proposée</li>
+        <li>7. Prochaines étapes</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Slide 3: Context -->
+  <div class="slide">
+    <h1 class="slide-title">1. L'AI Act en bref</h1>
+    <div class="slide-content">
+      <p style="font-size: 20px; margin-bottom: 30px;">Premier cadre juridique mondial sur l'Intelligence Artificielle</p>
+      <div class="highlight">
+        <p><strong>Sanctions :</strong> Jusqu'à 35M€ ou 7% du CA mondial</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-date">Fév 2025</div><div class="timeline-event">Article 4 Formation</div></div>
+        <div class="timeline-item"><div class="timeline-date">Août 2025</div><div class="timeline-event">Interdictions</div></div>
+        <div class="timeline-item"><div class="timeline-date">Août 2026</div><div class="timeline-event">Obligations HR</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Our Score -->
+  <div class="slide">
+    <h1 class="slide-title">2. Notre score de conformité</h1>
+    <div class="slide-content">
+      <div class="metric">
+        <div class="metric-box">
+          <div class="metric-value">${score}%</div>
+          <div class="metric-label">Score global</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value" style="color: #00F5FF;">${totalQuestions}</div>
+          <div class="metric-label">Critères évalués</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value" style="color: ${highRiskFlags.length > 0 ? '#FF4444' : '#00FF88'};">${highRiskFlags.length}</div>
+          <div class="metric-label">Systèmes haut risque</div>
+        </div>
+      </div>
+      <p style="text-align: center; color: rgba(255,255,255,0.6);">Audit réalisé le ${new Date(completedAt).toLocaleDateString('fr-FR')}</p>
+    </div>
+  </div>
+
+  <!-- Slide 5: Results by Domain -->
+  <div class="slide">
+    <h1 class="slide-title">Résultats par domaine</h1>
+    <div class="slide-content">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        ${categoryScores.map(cat => `
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <span style="font-size: 24px;">${cat.icon}</span>
+            <div style="flex: 1;">
+              <div style="font-size: 14px;">${categoryNames[cat.category] || cat.category}</div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 5px;">
+                <div style="height: 100%; width: ${cat.score}%; background: ${cat.color}; border-radius: 3px;"></div>
+              </div>
+            </div>
+            <span style="font-weight: 700; color: ${cat.color};">${Math.round(cat.score)}%</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Strengths -->
+  <div class="slide">
+    <h1 class="slide-title">✅ Points forts</h1>
+    <div class="slide-content">
+      <ul>
+        ${categoryScores.filter(c => c.score >= 70).map(c => `
+          <li style="color: #00FF88;"><strong>${categoryNames[c.category] || c.category}</strong> : ${Math.round(c.score)}%</li>
+        `).join('')}
+      </ul>
+      <div class="highlight" style="margin-top: 30px;">
+        <p>Ces domaines constituent une base solide pour notre conformité AI Act.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Weaknesses -->
+  <div class="slide">
+    <h1 class="slide-title">⚠️ Points d'amélioration</h1>
+    <div class="slide-content">
+      <div class="risk-matrix">
+        ${categoryScores.filter(c => c.score < 70).map(c => `
+          <div class="risk-item ${c.score < 50 ? 'risk-high' : 'risk-med'}">
+            <strong>${categoryNames[c.category] || c.category}</strong><br>
+            Score: ${Math.round(c.score)}% - ${c.score < 50 ? 'Action urgente' : 'À améliorer'}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Key Risks -->
+  <div class="slide">
+    <h1 class="slide-title">3. Analyse des risques</h1>
+    <div class="slide-content">
+      <h2>Risques identifiés</h2>
+      <ul>
+        <li><strong>Risque réglementaire :</strong> Sanctions financières (jusqu'à 7% CA)</li>
+        <li><strong>Risque opérationnel :</strong> Suspension d'usage de certains systèmes</li>
+        <li><strong>Risque réputationnel :</strong> Impact sur l'image de marque</li>
+        <li><strong>Risque commercial :</strong> Perte de confiance clients B2B</li>
+      </ul>
+      ${highRiskFlags.length > 0 ? `
+      <div class="highlight" style="border-left-color: #FF4444; background: rgba(255,68,68,0.1);">
+        <p><strong>${highRiskFlags.length} système(s) identifié(s) comme potentiellement à haut risque</strong></p>
+      </div>
+      ` : ''}
+    </div>
+  </div>
+
+  <!-- Slide 9: Priority Actions -->
+  <div class="slide">
+    <h1 class="slide-title">4. Recommandations prioritaires</h1>
+    <div class="slide-content">
+      <ol>
+        ${categoryScores.filter(c => c.score < 80).slice(0, 4).map((c, i) => `
+          <li style="margin: 15px 0;"><strong>${categoryNames[c.category] || c.category}</strong> - ${c.score < 50 ? '🔴 Critique' : '🟠 Prioritaire'}</li>
+        `).join('')}
+      </ol>
+      <div class="highlight">
+        <p>L'Article 4 (Formation) est en vigueur depuis février 2025 - Action immédiate requise</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Action Plan Overview -->
+  <div class="slide">
+    <h1 class="slide-title">5. Plan d'action 6 mois</h1>
+    <div class="slide-content">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+        <div style="padding: 20px; background: rgba(139,92,246,0.2); border-radius: 8px; text-align: center;">
+          <div style="font-size: 24px; font-weight: 700;">M1-M2</div>
+          <div style="font-size: 14px; margin-top: 10px;">Fondations & Gouvernance</div>
+        </div>
+        <div style="padding: 20px; background: rgba(0,245,255,0.2); border-radius: 8px; text-align: center;">
+          <div style="font-size: 24px; font-weight: 700;">M3-M4</div>
+          <div style="font-size: 14px; margin-top: 10px;">Documentation & Formation</div>
+        </div>
+        <div style="padding: 20px; background: rgba(0,255,136,0.2); border-radius: 8px; text-align: center;">
+          <div style="font-size: 24px; font-weight: 700;">M5-M6</div>
+          <div style="font-size: 14px; margin-top: 10px;">Consolidation & Audit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: Budget -->
+  <div class="slide">
+    <h1 class="slide-title">Budget estimatif</h1>
+    <div class="slide-content">
+      <div class="metric">
+        <div class="metric-box">
+          <div class="metric-value" style="font-size: 36px;">30-80k€</div>
+          <div class="metric-label">Budget total estimé</div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;">
+        <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div style="color: #00F5FF;">40-50%</div>
+          <div style="font-size: 12px;">Ressources internes</div>
+        </div>
+        <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div style="color: #00F5FF;">25-35%</div>
+          <div style="font-size: 12px;">Formation</div>
+        </div>
+        <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div style="color: #00F5FF;">15-25%</div>
+          <div style="font-size: 12px;">Conseil externe</div>
+        </div>
+        <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <div style="color: #00F5FF;">5-10%</div>
+          <div style="font-size: 12px;">Outils</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 12: ROI -->
+  <div class="slide">
+    <h1 class="slide-title">Retour sur investissement</h1>
+    <div class="slide-content">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div>
+          <h2 style="color: #FF4444;">Coût de la non-conformité</h2>
+          <ul>
+            <li>Sanctions : jusqu'à 35M€</li>
+            <li>Suspension d'activité</li>
+            <li>Perte de contrats</li>
+            <li>Atteinte réputationnelle</li>
+          </ul>
+        </div>
+        <div>
+          <h2 style="color: #00FF88;">Bénéfices de la conformité</h2>
+          <ul>
+            <li>Avantage concurrentiel</li>
+            <li>Confiance clients renforcée</li>
+            <li>Maîtrise des risques</li>
+            <li>Innovation responsable</li>
+          </ul>
+        </div>
+      </div>
+      <div class="highlight" style="margin-top: 30px;">
+        <p><strong>ROI estimé : 200-500%</strong> sur 3 ans</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 13: Governance -->
+  <div class="slide">
+    <h1 class="slide-title">6. Gouvernance proposée</h1>
+    <div class="slide-content">
+      <div style="text-align: center;">
+        <div style="padding: 20px; background: rgba(139,92,246,0.3); border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+          <div style="font-size: 24px;">👤 Référent IA</div>
+          <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Pilotage opérationnel</div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+          <div style="padding: 15px; background: rgba(0,245,255,0.2); border-radius: 8px;">
+            <div>🏛️ Comité IA</div>
+            <div style="font-size: 10px;">Direction, DSI, DRH, Juridique</div>
+          </div>
+          <div style="padding: 15px; background: rgba(0,245,255,0.2); border-radius: 8px;">
+            <div>📋 Politique IA</div>
+            <div style="font-size: 10px;">Règles d'utilisation</div>
+          </div>
+          <div style="padding: 15px; background: rgba(0,245,255,0.2); border-radius: 8px;">
+            <div>✅ Validation</div>
+            <div style="font-size: 10px;">Processus avant déploiement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 14: Next Steps -->
+  <div class="slide">
+    <h1 class="slide-title">7. Prochaines étapes</h1>
+    <div class="slide-content">
+      <h2>Actions immédiates (30 jours)</h2>
+      <ol>
+        <li>Valider le budget conformité</li>
+        <li>Nommer le Référent IA</li>
+        <li>Lancer les formations Article 4</li>
+        <li>Constituer le comité de gouvernance</li>
+      </ol>
+      <div class="highlight" style="margin-top: 30px;">
+        <p><strong>Décision attendue :</strong> Validation du plan d'action et du budget</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 15: Questions -->
+  <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+    <div style="font-size: 64px; margin-bottom: 30px;">❓</div>
+    <h1 class="slide-title" style="font-size: 48px;">Questions</h1>
+    <p style="font-size: 20px; color: rgba(255,255,255,0.7); margin-top: 30px;">Merci de votre attention</p>
+  </div>
+
+  <!-- Slide 16-20: Annexes -->
+  <div class="slide">
+    <h1 class="slide-title">Annexe 1 : Calendrier AI Act</h1>
+    <div class="slide-content">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background: rgba(139,92,246,0.2);"><th style="padding: 15px; text-align: left;">Date</th><th style="padding: 15px; text-align: left;">Dispositions</th></tr>
+        <tr><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">2 février 2025</td><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">Article 4 (Formation), Pratiques interdites</td></tr>
+        <tr><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">2 août 2025</td><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">Gouvernance, Organismes notifiés</td></tr>
+        <tr><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">2 août 2026</td><td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">Obligations systèmes haut risque</td></tr>
+        <tr><td style="padding: 12px;">2 août 2027</td><td style="padding: 12px;">Systèmes HR produits Annexe I</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="slide">
+    <h1 class="slide-title">Annexe 2 : Niveaux de risque AI Act</h1>
+    <div class="slide-content">
+      <div class="risk-matrix" style="grid-template-columns: 1fr;">
+        <div class="risk-item risk-high">🚫 <strong>Inacceptable</strong> - Interdit (scoring social, manipulation subliminale...)</div>
+        <div class="risk-item risk-med">⚠️ <strong>Haut risque</strong> - Obligations renforcées (RH, santé, finance...)</div>
+        <div class="risk-item" style="background: rgba(0,245,255,0.2); border: 1px solid #00F5FF;">ℹ️ <strong>Limité</strong> - Obligations de transparence (chatbots, deepfakes...)</div>
+        <div class="risk-item risk-low">✅ <strong>Minimal</strong> - Pas d'obligation spécifique</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <h1 class="slide-title">Annexe 3 : Détail des scores</h1>
+    <div class="slide-content">
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background: rgba(139,92,246,0.2);"><th style="padding: 10px;">Domaine</th><th style="padding: 10px;">Score</th><th style="padding: 10px;">Statut</th></tr>
+        ${categoryScores.map(c => `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">${c.icon} ${categoryNames[c.category] || c.category}</td>
+            <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); color: ${c.color}; font-weight: 700;">${Math.round(c.score)}%</td>
+            <td style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">${c.score >= 80 ? '✅ Conforme' : c.score >= 60 ? '🟡 À améliorer' : '🔴 Critique'}</td>
+          </tr>
+        `).join('')}
+      </table>
+    </div>
+  </div>
+
+  <div class="slide">
+    <h1 class="slide-title">Annexe 4 : Contacts & Ressources</h1>
+    <div class="slide-content">
+      <h2>Référent AI Act proposé</h2>
+      <p>[Nom à définir] - [Fonction]</p>
+      
+      <h2 style="margin-top: 30px;">Ressources</h2>
+      <ul>
+        <li>Formation complète : formation-ia-act.fr</li>
+        <li>Texte officiel : eur-lex.europa.eu</li>
+        <li>Commission européenne : digital-strategy.ec.europa.eu</li>
+      </ul>
+      
+      <div class="highlight" style="margin-top: 30px;">
+        <p>Pour toute question : contact@formation-ia-act.fr</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+    <div style="font-size: 48px; margin-bottom: 20px;">🛡️</div>
+    <h1 class="slide-title">Merci</h1>
+    <p style="color: rgba(255,255,255,0.6);">Présentation générée par Formation-IA-Act.fr</p>
+    <p style="color: rgba(255,255,255,0.4); margin-top: 20px;">${profile.name || 'Organisation'} • ${new Date().toLocaleDateString('fr-FR')}</p>
+  </div>
+</body>
+</html>
+    `;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(pptHTML);
+      printWindow.document.close();
+    }
+  };
+
+  // Generate Organigramme Gouvernance IA
+  const generateOrganigramme = () => {
+    const orgHTML = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Organigramme Gouvernance IA - ${profile.name || 'Organisation'}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; padding: 40px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; color: #1a1a2e; margin-bottom: 10px; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 40px; }
+    .org-chart { display: flex; flex-direction: column; align-items: center; }
+    .level { display: flex; justify-content: center; gap: 30px; margin: 20px 0; position: relative; }
+    .box { background: white; border-radius: 12px; padding: 20px 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-width: 200px; position: relative; }
+    .box.direction { background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: white; }
+    .box.referent { background: linear-gradient(135deg, #00F5FF, #0066FF); color: white; border: 3px solid #FFB800; }
+    .box.comite { background: linear-gradient(135deg, #00FF88, #00CC6A); color: white; }
+    .box.equipe { background: white; border: 2px solid #8B5CF6; }
+    .box h3 { font-size: 18px; margin-bottom: 5px; }
+    .box p { font-size: 12px; opacity: 0.9; }
+    .box .role { font-size: 11px; margin-top: 10px; padding: 5px 10px; background: rgba(255,255,255,0.2); border-radius: 15px; display: inline-block; }
+    .connector { width: 2px; height: 30px; background: #8B5CF6; margin: 0 auto; }
+    .h-connector { height: 2px; background: #8B5CF6; position: absolute; top: -15px; }
+    .legend { margin-top: 50px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .legend h4 { margin-bottom: 15px; color: #1a1a2e; }
+    .legend-item { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; }
+    .legend-color { width: 30px; height: 20px; border-radius: 4px; }
+    .responsibilities { margin-top: 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .resp-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .resp-box h4 { color: #8B5CF6; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .resp-box ul { margin-left: 20px; font-size: 14px; color: #555; }
+    .resp-box li { margin: 8px 0; }
+    @media print { body { background: white; } .print-btn { display: none; } }
+    .print-btn { position: fixed; top: 20px; right: 20px; padding: 15px 30px; background: #8B5CF6; color: white; border: none; border-radius: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+  
+  <div class="container">
+    <h1>🏛️ Organigramme Gouvernance IA</h1>
+    <p class="subtitle">${profile.name || 'Organisation'} - ${new Date().toLocaleDateString('fr-FR')}</p>
+    
+    <div class="org-chart">
+      <!-- Niveau 1: Direction -->
+      <div class="level">
+        <div class="box direction">
+          <h3>👔 Direction Générale</h3>
+          <p>Sponsor exécutif</p>
+          <span class="role">Validation stratégique</span>
+        </div>
+      </div>
+      
+      <div class="connector"></div>
+      
+      <!-- Niveau 2: Comité -->
+      <div class="level">
+        <div class="box comite">
+          <h3>🏛️ Comité de Gouvernance IA</h3>
+          <p>Instance de pilotage</p>
+          <span class="role">Réunion mensuelle</span>
+        </div>
+      </div>
+      
+      <div class="connector"></div>
+      
+      <!-- Niveau 3: Référent -->
+      <div class="level">
+        <div class="box referent">
+          <h3>⭐ Référent IA</h3>
+          <p>Pilote opérationnel</p>
+          <span class="role">Point focal AI Act</span>
+        </div>
+      </div>
+      
+      <div class="connector"></div>
+      
+      <!-- Niveau 4: Équipes -->
+      <div class="level">
+        <div class="box equipe">
+          <h3>💻 DSI</h3>
+          <p>Systèmes & Data</p>
+        </div>
+        <div class="box equipe">
+          <h3>👥 DRH</h3>
+          <p>Formation & RH</p>
+        </div>
+        <div class="box equipe">
+          <h3>⚖️ Juridique</h3>
+          <p>Conformité</p>
+        </div>
+        <div class="box equipe">
+          <h3>🔒 RSSI/DPO</h3>
+          <p>Sécurité & RGPD</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Légende -->
+    <div class="legend">
+      <h4>Légende</h4>
+      <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <div class="legend-item">
+          <div class="legend-color" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);"></div>
+          <span>Direction - Sponsor exécutif</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: linear-gradient(135deg, #00FF88, #00CC6A);"></div>
+          <span>Comité - Instance de pilotage</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: linear-gradient(135deg, #00F5FF, #0066FF); border: 2px solid #FFB800;"></div>
+          <span>Référent IA - Pilote opérationnel (⭐ Clé)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: white; border: 2px solid #8B5CF6;"></div>
+          <span>Équipes support</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Responsabilités -->
+    <div class="responsibilities">
+      <div class="resp-box">
+        <h4>⭐ Référent IA</h4>
+        <ul>
+          <li>Piloter le programme de conformité AI Act</li>
+          <li>Tenir à jour le registre des systèmes IA</li>
+          <li>Coordonner les équipes sur les sujets IA</li>
+          <li>Valider les nouveaux déploiements IA</li>
+          <li>Assurer la veille réglementaire</li>
+          <li>Reporter au Comité et à la Direction</li>
+        </ul>
+      </div>
+      <div class="resp-box">
+        <h4>🏛️ Comité de Gouvernance</h4>
+        <ul>
+          <li>Valider la stratégie IA de l'organisation</li>
+          <li>Arbitrer les cas complexes</li>
+          <li>Allouer les ressources nécessaires</li>
+          <li>Suivre les indicateurs de conformité</li>
+          <li>Approuver la Politique IA</li>
+        </ul>
+      </div>
+      <div class="resp-box">
+        <h4>💻 DSI</h4>
+        <ul>
+          <li>Maintenir l'inventaire technique des IA</li>
+          <li>Assurer la documentation technique</li>
+          <li>Gérer les relations fournisseurs IA</li>
+          <li>Implémenter les mesures de sécurité</li>
+        </ul>
+      </div>
+      <div class="resp-box">
+        <h4>👥 DRH</h4>
+        <ul>
+          <li>Piloter le plan de formation Article 4</li>
+          <li>Suivre les attestations de formation</li>
+          <li>Intégrer l'IA dans l'onboarding</li>
+          <li>Gérer la conformité IA RH (recrutement)</li>
+        </ul>
+      </div>
+    </div>
+    
+    <p style="text-align: center; margin-top: 40px; color: #666; font-size: 12px;">
+      Document généré par Formation-IA-Act.fr
+    </p>
+  </div>
+</body>
+</html>
+    `;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(orgHTML);
+      printWindow.document.close();
+    }
+  };
+
+  // Generate Dashboard de suivi
+  const generateDashboard = () => {
+    const dashHTML = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard de Suivi Conformité AI Act</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f0f23; color: white; min-height: 100vh; }
+    .dashboard { padding: 30px; max-width: 1400px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .header h1 { font-size: 28px; background: linear-gradient(135deg, #8B5CF6, #00F5FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header .date { color: rgba(255,255,255,0.6); }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+    .metric-card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
+    .metric-card .value { font-size: 42px; font-weight: 700; margin-bottom: 5px; }
+    .metric-card .label { font-size: 14px; color: rgba(255,255,255,0.6); }
+    .metric-card .trend { font-size: 12px; margin-top: 10px; }
+    .metric-card .trend.up { color: #00FF88; }
+    .metric-card .trend.down { color: #FF4444; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
+    .card h3 { font-size: 18px; margin-bottom: 20px; color: #00F5FF; }
+    .progress-item { margin: 15px 0; }
+    .progress-item .header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; }
+    .timeline-item { display: flex; gap: 15px; margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    .timeline-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .timeline-content h4 { font-size: 14px; margin-bottom: 5px; }
+    .timeline-content p { font-size: 12px; color: rgba(255,255,255,0.6); }
+    .checklist-item { display: flex; align-items: center; gap: 12px; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 14px; }
+    .checklist-item.done { opacity: 0.6; }
+    .checklist-item .check { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .checklist-item.done .check { background: #00FF88; border-color: #00FF88; }
+    .alert-box { padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px; }
+    .alert-box.warning { background: rgba(255,184,0,0.1); border: 1px solid #FFB800; }
+    .alert-box.danger { background: rgba(255,68,68,0.1); border: 1px solid #FF4444; }
+    .alert-box.success { background: rgba(0,255,136,0.1); border: 1px solid #00FF88; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { color: rgba(255,255,255,0.6); font-weight: 500; }
+    .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+    .status.done { background: rgba(0,255,136,0.2); color: #00FF88; }
+    .status.progress { background: rgba(0,245,255,0.2); color: #00F5FF; }
+    .status.todo { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+    @media print { body { background: white; color: #333; } .card { border: 1px solid #ddd; background: #f9f9f9; } }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="header">
+      <h1>📊 Dashboard Conformité AI Act</h1>
+      <div>
+        <div class="date">${profile.name || 'Organisation'}</div>
+        <div class="date">Mis à jour le ${new Date().toLocaleDateString('fr-FR')}</div>
+      </div>
+    </div>
+    
+    <!-- Métriques principales -->
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="value" style="color: ${score >= 80 ? '#00FF88' : score >= 60 ? '#00F5FF' : '#FFB800'};">${score}%</div>
+        <div class="label">Score de conformité</div>
+        <div class="trend up">↑ Objectif : 80%</div>
+      </div>
+      <div class="metric-card">
+        <div class="value" style="color: #00F5FF;">${totalQuestions}</div>
+        <div class="label">Critères évalués</div>
+      </div>
+      <div class="metric-card">
+        <div class="value" style="color: ${highRiskFlags.length > 0 ? '#FF4444' : '#00FF88'};">${highRiskFlags.length}</div>
+        <div class="label">Systèmes haut risque</div>
+      </div>
+      <div class="metric-card">
+        <div class="value" style="color: #8B5CF6;">${categoryScores.filter(c => c.score >= 80).length}/${categoryScores.length}</div>
+        <div class="label">Domaines conformes</div>
+      </div>
+    </div>
+    
+    <div class="grid">
+      <!-- Progression par domaine -->
+      <div class="card">
+        <h3>📈 Progression par domaine</h3>
+        ${categoryScores.map(c => `
+          <div class="progress-item">
+            <div class="header">
+              <span>${c.icon} ${categoryNames[c.category] || c.category}</span>
+              <span style="color: ${c.color};">${Math.round(c.score)}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${c.score}%; background: ${c.color};"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <!-- Alertes -->
+      <div class="card">
+        <h3>⚠️ Alertes & Échéances</h3>
+        ${categoryScores.filter(c => c.score < 60).length > 0 ? `
+          <div class="alert-box danger">
+            🔴 ${categoryScores.filter(c => c.score < 60).length} domaine(s) critique(s) à traiter en priorité
+          </div>
+        ` : ''}
+        <div class="alert-box warning">
+          📅 Article 4 (Formation) : Obligation en vigueur depuis février 2025
+        </div>
+        <div class="alert-box warning">
+          📅 Interdictions : Août 2025
+        </div>
+        ${score >= 80 ? `
+          <div class="alert-box success">
+            ✅ Score de conformité satisfaisant (${score}%)
+          </div>
+        ` : ''}
+      </div>
+    </div>
+    
+    <div class="grid">
+      <!-- Plan d'action -->
+      <div class="card">
+        <h3>📋 Plan d'action - Prochaines étapes</h3>
+        <table>
+          <thead>
+            <tr><th>Action</th><th>Responsable</th><th>Échéance</th><th>Statut</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nommer le Référent IA</td>
+              <td>DG</td>
+              <td>M1</td>
+              <td><span class="status ${score >= 60 ? 'done' : 'progress'}">${score >= 60 ? 'Fait' : 'En cours'}</span></td>
+            </tr>
+            <tr>
+              <td>Compléter l'inventaire IA</td>
+              <td>DSI</td>
+              <td>M1</td>
+              <td><span class="status ${categoryScores.find(c => c.category === 'inventory')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find(c => c.category === 'inventory')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+            </tr>
+            <tr>
+              <td>Former les équipes (Article 4)</td>
+              <td>DRH</td>
+              <td>M2-M3</td>
+              <td><span class="status ${categoryScores.find(c => c.category === 'training')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find(c => c.category === 'training')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+            </tr>
+            <tr>
+              <td>Rédiger la Politique IA</td>
+              <td>Juridique</td>
+              <td>M2</td>
+              <td><span class="status ${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+            </tr>
+            <tr>
+              <td>Classifier les systèmes</td>
+              <td>Référent IA</td>
+              <td>M2</td>
+              <td><span class="status ${categoryScores.find(c => c.category === 'classification')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find(c => c.category === 'classification')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+            </tr>
+            <tr>
+              <td>Mettre à jour CGU (transparence)</td>
+              <td>Juridique</td>
+              <td>M3</td>
+              <td><span class="status todo">À faire</span></td>
+            </tr>
+            <tr>
+              <td>Audit interne de validation</td>
+              <td>Référent IA</td>
+              <td>M6</td>
+              <td><span class="status todo">À faire</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Checklist rapide -->
+      <div class="card">
+        <h3>✅ Checklist conformité</h3>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'inventory')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'inventory')?.score >= 80 ? '✓' : ''}</div>
+          <span>Inventaire IA complet</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? '✓' : ''}</div>
+          <span>Référent IA nommé</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'governance')?.score >= 80 ? '✓' : ''}</div>
+          <span>Politique IA rédigée</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'classification')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'classification')?.score >= 80 ? '✓' : ''}</div>
+          <span>Systèmes classifiés</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'training')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'training')?.score >= 80 ? '✓' : ''}</div>
+          <span>Formation Article 4 déployée</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'documentation')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'documentation')?.score >= 80 ? '✓' : ''}</div>
+          <span>Documentation technique</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'transparency')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'transparency')?.score >= 80 ? '✓' : ''}</div>
+          <span>Transparence IA</span>
+        </div>
+        <div class="checklist-item ${categoryScores.find(c => c.category === 'security')?.score >= 80 ? 'done' : ''}">
+          <div class="check">${categoryScores.find(c => c.category === 'security')?.score >= 80 ? '✓' : ''}</div>
+          <span>Sécurité & RGPD alignés</span>
+        </div>
+      </div>
+    </div>
+    
+    <p style="text-align: center; margin-top: 30px; color: rgba(255,255,255,0.4); font-size: 12px;">
+      Dashboard généré par Formation-IA-Act.fr | Score basé sur l'audit du ${new Date(completedAt).toLocaleDateString('fr-FR')}
+    </p>
+  </div>
+</body>
+</html>
+    `;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(dashHTML);
+      printWindow.document.close();
+    }
   };
 
   const categoryNames: Record<string, string> = {
@@ -729,7 +1692,7 @@ export default function AuditResultsPage() {
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/5 rounded-xl p-4 text-center">
-                        <div className="text-3xl font-bold text-[#00F5FF]">{results?.totalQuestions || 40}</div>
+                        <div className="text-3xl font-bold text-[#00F5FF]">{totalQuestions}</div>
                         <div className="text-sm text-white/50">Questions analysées</div>
                       </div>
                       <div className="bg-white/5 rounded-xl p-4 text-center">
@@ -997,20 +1960,20 @@ export default function AuditResultsPage() {
                       </div>
                       <div className="space-y-3">
                         <button 
-                          onClick={() => alert('Téléchargement du PowerPoint COMEX (20 slides)...\n\nCette fonctionnalité sera disponible en production.')}
+                          onClick={generatePowerPointCOMEX}
                           className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                           📊 PowerPoint COMEX (20 slides)
                         </button>
                         <button 
-                          onClick={() => alert('Téléchargement de l\'organigramme gouvernance IA...\n\nCette fonctionnalité sera disponible en production.')}
+                          onClick={generateOrganigramme}
                           className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                           🏛️ Organigramme gouvernance IA
                         </button>
                         <button 
-                          onClick={() => alert('Accès au Dashboard de suivi 12 mois...\n\nCette fonctionnalité sera disponible en production.')}
-                          className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
+                          onClick={generateDashboard}
+                          className="w-full py-3 bg-gradient-to-r from-[#8B5CF6]/20 to-[#00F5FF]/20 border border-[#00F5FF]/30 text-white font-medium rounded-xl hover:from-[#8B5CF6]/30 hover:to-[#00F5FF]/30 transition-colors flex items-center justify-center gap-2 text-sm"
                         >
                           📈 Accéder au Dashboard de suivi
                         </button>
