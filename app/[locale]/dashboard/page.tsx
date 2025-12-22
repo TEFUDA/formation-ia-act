@@ -67,11 +67,24 @@ const HoloCard = ({ children, glow = '#00F5FF', className = '' }: { children: Re
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [auditScore, setAuditScore] = useState<number | null>(null);
+  const [userPlan, setUserPlan] = useState<string>('solo');
+  const [showDevPanel, setShowDevPanel] = useState(false);
 
   useEffect(() => {
     const savedScore = localStorage.getItem('auditScore');
     if (savedScore) setAuditScore(parseInt(savedScore));
+    
+    const savedPlan = localStorage.getItem('userPlan');
+    if (savedPlan) setUserPlan(savedPlan);
+    else {
+      localStorage.setItem('userPlan', 'solo');
+    }
   }, []);
+
+  const changePlan = (plan: string) => {
+    setUserPlan(plan);
+    localStorage.setItem('userPlan', plan);
+  };
 
   const totalProgress = Math.round(modules.reduce((acc, m) => acc + m.progress, 0) / modules.length);
   const completedModules = modules.filter(m => m.completed).length;
@@ -79,6 +92,49 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#030014] text-white">
       <NeuralBackground />
+
+      {/* DEV MODE - Plan Selector */}
+      <div className="fixed bottom-4 right-4 z-[100]">
+        <button
+          onClick={() => setShowDevPanel(!showDevPanel)}
+          className="w-12 h-12 bg-[#FF6B00] rounded-full flex items-center justify-center text-white font-bold shadow-lg hover:bg-[#FF8C00] transition-colors"
+          title="Mode développeur"
+        >
+          🛠️
+        </button>
+        {showDevPanel && (
+          <div className="absolute bottom-14 right-0 bg-[#1a1a2e] border border-white/20 rounded-xl p-4 shadow-2xl min-w-[200px]">
+            <h4 className="text-sm font-bold text-white/80 mb-3">🧪 Mode Test</h4>
+            <p className="text-xs text-white/50 mb-3">Changer de plan :</p>
+            <div className="space-y-2">
+              {[
+                { id: 'solo', name: 'Solo', price: '499€', color: '#00F5FF' },
+                { id: 'pro', name: 'Pro', price: '999€', color: '#8B5CF6' },
+                { id: 'enterprise', name: 'Enterprise', price: '2999€', color: '#FFB800' },
+              ].map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => changePlan(p.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all ${
+                    userPlan === p.id
+                      ? 'bg-white/20 border-2'
+                      : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                  }`}
+                  style={{ borderColor: userPlan === p.id ? p.color : undefined }}
+                >
+                  <span style={{ color: p.color }}>{p.name}</span>
+                  <span className="text-white/40 text-xs">{p.price}</span>
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <p className="text-xs text-white/40">
+                Plan actuel: <span className="text-white font-medium">{userPlan.toUpperCase()}</span>
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Header */}
       <header className="relative z-50 px-6 py-4 border-b border-white/5">
@@ -107,7 +163,18 @@ export default function DashboardPage() {
           
           {/* Welcome */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Bonjour ! 👋</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">Bonjour ! 👋</h1>
+              <span 
+                className="px-3 py-1 rounded-full text-sm font-bold"
+                style={{ 
+                  backgroundColor: userPlan === 'enterprise' ? '#FFB800' : userPlan === 'pro' ? '#8B5CF6' : '#00F5FF',
+                  color: userPlan === 'enterprise' ? '#000' : '#fff'
+                }}
+              >
+                {userPlan.toUpperCase()}
+              </span>
+            </div>
             <p className="text-white/60">Bienvenue dans votre espace de formation AI Act</p>
           </motion.div>
 
