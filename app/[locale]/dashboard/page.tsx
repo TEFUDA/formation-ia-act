@@ -303,10 +303,13 @@ export default function DashboardPage() {
                             Télécharger
                           </a>
                           {template.hasVideo && (
-                            <button className="flex-1 py-2 rounded-lg text-xs font-medium bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/20 transition-colors flex items-center justify-center gap-1">
+                            <Link 
+                              href={`/tutoriels/${template.id}`}
+                              className="flex-1 py-2 rounded-lg text-xs font-medium bg-[#8B5CF6]/10 text-[#8B5CF6] border border-[#8B5CF6]/30 hover:bg-[#8B5CF6]/20 transition-colors flex items-center justify-center gap-1"
+                            >
                               <div className="w-3 h-3"><Icons.Video /></div>
                               Tuto vidéo
-                            </button>
+                            </Link>
                           )}
                         </div>
                       </div>
