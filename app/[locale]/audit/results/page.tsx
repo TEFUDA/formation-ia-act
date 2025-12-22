@@ -448,7 +448,7 @@ export default function AuditResultsPage() {
               <HoloCard glow="#8B5CF6" className="lg:col-span-1">
                 <div className="p-6">
                   <h3 className="text-center font-semibold mb-4">Score par domaine</h3>
-                  <RadarChart data={categoryScores.slice(0, 6).map(c => ({
+                  <RadarChart data={categoryScores.slice(0, 6).map((c: { category: string; score: number; color: string }) => ({
                     label: c.category,
                     value: Math.round(c.score),
                     color: c.color,
