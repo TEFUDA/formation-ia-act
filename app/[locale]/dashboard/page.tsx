@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const Icons = {
   Shield: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
@@ -65,6 +66,7 @@ const HoloCard = ({ children, glow = '#00F5FF', className = '' }: { children: Re
 );
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [auditScore, setAuditScore] = useState<number | null>(null);
   const [userPlan, setUserPlan] = useState<string>('solo');
@@ -223,11 +225,11 @@ export default function DashboardPage() {
                 {/* Quick Actions */}
                 <h3 className="text-lg font-semibold mb-4">Actions rapides</h3>
                 <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                  <button onClick={() => setActiveTab('formation')} className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors">
+                  <Link href="/formation" className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors block">
                     <span className="text-2xl mb-2 block">▶️</span>
                     <p className="font-medium">Continuer la formation</p>
                     <p className="text-white/50 text-sm">Module 3 - Leçon 4</p>
-                  </button>
+                  </Link>
                   <button onClick={() => setActiveTab('templates')} className="p-4 bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-xl text-left hover:bg-[#00F5FF]/20 transition-colors">
                     <span className="text-2xl mb-2 block">📥</span>
                     <p className="font-medium">Accéder aux templates</p>
@@ -315,6 +317,7 @@ export default function DashboardPage() {
                             </div>
                             <button
                               disabled={isLocked}
+                              onClick={() => !isLocked && router.push(`/formation?module=${module.id}`)}
                               className="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-shrink-0"
                               style={{
                                 background: isLocked ? 'rgba(255,255,255,0.05)' : `${module.color}20`,
