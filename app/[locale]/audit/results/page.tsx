@@ -1383,25 +1383,25 @@ export default function AuditResultsPage() {
               <td>Compléter l'inventaire IA</td>
               <td>DSI</td>
               <td>M1</td>
-              <td><span class="status ${categoryScores.find((c) => c.category === 'inventory')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find((c) => c.category === 'inventory')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+              <td><span class="status ${(categoryScores.find((c) => c.category === 'inventory')?.score ?? 0) >= 80 ? 'done' : 'progress'}">${(categoryScores.find((c) => c.category === 'inventory')?.score ?? 0) >= 80 ? 'Fait' : 'En cours'}</span></td>
             </tr>
             <tr>
               <td>Former les équipes (Article 4)</td>
               <td>DRH</td>
               <td>M2-M3</td>
-              <td><span class="status ${categoryScores.find((c) => c.category === 'training')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find((c) => c.category === 'training')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+              <td><span class="status ${(categoryScores.find((c) => c.category === 'training')?.score ?? 0) >= 80 ? 'done' : 'progress'}">${(categoryScores.find((c) => c.category === 'training')?.score ?? 0) >= 80 ? 'Fait' : 'En cours'}</span></td>
             </tr>
             <tr>
               <td>Rédiger la Politique IA</td>
               <td>Juridique</td>
               <td>M2</td>
-              <td><span class="status ${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+              <td><span class="status ${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? 'done' : 'progress'}">${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? 'Fait' : 'En cours'}</span></td>
             </tr>
             <tr>
               <td>Classifier les systèmes</td>
               <td>Référent IA</td>
               <td>M2</td>
-              <td><span class="status ${categoryScores.find((c) => c.category === 'classification')?.score >= 80 ? 'done' : 'progress'}">${categoryScores.find((c) => c.category === 'classification')?.score >= 80 ? 'Fait' : 'En cours'}</span></td>
+              <td><span class="status ${(categoryScores.find((c) => c.category === 'classification')?.score ?? 0) >= 80 ? 'done' : 'progress'}">${(categoryScores.find((c) => c.category === 'classification')?.score ?? 0) >= 80 ? 'Fait' : 'En cours'}</span></td>
             </tr>
             <tr>
               <td>Mettre à jour CGU (transparence)</td>
@@ -1422,36 +1422,36 @@ export default function AuditResultsPage() {
       <!-- Checklist rapide -->
       <div class="card">
         <h3>✅ Checklist conformité</h3>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'inventory')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'inventory')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'inventory')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'inventory')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Inventaire IA complet</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Référent IA nommé</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'governance')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'governance')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Politique IA rédigée</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'classification')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'classification')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'classification')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'classification')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Systèmes classifiés</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'training')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'training')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'training')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'training')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Formation Article 4 déployée</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'documentation')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'documentation')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'documentation')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'documentation')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Documentation technique</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'transparency')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'transparency')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'transparency')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'transparency')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Transparence IA</span>
         </div>
-        <div class="checklist-item ${categoryScores.find((c) => c.category === 'security')?.score >= 80 ? 'done' : ''}">
-          <div class="check">${categoryScores.find((c) => c.category === 'security')?.score >= 80 ? '✓' : ''}</div>
+        <div class="checklist-item ${(categoryScores.find((c) => c.category === 'security')?.score ?? 0) >= 80 ? 'done' : ''}">
+          <div class="check">${(categoryScores.find((c) => c.category === 'security')?.score ?? 0) >= 80 ? '✓' : ''}</div>
           <span>Sécurité & RGPD alignés</span>
         </div>
       </div>
