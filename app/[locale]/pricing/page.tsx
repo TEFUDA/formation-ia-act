@@ -202,44 +202,10 @@ export default function PricingPage() {
                         Commencer maintenant
                       </Link>
                     ) : (
-                      <Link href="/devis" className="w-full py-4 rounded-xl font-bold text-center transition-all block" style={{ background: plan.color, color: '#000' }}>
-                        Générer mon devis
+                      <Link href="/contact?type=entreprise" className="w-full py-4 rounded-xl font-bold text-center transition-all block" style={{ background: plan.color, color: '#000' }}>
+                        Demander un devis
                       </Link>
                     )}
-                    
-                    {/* DEV BUTTONS - À SUPPRIMER AVANT PROD */}
-                    <div className="mt-3 pt-3 border-t border-white/10">
-                      <p className="text-white/30 text-xs text-center mb-2">🔧 Mode DEV</p>
-                      <div className="flex gap-2">
-                        <Link 
-                          href="/dashboard" 
-                          className="flex-1 py-2 rounded-lg text-xs font-medium text-center bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 transition-all"
-                        >
-                          → Dashboard
-                        </Link>
-                        <Link 
-                          href="/formation" 
-                          className="flex-1 py-2 rounded-lg text-xs font-medium text-center bg-purple-500/20 text-purple-400 border border-purple-500/30 hover:bg-purple-500/30 transition-all"
-                        >
-                          → Formation
-                        </Link>
-                      </div>
-                      <div className="flex gap-2 mt-2">
-                        <Link 
-                          href="/audit" 
-                          className="flex-1 py-2 rounded-lg text-xs font-medium text-center bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all"
-                        >
-                          → Audit
-                        </Link>
-                        <Link 
-                          href="/certificate" 
-                          className="flex-1 py-2 rounded-lg text-xs font-medium text-center bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30 transition-all"
-                        >
-                          → Certificat
-                        </Link>
-                      </div>
-                    </div>
-                    {/* FIN DEV BUTTONS */}
                   </div>
                 </HoloCard>
               </motion.div>
