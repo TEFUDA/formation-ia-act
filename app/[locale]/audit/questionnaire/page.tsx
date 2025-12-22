@@ -1129,10 +1129,33 @@ const ProfilingStep = ({
 export default function AuditQuestionnairePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const plan = (searchParams.get('plan') || 'solo') as 'solo' | 'pro' | 'enterprise';
+  
+  // Get plan from URL param or localStorage
+  const [plan, setPlan] = useState<'solo' | 'pro' | 'enterprise'>('solo');
+  
+  useEffect(() => {
+    const urlPlan = searchParams.get('plan');
+    if (urlPlan && ['solo', 'pro', 'enterprise'].includes(urlPlan)) {
+      setPlan(urlPlan as 'solo' | 'pro' | 'enterprise');
+    } else {
+      const savedPlan = localStorage.getItem('userPlan');
+      if (savedPlan && ['solo', 'pro', 'enterprise'].includes(savedPlan)) {
+        setPlan(savedPlan as 'solo' | 'pro' | 'enterprise');
+      }
+    }
+  }, [searchParams]);
+
+  // Update phase based on plan
+  useEffect(() => {
+    if (plan !== 'solo') {
+      setPhase('profiling');
+    } else {
+      setPhase('questions');
+    }
+  }, [plan]);
 
   // State
-  const [phase, setPhase] = useState<'profiling' | 'questions' | 'complete'>(plan === 'solo' ? 'questions' : 'profiling');
+  const [phase, setPhase] = useState<'profiling' | 'questions' | 'complete'>('questions');
   const [profile, setProfile] = useState<CompanyProfile>({
     name: '',
     sector: '',
