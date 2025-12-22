@@ -1616,7 +1616,10 @@ export default function AuditResultsPage() {
                   )}
 
                   {plan === 'enterprise' && (
-                    <button className="w-full flex items-center justify-center gap-2 py-3 bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800] font-medium rounded-xl hover:bg-[#FFB800]/20 transition-colors">
+                    <button 
+                      onClick={generateDashboard}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800] font-medium rounded-xl hover:bg-[#FFB800]/20 transition-colors"
+                    >
                       <div className="w-5 h-5"><Icons.BarChart /></div>
                       Accéder au Dashboard
                     </button>
