@@ -345,23 +345,140 @@ export default function AuditResultsPage() {
 
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
-    // Simulate PDF generation
-    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // In real implementation, call API to generate PDF
-    const pdfData = {
-      score,
-      plan,
-      profile,
-      categoryScores,
-      recommendations,
-      actionPlan,
-      generatedAt: new Date().toISOString(),
-    };
+    try {
+      const response = await fetch('/api/audit/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score,
+          plan,
+          profile,
+          categoryScores,
+          highRiskFlags,
+          answers: {},
+          totalQuestions: plan === 'enterprise' ? 150 : plan === 'pro' ? 80 : 40,
+          completedAt: new Date().toISOString(),
+        }),
+      });
+      
+      if (!response.ok) throw new Error('Erreur génération rapport');
+      
+      const html = await response.text();
+      
+      // Open in new window for printing
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la génération du rapport. Veuillez réessayer.');
+    }
     
-    // For now, just download a placeholder
-    alert(`Génération du rapport PDF ${plan === 'solo' ? '(15 pages)' : plan === 'pro' ? '(40-50 pages)' : '(80-100 pages)'} en cours...`);
     setIsGeneratingPDF(false);
+  };
+
+  const generateCertificate = async () => {
+    // Generate certificate HTML
+    const certId = `AACT-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+    const certHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Certificat AI Act - ${profile.name || 'Entreprise'}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Inter', sans-serif; background: #f5f5f5; padding: 40px; }
+          .certificate { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            border: 4px solid #00FF88;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+          }
+          .badge { font-size: 80px; margin-bottom: 20px; }
+          .title { font-size: 32px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+          .subtitle { font-size: 18px; color: #666; margin-bottom: 40px; }
+          .company { font-size: 28px; font-weight: 600; color: #8B5CF6; margin-bottom: 20px; }
+          .score-box { 
+            display: inline-block;
+            background: linear-gradient(135deg, #00FF88, #00F5FF);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            margin: 20px 0;
+          }
+          .score { font-size: 48px; font-weight: 700; }
+          .score-label { font-size: 16px; opacity: 0.9; }
+          .cert-id { 
+            font-family: monospace;
+            font-size: 20px;
+            color: #00FF88;
+            margin: 30px 0;
+          }
+          .date { color: #666; margin-top: 20px; }
+          .validity { 
+            background: #f0f9f0;
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 20px;
+          }
+          .footer { margin-top: 40px; color: #999; font-size: 12px; }
+          @media print {
+            body { padding: 0; background: white; }
+            .certificate { border: 4px solid #00FF88; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="certificate">
+          <div class="badge">🏆</div>
+          <div class="title">Certificat de Conformité AI Act</div>
+          <div class="subtitle">Audit réalisé avec Formation-IA-Act.fr</div>
+          
+          <div class="company">${profile.name || 'Entreprise'}</div>
+          
+          <div class="score-box">
+            <div class="score">${score}%</div>
+            <div class="score-label">Score de conformité</div>
+          </div>
+          
+          <div class="cert-id">Certificat n° ${certId}</div>
+          
+          <div class="date">
+            Audit réalisé le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+          
+          <div class="validity">
+            ✓ Valable jusqu'au ${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+          
+          <div class="footer">
+            Ce certificat atteste que l'organisation a réalisé un audit de conformité AI Act.<br>
+            Vérifiable sur formation-ia-act.fr/verify/${certId}
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(certHtml);
+      printWindow.document.close();
+    }
+  };
+
+  const downloadTemplates = () => {
+    // In production, this would download a zip of templates
+    alert(`Téléchargement du pack de ${plan === 'enterprise' ? '12' : '3'} templates...\n\nCette fonctionnalité sera connectée au serveur en production.`);
   };
 
   const categoryNames: Record<string, string> = {
@@ -498,11 +615,17 @@ export default function AuditResultsPage() {
                   
                   {(plan === 'pro' || plan === 'enterprise') && (
                     <>
-                      <button className="w-full flex items-center justify-center gap-2 py-3 bg-[#00FF88]/10 border border-[#00FF88]/30 text-[#00FF88] font-medium rounded-xl hover:bg-[#00FF88]/20 transition-colors">
+                      <button 
+                        onClick={generateCertificate}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-[#00FF88]/10 border border-[#00FF88]/30 text-[#00FF88] font-medium rounded-xl hover:bg-[#00FF88]/20 transition-colors"
+                      >
                         <div className="w-5 h-5"><Icons.Award /></div>
                         Télécharger le certificat
                       </button>
-                      <button className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-white/70 font-medium rounded-xl hover:bg-white/10 transition-colors">
+                      <button 
+                        onClick={downloadTemplates}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-white/70 font-medium rounded-xl hover:bg-white/10 transition-colors"
+                      >
                         <div className="w-5 h-5"><Icons.FileText /></div>
                         Templates pré-remplis ({plan === 'enterprise' ? '12' : '3'})
                       </button>
@@ -526,7 +649,7 @@ export default function AuditResultsPage() {
                       <li>✓ Templates pré-remplis</li>
                     </ul>
                     <Link 
-                      href="/checkout?plan=audit-pro"
+                      href="/pricing"
                       className="mt-3 block text-center text-[#8B5CF6] text-sm hover:underline"
                     >
                       Upgrader vers Pro →
@@ -738,7 +861,7 @@ export default function AuditResultsPage() {
                     <div className="mt-8 p-4 bg-white/5 rounded-xl text-center">
                       <p className="text-white/60 mb-3">Passez au Pro pour un plan d'action détaillé avec timeline visuelle et budget estimé</p>
                       <Link 
-                        href="/checkout?plan=audit-pro"
+                        href="/pricing"
                         className="inline-flex items-center gap-2 text-[#8B5CF6] hover:underline"
                       >
                         Upgrader vers Pro
@@ -814,7 +937,10 @@ export default function AuditResultsPage() {
                         <li>✓ Score et date d'audit</li>
                       </ul>
                     </div>
-                    <button className="w-full py-3 bg-[#00FF88]/10 border border-[#00FF88]/30 text-[#00FF88] font-medium rounded-xl hover:bg-[#00FF88]/20 transition-colors flex items-center justify-center gap-2">
+                    <button 
+                      onClick={generateCertificate}
+                      className="w-full py-3 bg-[#00FF88]/10 border border-[#00FF88]/30 text-[#00FF88] font-medium rounded-xl hover:bg-[#00FF88]/20 transition-colors flex items-center justify-center gap-2"
+                    >
                       <div className="w-5 h-5"><Icons.Download /></div>
                       Télécharger
                     </button>
@@ -846,7 +972,10 @@ export default function AuditResultsPage() {
                         </>
                       )}
                     </ul>
-                    <button className="w-full py-3 bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800] font-medium rounded-xl hover:bg-[#FFB800]/20 transition-colors flex items-center justify-center gap-2">
+                    <button 
+                      onClick={downloadTemplates}
+                      className="w-full py-3 bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800] font-medium rounded-xl hover:bg-[#FFB800]/20 transition-colors flex items-center justify-center gap-2"
+                    >
                       <div className="w-5 h-5"><Icons.Download /></div>
                       Télécharger le pack
                     </button>
@@ -867,13 +996,22 @@ export default function AuditResultsPage() {
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <button className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm">
+                        <button 
+                          onClick={() => alert('Téléchargement du PowerPoint COMEX (20 slides)...\n\nCette fonctionnalité sera disponible en production.')}
+                          className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
                           📊 PowerPoint COMEX (20 slides)
                         </button>
-                        <button className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm">
+                        <button 
+                          onClick={() => alert('Téléchargement de l\'organigramme gouvernance IA...\n\nCette fonctionnalité sera disponible en production.')}
+                          className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
                           🏛️ Organigramme gouvernance IA
                         </button>
-                        <button className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm">
+                        <button 
+                          onClick={() => alert('Accès au Dashboard de suivi 12 mois...\n\nCette fonctionnalité sera disponible en production.')}
+                          className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-sm"
+                        >
                           📈 Accéder au Dashboard de suivi
                         </button>
                       </div>
@@ -887,7 +1025,7 @@ export default function AuditResultsPage() {
           {/* Refaire l'audit */}
           <div className="mt-12 text-center">
             <Link 
-              href="/audit/questionnaire?plan=${plan}"
+              href={`/audit/questionnaire?plan=${plan}`}
               className="text-white/50 hover:text-white transition-colors text-sm"
             >
               🔄 Refaire l'audit
