@@ -709,17 +709,41 @@ const TeaserSection = () => {
 // ROI CALCULATOR - Simulateur interactif
 // ============================================
 const ROICalculator = () => {
-  const [employees, setEmployees] = useState(10);
+  const [employees, setEmployees] = useState(5);
   const [hasIA, setHasIA] = useState(true);
   const [showResult, setShowResult] = useState(false);
 
-  // Calculs
-  const cabinetCost = employees <= 10 ? 15000 : employees <= 50 ? 30000 : 50000;
-  const formationCost = employees === 1 ? 4900 : employees <= 5 ? 19500 : Math.ceil(employees / 5) * 19500;
+  // Calculs corrigés - Cabinet toujours plus cher
+  // Cabinet conseil : audit + accompagnement + formation = prix élevé
+  // Notre formation : autonomie complète à prix fixe
+  
+  // Prix cabinet (accompagnement mise en conformité AI Act)
+  const getCabinetCost = (n: number) => {
+    if (n <= 1) return 12000;      // Audit simple + accompagnement
+    if (n <= 5) return 25000;      // PME
+    if (n <= 10) return 40000;     // ETI
+    if (n <= 25) return 60000;     // Grande entreprise
+    if (n <= 50) return 85000;     // Grand groupe
+    return 120000;                  // Enterprise
+  };
+  
+  // Notre prix (formation tout-en-un)
+  const getFormationCost = (n: number) => {
+    if (n <= 1) return 4900;        // Solo
+    if (n <= 5) return 9800;        // 2 packs solo (économie de groupe)
+    if (n <= 10) return 19500;      // Pack Équipe
+    if (n <= 25) return 29000;      // Pack Équipe + options
+    if (n <= 50) return 45000;      // Enterprise light
+    return 65000;                    // Enterprise full
+  };
+
+  const cabinetCost = getCabinetCost(employees);
+  const formationCost = getFormationCost(employees);
   const savings = cabinetCost - formationCost;
-  const fineRisk = hasIA ? 35000000 : 7500000; // 35M max ou 7.5M
-  const timeWithoutTraining = employees <= 10 ? 3 : employees <= 50 ? 5 : 8; // mois
-  const timeWithTraining = 1; // mois
+  const savingsPercent = Math.round((savings / cabinetCost) * 100);
+  const fineRisk = hasIA ? 35000000 : 7500000;
+  const timeWithoutTraining = employees <= 10 ? 4 : employees <= 50 ? 6 : 9;
+  const timeWithTraining = 1;
 
   return (
     <section className="relative z-10 py-20 px-6 overflow-hidden">
@@ -739,7 +763,7 @@ const ROICalculator = () => {
           <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
             Calculez votre <span className="text-[#00FF88]">ROI</span>
           </h2>
-          <p className="text-white/40 max-w-xl mx-auto">Estimez vos économies par rapport à un cabinet conseil</p>
+          <p className="text-white/40 max-w-xl mx-auto">Comparez le coût d&apos;un cabinet conseil vs notre formation autonome</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-start">
@@ -753,14 +777,14 @@ const ROICalculator = () => {
               <div className="absolute -inset-1 bg-gradient-to-r from-[#FFB800]/20 to-[#FF6B00]/20 rounded-2xl blur-xl" />
               <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
                 <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                  <span className="text-2xl">🔧</span> Configurez votre situation
+                  <span className="text-2xl">🔧</span> Votre situation
                 </h3>
 
                 {/* Employees slider */}
                 <div className="mb-6">
                   <label className="flex justify-between text-sm mb-2">
-                    <span className="text-white/60">Personnes à former</span>
-                    <span className="text-white font-bold">{employees}</span>
+                    <span className="text-white/60">Taille de l&apos;équipe à former</span>
+                    <span className="text-white font-bold">{employees} pers.</span>
                   </label>
                   <input
                     type="range"
@@ -772,6 +796,7 @@ const ROICalculator = () => {
                   />
                   <div className="flex justify-between text-xs text-white/30 mt-1">
                     <span>1</span>
+                    <span>25</span>
                     <span>50</span>
                     <span>100</span>
                   </div>
@@ -779,7 +804,7 @@ const ROICalculator = () => {
 
                 {/* IA Usage */}
                 <div className="mb-6">
-                  <label className="text-sm text-white/60 mb-3 block">Utilisez-vous des systèmes IA ?</label>
+                  <label className="text-sm text-white/60 mb-3 block">Utilisez-vous des systèmes IA à risque ?</label>
                   <div className="flex gap-3">
                     <button
                       onClick={() => { setHasIA(true); setShowResult(false); }}
@@ -789,7 +814,7 @@ const ROICalculator = () => {
                           : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
                       }`}
                     >
-                      Oui
+                      Oui / Probable
                     </button>
                     <button
                       onClick={() => { setHasIA(false); setShowResult(false); }}
@@ -840,23 +865,34 @@ const ROICalculator = () => {
                       <div className="space-y-4 mb-6">
                         {/* Cost comparison */}
                         <div className="flex justify-between items-center py-3 border-b border-white/10">
-                          <span className="text-white/60">Coût cabinet conseil</span>
-                          <span className="text-[#FF4444] font-bold line-through">{cabinetCost.toLocaleString('fr-FR')} €</span>
+                          <div>
+                            <span className="text-white/60">Cabinet conseil</span>
+                            <p className="text-white/40 text-xs">Audit + accompagnement externe</p>
+                          </div>
+                          <span className="text-[#FF4444] font-bold text-xl line-through">{cabinetCost.toLocaleString('fr-FR')} €</span>
                         </div>
                         <div className="flex justify-between items-center py-3 border-b border-white/10">
-                          <span className="text-white/60">Notre formation</span>
-                          <span className="text-[#00FF88] font-bold">{formationCost.toLocaleString('fr-FR')} €</span>
+                          <div>
+                            <span className="text-white/60">Notre formation</span>
+                            <p className="text-white/40 text-xs">Autonomie complète + outils</p>
+                          </div>
+                          <span className="text-[#00FF88] font-bold text-xl">{formationCost.toLocaleString('fr-FR')} €</span>
                         </div>
-                        <div className="flex justify-between items-center py-3 bg-[#00FF88]/10 rounded-lg px-3 -mx-3">
-                          <span className="text-white font-semibold">💰 Économie</span>
-                          <span className="text-[#00FF88] font-black text-xl">{savings.toLocaleString('fr-FR')} €</span>
+                        <div className="flex justify-between items-center py-4 bg-[#00FF88]/10 rounded-xl px-4 -mx-1">
+                          <span className="text-white font-semibold flex items-center gap-2">
+                            <span className="text-2xl">💰</span> Économie
+                          </span>
+                          <div className="text-right">
+                            <span className="text-[#00FF88] font-black text-2xl">{savings.toLocaleString('fr-FR')} €</span>
+                            <span className="text-[#00FF88] text-sm ml-2">(-{savingsPercent}%)</span>
+                          </div>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className="bg-white/5 rounded-xl p-3 text-center">
                           <div className="text-2xl font-bold text-[#FF4444]">{timeWithoutTraining}</div>
-                          <div className="text-white/40 text-xs">mois sans formation</div>
+                          <div className="text-white/40 text-xs">mois avec cabinet</div>
                         </div>
                         <div className="bg-white/5 rounded-xl p-3 text-center">
                           <div className="text-2xl font-bold text-[#00FF88]">{timeWithTraining}</div>
@@ -866,8 +902,14 @@ const ROICalculator = () => {
 
                       {/* Risk */}
                       <div className="bg-[#FF4444]/10 rounded-xl p-4 border border-[#FF4444]/20">
-                        <p className="text-[#FF4444] text-sm font-medium mb-1">⚠️ Risque en cas de non-conformité</p>
+                        <p className="text-[#FF4444] text-sm font-medium mb-1">⚠️ Sans mise en conformité</p>
                         <p className="text-white/80 text-xs">Amende jusqu&apos;à <span className="text-[#FF4444] font-bold">{(fineRisk / 1000000).toFixed(0)}M€</span> ou 7% du CA mondial</p>
+                      </div>
+
+                      {/* Bonus */}
+                      <div className="mt-4 bg-[#8B5CF6]/10 rounded-xl p-4 border border-[#8B5CF6]/20">
+                        <p className="text-[#8B5CF6] text-sm font-medium mb-1">✨ Bonus formation</p>
+                        <p className="text-white/80 text-xs">Équipe formée + autonome, templates réutilisables, certificats Article 4</p>
                       </div>
                     </div>
                   </div>
@@ -904,6 +946,7 @@ const ROICalculator = () => {
               Économiser {savings.toLocaleString('fr-FR')} € maintenant
               <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1, repeat: Infinity }}>→</motion.span>
             </Link>
+            <p className="text-white/40 text-sm mt-3">+ Financement OPCO possible jusqu&apos;à 100%</p>
           </motion.div>
         )}
       </div>
