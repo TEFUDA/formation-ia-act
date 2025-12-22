@@ -699,7 +699,7 @@ export default function AuditResultsPage() {
                     <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-white/10" />
                     
                     <div className="space-y-6">
-                      {actionPlan.slice(0, plan === 'enterprise' ? 12 : 6).map((action: { month: number; title: string; tasks: string[]; priority: boolean; kpi: string; budget: string }, i: number) => (
+                      {actionPlan.slice(0, plan === 'enterprise' ? 12 : 6).map((action: { month: number; title: string; tasks: string[]; priority: boolean; kpi?: string; budget?: string }, i: number) => (
                         <motion.div
                           key={i}
                           initial={{ opacity: 0, x: -20 }}
