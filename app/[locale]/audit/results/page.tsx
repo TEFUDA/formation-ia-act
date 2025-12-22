@@ -460,7 +460,7 @@ export default function AuditResultsPage() {
                 <div className="p-6">
                   <h3 className="font-semibold mb-4">Score par catégorie</h3>
                   <div className="space-y-3">
-                    {categoryScores.map((cat, i) => (
+                    {categoryScores.map((cat: { category: string; icon: string; color: string; score: number }, i: number) => (
                       <div key={i}>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-white/70">{cat.icon} {categoryNames[cat.category]}</span>
@@ -544,7 +544,7 @@ export default function AuditResultsPage() {
               { id: 'details', label: '📋 Détails par catégorie' },
               { id: 'actions', label: '🎯 Plan d\'action' },
               ...(plan !== 'solo' ? [{ id: 'deliverables', label: '📦 Livrables' }] : []),
-            ].map(tab => (
+            ].map((tab: { id: string; label: string }) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -576,7 +576,7 @@ export default function AuditResultsPage() {
                       Recommandations prioritaires
                     </h3>
                     <div className="space-y-3">
-                      {recommendations.slice(0, 6).map((rec, i) => (
+                      {recommendations.slice(0, 6).map((rec: { priority: string; text: string; category: string; aiActRef?: string }, i: number) => (
                         <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
                           <span className={`text-lg ${
                             rec.priority === 'critical' ? 'text-[#FF4444]' :
@@ -643,7 +643,7 @@ export default function AuditResultsPage() {
             {/* Details Tab */}
             {activeTab === 'details' && (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoryScores.map((cat, i) => (
+                {categoryScores.map((cat: { category: string; icon: string; color: string; score: number }, i: number) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
@@ -699,7 +699,7 @@ export default function AuditResultsPage() {
                     <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-white/10" />
                     
                     <div className="space-y-6">
-                      {actionPlan.slice(0, plan === 'enterprise' ? 12 : 6).map((action, i) => (
+                      {actionPlan.slice(0, plan === 'enterprise' ? 12 : 6).map((action: { month: number; title: string; tasks: string[]; priority: boolean; kpi: string; budget: string }, i: number) => (
                         <motion.div
                           key={i}
                           initial={{ opacity: 0, x: -20 }}
@@ -721,7 +721,7 @@ export default function AuditResultsPage() {
                               {action.priority && <span className="text-xs bg-[#8B5CF6] text-white px-2 py-0.5 rounded-full">Prioritaire</span>}
                             </div>
                             <ul className="space-y-1">
-                              {action.tasks.map((task, j) => (
+                              {action.tasks.map((task: string, j: number) => (
                                 <li key={j} className="text-sm text-white/60 flex items-center gap-2">
                                   <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
                                   {task}
