@@ -210,6 +210,707 @@ const HoloCard = ({ children, glow = '#00F5FF', className = '' }: { children: Re
   </motion.div>
 );
 
+// ============================================
+// TEASER SECTION - Interactive Preview
+// ============================================
+const miniAuditQuestions = [
+  { q: "Votre entreprise utilise-t-elle des algorithmes de prise de décision automatisée ?", tips: "Ex: scoring client, tri de CV, chatbot, recommandations..." },
+  { q: "Vos systèmes IA sont-ils documentés (registre, politique, processus) ?", tips: "Documentation technique, registre des traitements IA..." },
+  { q: "Avez-vous identifié le niveau de risque de vos systèmes selon l'AI Act ?", tips: "Risque minimal, limité, élevé ou inacceptable" },
+  { q: "Vos équipes sont-elles formées aux obligations de l'AI Act ?", tips: "Formation Article 4, sensibilisation, certification..." },
+  { q: "Avez-vous mis en place une supervision humaine de vos systèmes IA ?", tips: "Contrôle humain, processus d'escalade, audit..." },
+];
+
+const templatePreviews = [
+  { name: "Registre des systèmes IA", icon: "📋", type: "Excel", pages: "12 onglets", blur: true },
+  { name: "Politique IA entreprise", icon: "📜", type: "Word", pages: "18 pages", blur: true },
+  { name: "FRIA - Évaluation d'impact", icon: "⚖️", type: "Word", pages: "24 pages", blur: true },
+];
+
+const TeaserSection = () => {
+  const [activeTab, setActiveTab] = useState<'audit' | 'video' | 'templates'>('audit');
+  const [auditStep, setAuditStep] = useState(0);
+  const [auditAnswers, setAuditAnswers] = useState<(boolean | null)[]>([null, null, null, null, null]);
+  const [auditComplete, setAuditComplete] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+
+  const handleAuditAnswer = (answer: boolean) => {
+    const newAnswers = [...auditAnswers];
+    newAnswers[auditStep] = answer;
+    setAuditAnswers(newAnswers);
+    
+    if (auditStep < miniAuditQuestions.length - 1) {
+      setTimeout(() => setAuditStep(auditStep + 1), 300);
+    } else {
+      setTimeout(() => setAuditComplete(true), 300);
+    }
+  };
+
+  const auditScore = auditAnswers.filter(a => a === true).length;
+  const auditRisk = auditScore <= 1 ? 'Critique' : auditScore <= 2 ? 'Élevé' : auditScore <= 3 ? 'Modéré' : 'Faible';
+  const auditColor = auditScore <= 1 ? '#FF4444' : auditScore <= 2 ? '#FF6B00' : auditScore <= 3 ? '#FFB800' : '#00FF88';
+
+  // Simulate video progress
+  useEffect(() => {
+    if (videoPlaying && videoProgress < 100) {
+      const timer = setTimeout(() => setVideoProgress(p => Math.min(p + 2, 100)), 200);
+      return () => clearTimeout(timer);
+    }
+    if (videoProgress >= 100) {
+      setVideoPlaying(false);
+    }
+  }, [videoPlaying, videoProgress]);
+
+  return (
+    <section className="relative z-10 py-20 px-6">
+      <div className="max-w-6xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00FF88]/20 to-[#00F5FF]/20 border border-[#00FF88]/30 rounded-full px-4 py-2 text-sm font-medium text-[#00FF88] mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00FF88] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00FF88]"></span>
+            </span>
+            Accès gratuit
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Testez <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF88] to-[#00F5FF]">avant d&apos;acheter</span>
+          </h2>
+          <p className="text-white/60 max-w-2xl mx-auto">
+            Découvrez la qualité de notre formation avec un mini-audit gratuit, un extrait vidéo et un aperçu des templates
+          </p>
+        </motion.div>
+
+        {/* Tabs */}
+        <div className="flex justify-center gap-2 mb-8">
+          {[
+            { id: 'audit', label: '🎯 Mini-Audit', desc: '5 questions' },
+            { id: 'video', label: '🎬 Extrait vidéo', desc: 'Module 1' },
+            { id: 'templates', label: '📄 Templates', desc: 'Aperçu' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`px-4 sm:px-6 py-3 rounded-xl font-medium transition-all ${
+                activeTab === tab.id 
+                  ? 'bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black' 
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              <span className="text-xs block opacity-70">{tab.desc}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          {/* MINI AUDIT TAB */}
+          {activeTab === 'audit' && (
+            <motion.div
+              key="audit"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00FF88]/20 to-[#00F5FF]/20 rounded-3xl blur-xl" />
+                <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8">
+                  
+                  {!auditComplete ? (
+                    <>
+                      {/* Progress */}
+                      <div className="flex items-center justify-between mb-6">
+                        <span className="text-white/60 text-sm">Question {auditStep + 1} / {miniAuditQuestions.length}</span>
+                        <div className="flex gap-1">
+                          {miniAuditQuestions.map((_, i) => (
+                            <div 
+                              key={i}
+                              className={`w-8 h-1.5 rounded-full transition-all ${
+                                i < auditStep ? 'bg-[#00FF88]' : i === auditStep ? 'bg-[#00F5FF]' : 'bg-white/10'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Question */}
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={auditStep}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="mb-8"
+                        >
+                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">
+                            {miniAuditQuestions[auditStep].q}
+                          </h3>
+                          <p className="text-white/40 text-sm">
+                            💡 {miniAuditQuestions[auditStep].tips}
+                          </p>
+                        </motion.div>
+                      </AnimatePresence>
+
+                      {/* Answers */}
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleAuditAnswer(true)}
+                          className="flex-1 py-4 px-6 rounded-xl bg-[#00FF88]/10 border border-[#00FF88]/30 text-[#00FF88] font-bold hover:bg-[#00FF88]/20 transition-all"
+                        >
+                          ✅ Oui
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleAuditAnswer(false)}
+                          className="flex-1 py-4 px-6 rounded-xl bg-[#FF4444]/10 border border-[#FF4444]/30 text-[#FF4444] font-bold hover:bg-[#FF4444]/20 transition-all"
+                        >
+                          ❌ Non
+                        </motion.button>
+                      </div>
+                    </>
+                  ) : (
+                    /* Results */
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-center"
+                    >
+                      <div 
+                        className="w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 border-4"
+                        style={{ borderColor: auditColor, background: `${auditColor}15` }}
+                      >
+                        <div className="text-center">
+                          <div className="text-4xl font-black" style={{ color: auditColor }}>{auditScore}/5</div>
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold mb-2">
+                        Niveau de préparation : <span style={{ color: auditColor }}>{auditRisk}</span>
+                      </h3>
+                      <p className="text-white/60 mb-6 max-w-lg mx-auto">
+                        {auditScore <= 2 
+                          ? "⚠️ Votre organisation présente des lacunes importantes. L'audit complet identifiera les 150+ points à corriger avant août 2026."
+                          : auditScore <= 3 
+                            ? "⚡ Vous avez des bases mais des zones grises subsistent. L'audit complet révélera vos angles morts."
+                            : "✅ Bonne base ! L'audit complet validera votre conformité et identifiera les derniers ajustements."
+                        }
+                      </p>
+
+                      <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+                        <p className="text-white/40 text-sm mb-2">🔒 Dans l&apos;audit complet :</p>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-2xl font-bold text-[#00F5FF]">150+</div>
+                            <div className="text-xs text-white/40">Questions</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-[#8B5CF6]">6</div>
+                            <div className="text-xs text-white/40">Catégories</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-[#00FF88]">PDF</div>
+                            <div className="text-xs text-white/40">Rapport détaillé</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Link 
+                          href="/pricing"
+                          className="px-6 py-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold rounded-xl"
+                        >
+                          Débloquer l&apos;audit complet →
+                        </Link>
+                        <button 
+                          onClick={() => { setAuditComplete(false); setAuditStep(0); setAuditAnswers([null,null,null,null,null]); }}
+                          className="px-6 py-3 bg-white/5 text-white/60 font-medium rounded-xl hover:bg-white/10"
+                        >
+                          Recommencer
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* VIDEO TAB */}
+          {activeTab === 'video' && (
+            <motion.div
+              key="video"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#8B5CF6]/20 to-[#00F5FF]/20 rounded-3xl blur-xl" />
+                <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+                  
+                  {/* Video Player Mockup */}
+                  <div className="aspect-video bg-gradient-to-br from-[#1a1a3e] to-[#0a0a1b] relative">
+                    {/* Fake video content */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {!videoPlaying && videoProgress === 0 ? (
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setVideoPlaying(true)}
+                          className="w-20 h-20 rounded-full bg-gradient-to-r from-[#00FF88] to-[#00F5FF] flex items-center justify-center shadow-lg shadow-[#00FF88]/30"
+                        >
+                          <svg className="w-8 h-8 text-black ml-1" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                          </svg>
+                        </motion.button>
+                      ) : videoProgress >= 100 ? (
+                        <div className="text-center">
+                          <div className="text-6xl mb-4">🔒</div>
+                          <p className="text-white text-xl font-bold mb-2">Fin de l&apos;extrait gratuit</p>
+                          <p className="text-white/60 mb-4">Accédez aux 6 modules complets (8h de formation)</p>
+                          <Link 
+                            href="/pricing"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold rounded-xl"
+                          >
+                            Débloquer la formation complète →
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full relative">
+                          {/* Simulated slide content */}
+                          <div className="absolute inset-0 p-8 sm:p-12 flex flex-col">
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#00F5FF] to-[#0066FF] flex items-center justify-center">
+                                <div className="w-5 h-5 text-white"><Icons.Shield /></div>
+                              </div>
+                              <div>
+                                <p className="text-[#00F5FF] text-xs font-medium">MODULE 1</p>
+                                <p className="text-white font-bold">Comprendre l&apos;AI Act</p>
+                              </div>
+                            </div>
+                            
+                            <motion.div 
+                              className="flex-grow flex items-center"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                            >
+                              {videoProgress < 30 && (
+                                <div className="w-full">
+                                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Qu&apos;est-ce que l&apos;AI Act ?</h3>
+                                  <ul className="space-y-3 text-white/80">
+                                    <motion.li initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-2">
+                                      <span className="text-[#00FF88]">✓</span> Premier règlement mondial sur l&apos;IA
+                                    </motion.li>
+                                    <motion.li initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="flex items-center gap-2">
+                                      <span className="text-[#00FF88]">✓</span> Approche basée sur les risques
+                                    </motion.li>
+                                    <motion.li initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }} className="flex items-center gap-2">
+                                      <span className="text-[#00FF88]">✓</span> Amendes jusqu&apos;à 35M€ ou 7% du CA
+                                    </motion.li>
+                                  </ul>
+                                </div>
+                              )}
+                              {videoProgress >= 30 && videoProgress < 60 && (
+                                <div className="w-full">
+                                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Les 4 niveaux de risque</h3>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#FF4444]/20 rounded-lg p-3 border border-[#FF4444]/30">
+                                      <p className="text-[#FF4444] font-bold">🚫 Inacceptable</p>
+                                      <p className="text-white/60 text-xs">Interdit</p>
+                                    </motion.div>
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#FF6B00]/20 rounded-lg p-3 border border-[#FF6B00]/30">
+                                      <p className="text-[#FF6B00] font-bold">⚠️ Élevé</p>
+                                      <p className="text-white/60 text-xs">Conformité stricte</p>
+                                    </motion.div>
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[#FFB800]/20 rounded-lg p-3 border border-[#FFB800]/30">
+                                      <p className="text-[#FFB800] font-bold">📋 Limité</p>
+                                      <p className="text-white/60 text-xs">Transparence</p>
+                                    </motion.div>
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-[#00FF88]/20 rounded-lg p-3 border border-[#00FF88]/30">
+                                      <p className="text-[#00FF88] font-bold">✅ Minimal</p>
+                                      <p className="text-white/60 text-xs">Libre</p>
+                                    </motion.div>
+                                  </div>
+                                </div>
+                              )}
+                              {videoProgress >= 60 && (
+                                <div className="w-full">
+                                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Calendrier de mise en conformité</h3>
+                                  <div className="space-y-3">
+                                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3">
+                                      <span className="text-[#00FF88] font-mono font-bold">Fév 2025</span>
+                                      <span className="text-white/60">→ Interdictions</span>
+                                    </motion.div>
+                                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="flex items-center gap-3">
+                                      <span className="text-[#FFB800] font-mono font-bold">Août 2025</span>
+                                      <span className="text-white/60">→ Modèles GPAI</span>
+                                    </motion.div>
+                                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-3 bg-white/5 rounded-lg p-2 border border-[#FF4444]/30">
+                                      <span className="text-[#FF4444] font-mono font-bold">Août 2026</span>
+                                      <span className="text-white">→ Application complète ⚠️</span>
+                                    </motion.div>
+                                  </div>
+                                </div>
+                              )}
+                            </motion.div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress bar */}
+                    {(videoPlaying || videoProgress > 0) && videoProgress < 100 && (
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+                        <motion.div 
+                          className="h-full bg-gradient-to-r from-[#00FF88] to-[#00F5FF]"
+                          style={{ width: `${videoProgress}%` }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Time indicator */}
+                    {videoProgress > 0 && videoProgress < 100 && (
+                      <div className="absolute bottom-4 right-4 bg-black/50 px-2 py-1 rounded text-xs text-white/80">
+                        {Math.floor(videoProgress * 1.8 / 60)}:{String(Math.floor((videoProgress * 1.8) % 60)).padStart(2, '0')} / 3:00
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Video info */}
+                  <div className="p-6 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-bold">Module 1 : Comprendre l&apos;AI Act (extrait)</p>
+                        <p className="text-white/40 text-sm">3 min sur 45 min • Accès complet avec la formation</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[#00FF88] text-sm font-medium">Gratuit</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TEMPLATES TAB */}
+          {activeTab === 'templates' && (
+            <motion.div
+              key="templates"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="grid md:grid-cols-3 gap-6">
+                {templatePreviews.map((template, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <div className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-[#8B5CF6]/20 to-[#00F5FF]/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+                        
+                        {/* Preview area with blur */}
+                        <div className="aspect-[4/3] bg-gradient-to-br from-[#1a1a3e] to-[#0a0a1b] relative overflow-hidden">
+                          {/* Simulated document content - blurred */}
+                          <div className="absolute inset-0 p-4 filter blur-[6px] select-none">
+                            <div className="h-3 w-3/4 bg-white/20 rounded mb-3" />
+                            <div className="h-2 w-full bg-white/10 rounded mb-2" />
+                            <div className="h-2 w-5/6 bg-white/10 rounded mb-2" />
+                            <div className="h-2 w-4/5 bg-white/10 rounded mb-4" />
+                            <div className="grid grid-cols-3 gap-2 mb-4">
+                              <div className="h-8 bg-white/5 rounded" />
+                              <div className="h-8 bg-white/5 rounded" />
+                              <div className="h-8 bg-white/5 rounded" />
+                            </div>
+                            <div className="h-2 w-full bg-white/10 rounded mb-2" />
+                            <div className="h-2 w-3/4 bg-white/10 rounded mb-2" />
+                            <div className="h-2 w-5/6 bg-white/10 rounded" />
+                          </div>
+                          
+                          {/* Lock overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="text-center">
+                              <motion.div 
+                                className="text-5xl mb-2"
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                              >
+                                🔒
+                              </motion.div>
+                              <p className="text-white/80 text-sm font-medium">Aperçu</p>
+                            </div>
+                          </div>
+
+                          {/* File type badge */}
+                          <div className="absolute top-3 right-3 bg-white/10 backdrop-blur rounded px-2 py-1 text-xs text-white/60">
+                            {template.type}
+                          </div>
+                        </div>
+
+                        {/* Info */}
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl">{template.icon}</span>
+                            <h3 className="text-white font-bold text-sm">{template.name}</h3>
+                          </div>
+                          <p className="text-white/40 text-xs mb-3">{template.pages} • Prêt à l&apos;emploi</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#FF6B00] text-xs font-medium">Inclus dans la formation</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-8 text-center"
+              >
+                <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-[#00F5FF]/10 rounded-2xl border border-white/10 p-6 inline-block">
+                  <p className="text-white/60 mb-4">
+                    <span className="text-3xl mr-2">📦</span>
+                    <span className="text-white font-bold">12 templates</span> professionnels inclus dans la formation
+                  </p>
+                  <Link 
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF] text-white font-bold rounded-xl"
+                  >
+                    Voir tous les templates →
+                  </Link>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// ROI CALCULATOR - Simulateur interactif
+// ============================================
+const ROICalculator = () => {
+  const [employees, setEmployees] = useState(10);
+  const [hasIA, setHasIA] = useState(true);
+  const [showResult, setShowResult] = useState(false);
+
+  // Calculs
+  const cabinetCost = employees <= 10 ? 15000 : employees <= 50 ? 30000 : 50000;
+  const formationCost = employees === 1 ? 4900 : employees <= 5 ? 19500 : Math.ceil(employees / 5) * 19500;
+  const savings = cabinetCost - formationCost;
+  const fineRisk = hasIA ? 35000000 : 7500000; // 35M max ou 7.5M
+  const timeWithoutTraining = employees <= 10 ? 3 : employees <= 50 ? 5 : 8; // mois
+  const timeWithTraining = 1; // mois
+
+  return (
+    <section className="relative z-10 py-20 px-6 overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-[#00FF88]/10 via-[#00F5FF]/10 to-[#8B5CF6]/10 blur-[100px] rounded-full" />
+      </div>
+      
+      <div className="max-w-5xl mx-auto relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          whileInView={{ opacity: 1, y: 0 }} 
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <span className="text-[#FFB800] text-sm font-medium uppercase tracking-widest">Calculateur</span>
+          <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+            Calculez votre <span className="text-[#00FF88]">ROI</span>
+          </h2>
+          <p className="text-white/40 max-w-xl mx-auto">Estimez vos économies par rapport à un cabinet conseil</p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
+          {/* Left: Inputs */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#FFB800]/20 to-[#FF6B00]/20 rounded-2xl blur-xl" />
+              <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <span className="text-2xl">🔧</span> Configurez votre situation
+                </h3>
+
+                {/* Employees slider */}
+                <div className="mb-6">
+                  <label className="flex justify-between text-sm mb-2">
+                    <span className="text-white/60">Personnes à former</span>
+                    <span className="text-white font-bold">{employees}</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={employees}
+                    onChange={(e) => { setEmployees(parseInt(e.target.value)); setShowResult(false); }}
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#FFB800]"
+                  />
+                  <div className="flex justify-between text-xs text-white/30 mt-1">
+                    <span>1</span>
+                    <span>50</span>
+                    <span>100</span>
+                  </div>
+                </div>
+
+                {/* IA Usage */}
+                <div className="mb-6">
+                  <label className="text-sm text-white/60 mb-3 block">Utilisez-vous des systèmes IA ?</label>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => { setHasIA(true); setShowResult(false); }}
+                      className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+                        hasIA 
+                          ? 'bg-[#FFB800]/20 border-2 border-[#FFB800] text-[#FFB800]' 
+                          : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      Oui
+                    </button>
+                    <button
+                      onClick={() => { setHasIA(false); setShowResult(false); }}
+                      className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+                        !hasIA 
+                          ? 'bg-[#FFB800]/20 border-2 border-[#FFB800] text-[#FFB800]' 
+                          : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      Non / Je ne sais pas
+                    </button>
+                  </div>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowResult(true)}
+                  className="w-full py-4 bg-gradient-to-r from-[#FFB800] to-[#FF6B00] text-black font-bold rounded-xl"
+                >
+                  Calculer mon ROI →
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right: Results */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <AnimatePresence mode="wait">
+              {showResult ? (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                >
+                  <div className="relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-[#00FF88]/30 to-[#00F5FF]/30 rounded-2xl blur-xl" />
+                    <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-[#00FF88]/30 p-6">
+                      <h3 className="text-lg font-bold text-[#00FF88] mb-6 flex items-center gap-2">
+                        <span className="text-2xl">📊</span> Votre estimation
+                      </h3>
+
+                      <div className="space-y-4 mb-6">
+                        {/* Cost comparison */}
+                        <div className="flex justify-between items-center py-3 border-b border-white/10">
+                          <span className="text-white/60">Coût cabinet conseil</span>
+                          <span className="text-[#FF4444] font-bold line-through">{cabinetCost.toLocaleString('fr-FR')} €</span>
+                        </div>
+                        <div className="flex justify-between items-center py-3 border-b border-white/10">
+                          <span className="text-white/60">Notre formation</span>
+                          <span className="text-[#00FF88] font-bold">{formationCost.toLocaleString('fr-FR')} €</span>
+                        </div>
+                        <div className="flex justify-between items-center py-3 bg-[#00FF88]/10 rounded-lg px-3 -mx-3">
+                          <span className="text-white font-semibold">💰 Économie</span>
+                          <span className="text-[#00FF88] font-black text-xl">{savings.toLocaleString('fr-FR')} €</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="bg-white/5 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-[#FF4444]">{timeWithoutTraining}</div>
+                          <div className="text-white/40 text-xs">mois sans formation</div>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-3 text-center">
+                          <div className="text-2xl font-bold text-[#00FF88]">{timeWithTraining}</div>
+                          <div className="text-white/40 text-xs">mois avec formation</div>
+                        </div>
+                      </div>
+
+                      {/* Risk */}
+                      <div className="bg-[#FF4444]/10 rounded-xl p-4 border border-[#FF4444]/20">
+                        <p className="text-[#FF4444] text-sm font-medium mb-1">⚠️ Risque en cas de non-conformité</p>
+                        <p className="text-white/80 text-xs">Amende jusqu&apos;à <span className="text-[#FF4444] font-bold">{(fineRisk / 1000000).toFixed(0)}M€</span> ou 7% du CA mondial</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="placeholder"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-full flex items-center justify-center"
+                >
+                  <div className="text-center text-white/30 py-20">
+                    <div className="text-6xl mb-4">📊</div>
+                    <p>Configurez votre situation<br />pour voir les résultats</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+
+        {/* Bottom CTA */}
+        {showResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 text-center"
+          >
+            <Link 
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold px-8 py-4 rounded-xl"
+            >
+              Économiser {savings.toLocaleString('fr-FR')} € maintenant
+              <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1, repeat: Infinity }}>→</motion.span>
+            </Link>
+          </motion.div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 // Sticky CTA Bar Component
 const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: number, spotsLeft: number }) => (
   <AnimatePresence>
@@ -653,6 +1354,36 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* QUICK WINS BAR - Bénéfices immédiats */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-8 px-6 border-y border-white/5 bg-gradient-to-r from-[#00FF88]/5 via-transparent to-[#00F5FF]/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: "⏱️", value: "8h", label: "pour être opérationnel", sublabel: "vs 3-6 mois en autodidacte" },
+              { icon: "📋", value: "12", label: "templates prêts à l'emploi", sublabel: "économisez 40h de rédaction" },
+              { icon: "🎯", value: "150+", label: "points de contrôle audit", sublabel: "zéro angle mort" },
+              { icon: "💰", value: "-90%", label: "vs cabinet conseil", sublabel: "même niveau d'expertise" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-3xl mb-2">{stat.icon}</div>
+                <div className="text-2xl sm:text-3xl font-black text-white mb-1">{stat.value}</div>
+                <div className="text-white/80 text-sm font-medium">{stat.label}</div>
+                <div className="text-white/40 text-xs">{stat.sublabel}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* PROBLEM AGITATION SECTION */}
       {/* ============================================ */}
       <section className="relative z-10 py-20 px-6">
@@ -747,6 +1478,138 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* BEFORE/AFTER - Transformation mesurable */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-[#FF6B00] text-sm font-medium uppercase tracking-widest">Transformation</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+              Avant vs <span className="text-[#00FF88]">Après</span> la formation
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto">Des résultats concrets et mesurables pour votre organisation</p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* AVANT */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#FF4444]/20 to-[#FF6B00]/20 rounded-2xl blur-xl" />
+                <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-[#FF4444]/20 p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-[#FF4444]/20 flex items-center justify-center">
+                      <span className="text-2xl">😰</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-[#FF4444]">AVANT</h3>
+                      <p className="text-white/40 text-sm">Sans formation AI Act</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-4">
+                    {[
+                      { metric: "0%", label: "de systèmes IA documentés", icon: "📋" },
+                      { metric: "???", label: "niveau de risque inconnu", icon: "⚠️" },
+                      { metric: "0", label: "personne formée Article 4", icon: "👥" },
+                      { metric: "35M€", label: "d'amende potentielle", icon: "💸" },
+                      { metric: "3-6 mois", label: "pour comprendre le sujet", icon: "⏳" },
+                      { metric: "15-50k€", label: "si cabinet externe", icon: "🏢" },
+                    ].map((item, i) => (
+                      <motion.li 
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center gap-3 bg-[#FF4444]/5 rounded-lg p-3"
+                      >
+                        <span className="text-xl">{item.icon}</span>
+                        <div>
+                          <span className="text-[#FF4444] font-bold">{item.metric}</span>
+                          <span className="text-white/60 text-sm ml-2">{item.label}</span>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* APRÈS */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00FF88]/20 to-[#00F5FF]/20 rounded-2xl blur-xl" />
+                <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-[#00FF88]/20 p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-[#00FF88]/20 flex items-center justify-center">
+                      <span className="text-2xl">🚀</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-[#00FF88]">APRÈS</h3>
+                      <p className="text-white/40 text-sm">Avec notre formation</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-4">
+                    {[
+                      { metric: "100%", label: "systèmes IA inventoriés", icon: "✅" },
+                      { metric: "Clair", label: "classification des risques", icon: "🎯" },
+                      { metric: "Toute l'équipe", label: "certifiée Article 4", icon: "🎓" },
+                      { metric: "0€", label: "risque d'amende", icon: "🛡️" },
+                      { metric: "8h", label: "pour être opérationnel", icon: "⚡" },
+                      { metric: "4 900€", label: "investissement unique", icon: "💎" },
+                    ].map((item, i) => (
+                      <motion.li 
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center gap-3 bg-[#00FF88]/5 rounded-lg p-3"
+                      >
+                        <span className="text-xl">{item.icon}</span>
+                        <div>
+                          <span className="text-[#00FF88] font-bold">{item.metric}</span>
+                          <span className="text-white/60 text-sm ml-2">{item.label}</span>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Bottom summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center"
+          >
+            <div className="inline-flex items-center gap-4 bg-gradient-to-r from-[#00FF88]/10 to-[#00F5FF]/10 rounded-2xl border border-white/10 px-6 py-4">
+              <span className="text-3xl">💡</span>
+              <div className="text-left">
+                <p className="text-white font-bold">ROI immédiat</p>
+                <p className="text-white/60 text-sm">Formation rentabilisée dès le premier audit évité</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* MODULES - Quick Overview */}
       {/* ============================================ */}
       <section id="programme" className="relative z-10 py-20 px-6">
@@ -787,6 +1650,175 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* TEASER SECTION - Testez gratuitement */}
+      {/* ============================================ */}
+      <TeaserSection />
+
+      {/* ============================================ */}
+      {/* ROI CALCULATOR - Simulateur interactif */}
+      {/* ============================================ */}
+      <ROICalculator />
+
+      {/* ============================================ */}
+      {/* CONCRETE RESULTS - Ce que vous aurez accompli */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-[#00FF88] text-sm font-medium uppercase tracking-widest">Résultats garantis</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+              Ce que vous aurez <span className="text-[#00FF88]">accompli</span>
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto">Une feuille de route claire avec des livrables concrets à chaque étape</p>
+          </motion.div>
+
+          {/* Timeline */}
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-[#00FF88] via-[#00F5FF] to-[#8B5CF6] hidden md:block" />
+            
+            <div className="space-y-8">
+              {[
+                { 
+                  week: "Semaine 1", 
+                  title: "Maîtrise du cadre réglementaire",
+                  deliverables: [
+                    "✓ Comprendre les 4 niveaux de risque AI Act",
+                    "✓ Identifier les systèmes IA concernés",
+                    "✓ Connaître les délais et sanctions"
+                  ],
+                  result: "Vous savez exactement ce qui s'applique à vous",
+                  color: "#00FF88",
+                  icon: "📚"
+                },
+                { 
+                  week: "Semaine 2", 
+                  title: "Inventaire complet de vos IA",
+                  deliverables: [
+                    "✓ Registre des systèmes IA rempli",
+                    "✓ Classification par niveau de risque",
+                    "✓ Cartographie des responsabilités"
+                  ],
+                  result: "Visibilité 100% sur votre parc IA",
+                  color: "#00F5FF",
+                  icon: "📋"
+                },
+                { 
+                  week: "Semaine 3", 
+                  title: "Documentation technique en place",
+                  deliverables: [
+                    "✓ Politique IA entreprise rédigée",
+                    "✓ Documentation technique complète",
+                    "✓ Processus de validation définis"
+                  ],
+                  result: "Prêt pour un audit externe",
+                  color: "#8B5CF6",
+                  icon: "📝"
+                },
+                { 
+                  week: "Semaine 4", 
+                  title: "Conformité opérationnelle",
+                  deliverables: [
+                    "✓ Équipe certifiée Article 4",
+                    "✓ Audit interne réalisé",
+                    "✓ Plan d'action si écarts"
+                  ],
+                  result: "Conformité AI Act démontrée",
+                  color: "#FFB800",
+                  icon: "🏆"
+                },
+              ].map((milestone, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 }}
+                  className={`flex items-center gap-6 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                >
+                  <div className={`flex-1 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
+                    <div 
+                      className="inline-block rounded-2xl p-6 border"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${milestone.color}10, transparent)`,
+                        borderColor: `${milestone.color}30`
+                      }}
+                    >
+                      <div className="flex items-center gap-2 mb-3" style={{ justifyContent: i % 2 === 0 ? 'flex-end' : 'flex-start' }}>
+                        <span className="text-2xl">{milestone.icon}</span>
+                        <span className="text-sm font-bold" style={{ color: milestone.color }}>{milestone.week}</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-3">{milestone.title}</h3>
+                      <ul className={`space-y-1 text-sm text-white/60 mb-3 ${i % 2 === 0 ? 'md:text-right' : ''}`}>
+                        {milestone.deliverables.map((d, j) => (
+                          <li key={j}>{d}</li>
+                        ))}
+                      </ul>
+                      <p className="text-sm font-medium" style={{ color: milestone.color }}>
+                        → {milestone.result}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Center dot */}
+                  <div 
+                    className="hidden md:flex w-12 h-12 rounded-full items-center justify-center border-4 z-10"
+                    style={{ 
+                      background: '#0A0A1B',
+                      borderColor: milestone.color,
+                      boxShadow: `0 0 20px ${milestone.color}50`
+                    }}
+                  >
+                    <span className="text-lg">{milestone.icon}</span>
+                  </div>
+                  
+                  <div className="flex-1 hidden md:block" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Final result */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12"
+          >
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#00FF88]/30 to-[#00F5FF]/30 rounded-2xl blur-xl" />
+              <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-[#00FF88]/30 p-8 text-center">
+                <div className="text-4xl mb-4">🎯</div>
+                <h3 className="text-2xl font-bold text-white mb-2">Résultat final</h3>
+                <p className="text-white/60 max-w-2xl mx-auto mb-6">
+                  En 4 semaines, vous passez de "on ne sait pas si on est concerné" à "conformité AI Act démontrée avec preuves".
+                </p>
+                <div className="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-[#00FF88]">100%</div>
+                    <div className="text-white/40 text-sm">Systèmes documentés</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-[#00F5FF]">12</div>
+                    <div className="text-white/40 text-sm">Livrables prêts</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-[#8B5CF6]">0€</div>
+                    <div className="text-white/40 text-sm">Risque d'amende</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -1208,6 +2240,103 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* CLIENT RESULTS STATS - Preuves concrètes */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-[#00F5FF] text-sm font-medium uppercase tracking-widest">Résultats mesurés</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+              Les chiffres de nos <span className="text-[#00FF88]">clients</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { 
+                value: "100%", 
+                label: "Taux de complétion", 
+                detail: "Formation terminée",
+                icon: "🎓",
+                color: "#00FF88"
+              },
+              { 
+                value: "4.8/5", 
+                label: "Note moyenne", 
+                detail: "847 avis vérifiés",
+                icon: "⭐",
+                color: "#FFB800"
+              },
+              { 
+                value: "< 4 sem", 
+                label: "Mise en conformité", 
+                detail: "Temps moyen",
+                icon: "⚡",
+                color: "#00F5FF"
+              },
+              { 
+                value: "89%", 
+                label: "Financés OPCO", 
+                detail: "Prise en charge obtenue",
+                icon: "💰",
+                color: "#8B5CF6"
+              },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div 
+                  className="relative rounded-2xl p-6 text-center h-full border"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${stat.color}08, transparent)`,
+                    borderColor: `${stat.color}30`
+                  }}
+                >
+                  <div className="text-4xl mb-3">{stat.icon}</div>
+                  <div className="text-4xl font-black mb-2" style={{ color: stat.color }}>{stat.value}</div>
+                  <div className="text-white font-medium">{stat.label}</div>
+                  <div className="text-white/40 text-sm">{stat.detail}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Additional proof points */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-10"
+          >
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              {[
+                "✓ 127 entreprises formées",
+                "✓ 847 certificats délivrés",
+                "✓ 12 secteurs représentés",
+                "✓ 0 litige conformité après formation",
+              ].map((proof, i) => (
+                <span 
+                  key={i} 
+                  className="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-white/60"
+                >
+                  {proof}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* MASSIVE TESTIMONIALS WALL - 100+ témoignages */}
       {/* ============================================ */}
       <section className="relative z-10 py-20 overflow-hidden">
@@ -1375,6 +2504,102 @@ export default function LandingPage() {
                 </div>
               </div>
             </HoloCard>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* OBJECTION KILLERS - Lever les derniers doutes */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold">
+              Vous hésitez encore ? <span className="text-white/40">Normal.</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                objection: "\"C'est trop cher pour une formation en ligne\"",
+                answer: "Un cabinet conseil facture 15 000€ à 50 000€ pour le même accompagnement. Vous économisez 90% tout en obtenant les mêmes livrables. Et c'est finançable OPCO.",
+                proof: "→ Nos clients économisent en moyenne 25 000€",
+                icon: "💸",
+                color: "#00FF88"
+              },
+              {
+                objection: "\"Je n'ai pas le temps de suivre une formation\"",
+                answer: "8h de formation à votre rythme, sur 12 mois. Suivez 30 minutes par jour pendant 2 semaines, ou 2h le weekend. Vous avez le temps.",
+                proof: "→ Format modulaire adapté aux emplois du temps chargés",
+                icon: "⏰",
+                color: "#00F5FF"
+              },
+              {
+                objection: "\"Je préfère attendre de voir comment ça évolue\"",
+                answer: "Les premières sanctions tombent en février 2025 (pratiques interdites). Août 2026 arrive vite. Attendre = se préparer dans l'urgence = erreurs coûteuses.",
+                proof: "→ {daysLeft} jours avant l'application complète",
+                icon: "⚠️",
+                color: "#FF6B00"
+              },
+              {
+                objection: "\"On va se faire accompagner par notre DPO/DSI\"",
+                answer: "L'AI Act n'est pas le RGPD. C'est un règlement technique qui nécessite des compétences spécifiques. Formez votre DPO/DSI pour qu'ils soient autonomes.",
+                proof: "→ 67% de nos clients sont des DPO qui montent en compétence",
+                icon: "👥",
+                color: "#8B5CF6"
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div 
+                  className="h-full rounded-2xl p-6 border"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${item.color}05, transparent)`,
+                    borderColor: `${item.color}20`
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: `${item.color}15` }}
+                    >
+                      <span className="text-2xl">{item.icon}</span>
+                    </div>
+                    <div>
+                      <p className="text-white/50 italic text-sm mb-2">{item.objection}</p>
+                      <p className="text-white/90 mb-3">{item.answer}</p>
+                      <p className="text-sm font-medium" style={{ color: item.color }}>
+                        {item.proof.replace('{daysLeft}', String(calculateDaysUntil()))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Final push */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-10 text-center"
+          >
+            <p className="text-white/60 text-lg mb-4">
+              Le vrai risque n&apos;est pas d&apos;investir 4 900€.<br/>
+              <span className="text-white font-semibold">C&apos;est de ne rien faire et de payer 35M€ d&apos;amende.</span>
+            </p>
           </motion.div>
         </div>
       </section>
