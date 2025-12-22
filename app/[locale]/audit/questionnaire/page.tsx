@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { getQuestionHelp } from './question-helps';
 
 // ============================================
 // TYPES
@@ -14,6 +15,13 @@ interface QuestionOption {
   score: number;
   highRiskFlag?: boolean;
   triggerQuestions?: string[];
+}
+
+interface QuestionHelp {
+  what: string;      // Qu'est-ce que ça veut dire ?
+  why: string;       // Pourquoi c'est important ?
+  how: string;       // Comment vérifier / trouver la réponse ?
+  tips?: string[];   // Conseils pratiques
 }
 
 interface Question {
@@ -29,6 +37,7 @@ interface Question {
   condition?: (answers: Record<string, any>) => boolean;
   infoBox?: string;
   aiActRef?: string;
+  help?: QuestionHelp;
 }
 
 interface CompanyProfile {
@@ -101,6 +110,16 @@ const allQuestions: Question[] = [
     categoryColor: '#00F5FF',
     plans: ['solo', 'pro', 'enterprise'],
     aiActRef: 'Article 49',
+    help: {
+      what: "Un inventaire IA est une liste exhaustive de tous les outils et systèmes utilisant l'intelligence artificielle dans votre entreprise : logiciels, applications, services cloud, etc.",
+      why: "L'AI Act impose aux organisations de connaître précisément leurs systèmes IA pour pouvoir les classifier et appliquer les obligations correspondantes. Sans inventaire, impossible de savoir si vous êtes concerné par des obligations.",
+      how: "Envoyez un questionnaire à chaque département en demandant : 'Utilisez-vous des outils qui font des prédictions, des recommandations, de la reconnaissance d'image/texte, ou de l'automatisation intelligente ?' Listez aussi tous les logiciels avec des fonctions 'smart' ou 'AI'.",
+      tips: [
+        "Pensez aux outils du quotidien : correcteurs orthographiques IA, filtres anti-spam, chatbots",
+        "N'oubliez pas les outils gratuits utilisés par les employés (ChatGPT, etc.)",
+        "Créez un fichier Excel simple avec : Nom, Département, Usage, Fournisseur"
+      ]
+    }
   },
   {
     id: 'inv2',
@@ -114,6 +133,16 @@ const allQuestions: Question[] = [
     categoryIcon: '📋',
     categoryColor: '#00F5FF',
     plans: ['solo', 'pro', 'enterprise'],
+    help: {
+      what: "L'IA générative crée du nouveau contenu (texte, images, code, audio). Les outils populaires incluent ChatGPT, Claude, Copilot, Midjourney, DALL-E, Gemini.",
+      why: "Ces outils posent des risques spécifiques : confidentialité des données saisies, propriété intellectuelle du contenu généré, hallucinations (informations fausses présentées comme vraies).",
+      how: "Demandez à vos équipes s'ils utilisent ces outils, même gratuitement. Vérifiez les extensions de navigateur, les abonnements payés en note de frais, les comptes créés avec des emails professionnels.",
+      tips: [
+        "Beaucoup d'employés utilisent ces outils sans le dire par peur d'être jugés",
+        "Créez un cadre bienveillant pour les recenser plutôt qu'interdire",
+        "Une politique d'encadrement définit ce qui peut/ne peut pas être partagé avec ces outils"
+      ]
+    }
   },
   {
     id: 'inv3',
@@ -128,6 +157,16 @@ const allQuestions: Question[] = [
     categoryIcon: '📋',
     categoryColor: '#00F5FF',
     plans: ['solo', 'pro', 'enterprise'],
+    help: {
+      what: "Le nombre total de systèmes ou outils utilisant l'IA dans votre organisation, qu'ils soient achetés, développés en interne, gratuits ou payants.",
+      why: "Plus vous avez de systèmes IA, plus la gouvernance devient complexe et plus les risques de non-conformité augmentent. Cela aide à dimensionner les ressources nécessaires.",
+      how: "Basez-vous sur votre inventaire. Si vous n'en avez pas, estimez en listant : logiciels métier avec IA, outils bureautiques (Office 365 a de l'IA), CRM, ERP, RH, marketing, etc.",
+      tips: [
+        "Une même suite logicielle peut contenir plusieurs systèmes IA distincts",
+        "Microsoft 365 seul contient 10+ fonctions IA différentes",
+        "En cas de doute, arrondissez au-dessus"
+      ]
+    }
   },
   {
     id: 'inv4',
@@ -141,6 +180,16 @@ const allQuestions: Question[] = [
     categoryIcon: '📋',
     categoryColor: '#00F5FF',
     plans: ['solo', 'pro', 'enterprise'],
+    help: {
+      what: "Savoir précisément quels services (RH, Finance, Marketing, Production, IT, etc.) utilisent des outils IA et lesquels.",
+      why: "Chaque département peut avoir des usages à risque différents. Les RH utilisant l'IA pour le recrutement = haut risque. Le marketing utilisant l'IA pour des visuels = risque moindre.",
+      how: "Organisez des entretiens de 15 min avec chaque responsable de département. Question clé : 'Quels outils utilisez-vous qui font des choses automatiquement ou intelligemment ?'",
+      tips: [
+        "Les départements les plus utilisateurs d'IA : IT, Marketing, RH, Service Client",
+        "N'oubliez pas les usages 'shadow IT' - outils installés sans l'accord de l'IT",
+        "Créez une matrice Département x Outils IA"
+      ]
+    }
   },
   {
     id: 'inv5',
@@ -154,6 +203,16 @@ const allQuestions: Question[] = [
     categoryIcon: '📋',
     categoryColor: '#00F5FF',
     plans: ['solo', 'pro', 'enterprise'],
+    help: {
+      what: "Chaque système IA devrait avoir une fiche avec : nom, description, fournisseur, usage prévu, données utilisées, responsable interne, date de mise en service.",
+      why: "L'AI Act exige une documentation technique. Commencer par des fiches simples facilite la mise en conformité et permet de réagir vite en cas d'incident ou de contrôle.",
+      how: "Créez un template simple (Word ou Excel) et demandez à chaque responsable d'outil de le remplir. 15 minutes par système suffisent pour une première version.",
+      tips: [
+        "Utilisez notre template 'Registre IA' disponible dans la formation",
+        "Commencez par les 5 systèmes les plus critiques",
+        "Un responsable = une personne nommée, pas 'l'équipe IT'"
+      ]
+    }
   },
   // Pro/Enterprise inventory questions
   {
@@ -1133,6 +1192,19 @@ export default function AuditQuestionnairePage() {
   // Get plan from URL param or localStorage
   const [plan, setPlan] = useState<'solo' | 'pro' | 'enterprise'>('solo');
   
+  // Save/Resume state
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [savedProgress, setSavedProgress] = useState<{
+    currentQuestion: number;
+    answers: Record<string, any>;
+    profile: CompanyProfile;
+    highRiskFlags: string[];
+    savedAt: string;
+  } | null>(null);
+  
+  // Help state
+  const [showHelp, setShowHelp] = useState(false);
+  
   useEffect(() => {
     const urlPlan = searchParams.get('plan');
     if (urlPlan && ['solo', 'pro', 'enterprise'].includes(urlPlan)) {
@@ -1144,6 +1216,22 @@ export default function AuditQuestionnairePage() {
       }
     }
   }, [searchParams]);
+
+  // Check for saved progress on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(`audit_progress_${plan}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.currentQuestion > 0) {
+          setSavedProgress(parsed);
+          setShowResumeModal(true);
+        }
+      } catch (e) {
+        console.error('Error loading saved progress:', e);
+      }
+    }
+  }, [plan]);
 
   // Update phase based on plan
   useEffect(() => {
@@ -1167,6 +1255,48 @@ export default function AuditQuestionnairePage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({ profile });
   const [highRiskFlags, setHighRiskFlags] = useState<string[]>([]);
+
+  // Save progress whenever answers change
+  useEffect(() => {
+    if (currentQuestion > 0 || Object.keys(answers).length > 1) {
+      const progressData = {
+        currentQuestion,
+        answers,
+        profile,
+        highRiskFlags,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(`audit_progress_${plan}`, JSON.stringify(progressData));
+    }
+  }, [currentQuestion, answers, profile, highRiskFlags, plan]);
+
+  // Resume saved progress
+  const resumeProgress = () => {
+    if (savedProgress) {
+      setCurrentQuestion(savedProgress.currentQuestion);
+      setAnswers(savedProgress.answers);
+      setProfile(savedProgress.profile);
+      setHighRiskFlags(savedProgress.highRiskFlags);
+      setPhase('questions');
+    }
+    setShowResumeModal(false);
+  };
+
+  // Start fresh
+  const startFresh = () => {
+    localStorage.removeItem(`audit_progress_${plan}`);
+    setCurrentQuestion(0);
+    setAnswers({ profile });
+    setHighRiskFlags([]);
+    setShowResumeModal(false);
+  };
+
+  // Clear progress on completion
+  const clearProgress = () => {
+    localStorage.removeItem(`audit_progress_${plan}`);
+  };
+
+  // Filter questions based on plan, sector, and conditions
 
   // Filter questions based on plan, sector, and conditions
   const filteredQuestions = useMemo(() => {
@@ -1263,6 +1393,7 @@ export default function AuditQuestionnairePage() {
     };
     
     localStorage.setItem('auditResults', JSON.stringify(results));
+    clearProgress(); // Clear saved progress when completing audit
     router.push(`/audit/results?score=${score}&plan=${plan}`);
   };
 
@@ -1383,14 +1514,166 @@ export default function AuditQuestionnairePage() {
 
   const catColor = categoryColors[currentQ.category] || { color: '#8B5CF6', icon: '📋' };
 
+  // Get help from centralized help file
+  const questionHelp = getQuestionHelp(currentQ.id);
+
   return (
     <div className="min-h-screen bg-[#0A0A1B] text-white">
       <NeuralBackground />
+
+      {/* Resume Modal */}
+      <AnimatePresence>
+        {showResumeModal && savedProgress && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#1a1a2e] border border-white/20 rounded-2xl p-8 max-w-md w-full"
+            >
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-4">📋</div>
+                <h2 className="text-2xl font-bold mb-2">Reprendre votre audit ?</h2>
+                <p className="text-white/60">
+                  Vous avez un audit en cours commencé le{' '}
+                  {new Date(savedProgress.savedAt).toLocaleDateString('fr-FR', { 
+                    day: 'numeric', 
+                    month: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+              
+              <div className="bg-white/5 rounded-xl p-4 mb-6">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-white/60">Progression</span>
+                  <span className="text-[#00F5FF] font-medium">
+                    {savedProgress.currentQuestion} / {totalQuestions} questions
+                  </span>
+                </div>
+                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF]"
+                    style={{ width: `${(savedProgress.currentQuestion / totalQuestions) * 100}%` }}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={resumeProgress}
+                  className="w-full py-4 bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF] text-white font-bold rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  ▶️ Continuer où j'en étais
+                </button>
+                <button
+                  onClick={startFresh}
+                  className="w-full py-4 bg-white/5 border border-white/20 text-white/70 font-medium rounded-xl hover:bg-white/10 transition-colors"
+                >
+                  🔄 Recommencer depuis le début
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Help Panel */}
+      <AnimatePresence>
+        {showHelp && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+            onClick={() => setShowHelp(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#1a1a2e] border border-white/20 rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <span className="text-2xl">💡</span> Aide & Conseils
+                </h3>
+                <button 
+                  onClick={() => setShowHelp(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="space-y-5">
+                {/* What */}
+                <div className="bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-xl p-4">
+                  <h4 className="font-semibold text-[#00F5FF] mb-2 flex items-center gap-2">
+                    <span>❓</span> Qu'est-ce que ça veut dire ?
+                  </h4>
+                  <p className="text-white/80 text-sm leading-relaxed">{questionHelp.what}</p>
+                </div>
+                
+                {/* Why */}
+                <div className="bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl p-4">
+                  <h4 className="font-semibold text-[#8B5CF6] mb-2 flex items-center gap-2">
+                    <span>🎯</span> Pourquoi c'est important ?
+                  </h4>
+                  <p className="text-white/80 text-sm leading-relaxed">{questionHelp.why}</p>
+                </div>
+                
+                {/* How */}
+                <div className="bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-xl p-4">
+                  <h4 className="font-semibold text-[#00FF88] mb-2 flex items-center gap-2">
+                    <span>🔍</span> Comment vérifier / trouver la réponse ?
+                  </h4>
+                  <p className="text-white/80 text-sm leading-relaxed">{questionHelp.how}</p>
+                </div>
+                
+                {/* Tips */}
+                {questionHelp.tips && questionHelp.tips.length > 0 && (
+                  <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-xl p-4">
+                    <h4 className="font-semibold text-[#FFB800] mb-2 flex items-center gap-2">
+                      <span>💡</span> Conseils pratiques
+                    </h4>
+                    <ul className="space-y-2">
+                      {questionHelp.tips.map((tip, i) => (
+                        <li key={i} className="text-white/80 text-sm flex items-start gap-2">
+                          <span className="text-[#FFB800]">•</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              
+              <button
+                onClick={() => setShowHelp(false)}
+                className="w-full mt-6 py-3 bg-white/10 border border-white/20 rounded-xl font-medium hover:bg-white/20 transition-colors"
+              >
+                J'ai compris, continuer
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Header */}
       <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/audit" className="text-white/60 hover:text-white text-sm">← Quitter</Link>
+          <Link href="/audit" className="text-white/60 hover:text-white text-sm flex items-center gap-1">
+            ← <span className="hidden sm:inline">Quitter</span>
+            <span className="text-xs text-white/40 ml-1">(sauvegardé)</span>
+          </Link>
           <div className="text-center">
             <h1 className="text-lg font-bold">Audit AI Act</h1>
             <p className="text-sm text-white/60">
@@ -1446,6 +1729,17 @@ export default function AuditQuestionnairePage() {
                 <h2 className="text-xl font-semibold text-white mb-2 text-center">
                   {currentQ.question}
                 </h2>
+                
+                {/* Help button */}
+                <div className="flex justify-center mb-4">
+                  <button
+                    onClick={() => setShowHelp(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                  >
+                    <span className="text-lg">💡</span>
+                    <span>Besoin d'aide pour répondre ?</span>
+                  </button>
+                </div>
                 
                 {/* Info box */}
                 {currentQ.infoBox && (
