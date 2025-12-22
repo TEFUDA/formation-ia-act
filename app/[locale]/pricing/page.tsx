@@ -202,8 +202,8 @@ export default function PricingPage() {
                         Commencer maintenant
                       </Link>
                     ) : (
-                      <Link href="/contact?type=entreprise" className="w-full py-4 rounded-xl font-bold text-center transition-all block" style={{ background: plan.color, color: '#000' }}>
-                        Demander un devis
+                      <Link href="/devis" className="w-full py-4 rounded-xl font-bold text-center transition-all block" style={{ background: plan.color, color: '#000' }}>
+                        Générer mon devis
                       </Link>
                     )}
                   </div>
