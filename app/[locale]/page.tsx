@@ -1480,14 +1480,14 @@ export default function LandingPage() {
 
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <Link 
-                          href={plan.id === 'enterprise' ? '/contact?type=entreprise' : `/checkout?plan=${plan.id}`} 
+                          href={plan.id === 'enterprise' ? '/devis' : `/checkout?plan=${plan.id}`} 
                           className="block w-full py-3 rounded-xl font-bold text-center transition-all"
                           style={{ 
                             background: plan.popular ? `linear-gradient(135deg, ${plan.color}, ${plan.color}cc)` : 'rgba(255,255,255,0.05)',
                             color: plan.popular ? 'black' : 'white'
                           }}
                         >
-                          {plan.id === 'enterprise' ? 'Demander un devis' : 'Choisir ce plan'}
+                          {plan.id === 'enterprise' ? 'Générer mon devis' : 'Choisir ce plan'}
                         </Link>
                       </motion.div>
                     </div>
@@ -1654,6 +1654,7 @@ export default function LandingPage() {
                 <li><Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link></li>
                 <li><Link href="/cgv" className="hover:text-white transition-colors">CGV</Link></li>
                 <li><Link href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</Link></li>
+                <li><Link href="/qualiopi" className="hover:text-white transition-colors">Financement OPCO</Link></li>
               </ul>
             </div>
             <div>
