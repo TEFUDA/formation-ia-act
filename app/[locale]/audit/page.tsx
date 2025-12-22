@@ -212,11 +212,34 @@ export default function AuditPage() {
             >
               {userPlan ? (
                 <div className="text-center">
-                  <div className="inline-flex items-center gap-3 bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-full px-6 py-3">
-                    <span className="text-[#00FF88]">✓</span>
-                    <span className="text-[#00FF88] font-medium">
-                      Vous avez accès à l'audit {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
-                    </span>
+                  <div className="inline-flex flex-col items-center gap-4 bg-gradient-to-br from-white/5 to-white/10 border border-white/20 rounded-2xl px-8 py-6">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">
+                        {userPlan === 'enterprise' ? '👑' : userPlan === 'pro' ? '⭐' : '📊'}
+                      </span>
+                      <span className="text-lg font-medium">
+                        Vous avez accès à l'<span style={{ color: userPlan === 'enterprise' ? '#FFB800' : userPlan === 'pro' ? '#8B5CF6' : '#00F5FF' }}>Audit {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}</span>
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/audit/questionnaire?plan=${userPlan}`)}
+                      className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105"
+                      style={{ 
+                        background: userPlan === 'enterprise' 
+                          ? 'linear-gradient(90deg, #FFB800, #FF8C00)' 
+                          : userPlan === 'pro' 
+                            ? 'linear-gradient(90deg, #8B5CF6, #00F5FF)' 
+                            : 'linear-gradient(90deg, #00F5FF, #0066FF)',
+                        color: userPlan === 'enterprise' ? '#000' : '#fff'
+                      }}
+                    >
+                      🚀 Lancer mon audit {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} →
+                    </button>
+                    <p className="text-white/40 text-sm">
+                      {userPlan === 'enterprise' ? '150 questions • 90-120 min • Rapport 80-100 pages' :
+                       userPlan === 'pro' ? '80 questions • 45-60 min • Rapport 40-50 pages' :
+                       '40 questions • 15-20 min • Rapport 15 pages'}
+                    </p>
                   </div>
                 </div>
               ) : (
