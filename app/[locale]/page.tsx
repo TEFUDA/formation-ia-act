@@ -1089,6 +1089,125 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* MARKET COMPARISON - Prix du marché */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-[#FFB800] text-sm font-medium uppercase tracking-widest">Comparaison</span>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">
+              Comparez avec le <span className="text-[#FFB800]">prix du marché</span>
+            </h2>
+            <p className="text-white/40">Ce que facturent les cabinets vs notre solution</p>
+          </motion.div>
+
+          <HoloCard glow="#FFB800">
+            <div className="p-6 sm:p-8">
+              {/* Comparison table */}
+              <div className="space-y-3 mb-6">
+                {[
+                  { solution: "Audit AI Act par cabinet", price: "5 000 - 20 000€", icon: "🔍", included: false },
+                  { solution: "Formation certifiante (1 pers)", price: "1 500 - 3 000€", icon: "🎓", included: false },
+                  { solution: "Templates juridiques seuls", price: "500 - 2 000€", icon: "📋", included: false },
+                  { solution: "Accompagnement cabinet complet", price: "15 000 - 50 000€", icon: "🤝", included: false },
+                ].map((row, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{row.icon}</span>
+                      <span className="text-white/70">{row.solution}</span>
+                    </div>
+                    <span className="text-white/40 font-medium">{row.price}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Separator */}
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/10"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[#0A0A1B] px-4 text-white/40 text-sm">VS</span>
+                </div>
+              </div>
+
+              {/* Our solution */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] rounded-2xl opacity-20 blur-sm" />
+                <div className="relative bg-gradient-to-r from-[#00FF88]/10 to-[#00F5FF]/10 border-2 border-[#00FF88]/40 rounded-xl p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <motion.div 
+                        className="text-4xl"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        🎯
+                      </motion.div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">Notre offre tout-en-un</h3>
+                        <p className="text-white/60 text-sm">Formation + Templates + Vidéos + Audit + Certificat</p>
+                      </div>
+                    </div>
+                    <div className="text-center sm:text-right">
+                      <motion.p 
+                        className="text-4xl font-black text-[#00FF88]"
+                        animate={{ scale: [1, 1.02, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        4 900€
+                      </motion.p>
+                      <p className="text-white/40 text-sm">HT / personne</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
+                    {['Formation 8h', '12 Templates', '12 Vidéos', 'Audit complet', 'Certificat', 'Support'].map((item, i) => (
+                      <span key={i} className="flex items-center gap-1 text-xs bg-white/5 px-2 py-1 rounded-full text-white/60">
+                        <span className="text-[#00FF88]">✓</span> {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Savings callout */}
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-6 text-center"
+              >
+                <p className="text-[#00FF88] font-bold text-lg">
+                  💰 Économisez jusqu&apos;à 90% par rapport à un accompagnement cabinet
+                </p>
+                <p className="text-white/40 text-sm mt-1">
+                  Et devenez autonome sur votre conformité AI Act
+                </p>
+              </motion.div>
+            </div>
+          </HoloCard>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* MASSIVE TESTIMONIALS WALL - 100+ témoignages */}
       {/* ============================================ */}
       <section className="relative z-10 py-20 overflow-hidden">
