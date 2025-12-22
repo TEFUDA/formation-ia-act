@@ -1393,6 +1393,8 @@ export default function AuditQuestionnairePage() {
     };
     
     localStorage.setItem('auditResults', JSON.stringify(results));
+    localStorage.setItem('auditScore', score.toString()); // Save score separately for dashboard
+    localStorage.setItem('auditPlan', plan); // Save plan for dashboard
     clearProgress(); // Clear saved progress when completing audit
     router.push(`/audit/results?score=${score}&plan=${plan}`);
   };
