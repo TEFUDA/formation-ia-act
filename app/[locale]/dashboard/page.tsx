@@ -233,11 +233,19 @@ export default function DashboardPage() {
                     <p className="font-medium">Accéder aux templates</p>
                     <p className="text-white/50 text-sm">12 documents inclus</p>
                   </button>
-                  <button onClick={() => setActiveTab('audit')} className="p-4 bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-xl text-left hover:bg-[#FFB800]/20 transition-colors">
-                    <span className="text-2xl mb-2 block">📊</span>
-                    <p className="font-medium">{auditScore ? 'Voir mon audit' : 'Lancer l\'audit v2.0'}</p>
-                    <p className="text-white/50 text-sm">{auditScore ? `Score: ${auditScore}%` : '150+ questions'}</p>
-                  </button>
+                  {auditScore ? (
+                    <button onClick={() => setActiveTab('audit')} className="p-4 bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-xl text-left hover:bg-[#FFB800]/20 transition-colors">
+                      <span className="text-2xl mb-2 block">📊</span>
+                      <p className="font-medium">Voir mon audit</p>
+                      <p className="text-white/50 text-sm">Score: {auditScore}%</p>
+                    </button>
+                  ) : (
+                    <Link href={`/audit/questionnaire?plan=${userPlan}`} className="p-4 bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-xl text-left hover:bg-[#FFB800]/20 transition-colors block">
+                      <span className="text-2xl mb-2 block">📊</span>
+                      <p className="font-medium">Lancer l&apos;audit {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}</p>
+                      <p className="text-white/50 text-sm">{userPlan === 'enterprise' ? '150 questions' : userPlan === 'pro' ? '80 questions' : '40 questions'}</p>
+                    </Link>
+                  )}
                 </div>
 
                 {/* Prochaines échéances */}
@@ -435,7 +443,7 @@ export default function DashboardPage() {
                                 <p className="text-white/40 text-xs">Rapport complet exportable</p>
                               </div>
                             </a>
-                            <Link href="/audit/questionnaire" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                            <Link href={`/audit/questionnaire?plan=${userPlan}`} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                               <div className="w-10 h-10 rounded-lg bg-[#8B5CF6]/10 flex items-center justify-center text-lg">🔄</div>
                               <div className="flex-1">
                                 <p className="font-medium text-sm">Refaire l&apos;audit</p>
@@ -479,7 +487,7 @@ export default function DashboardPage() {
                           <span>📄 Rapport PDF</span>
                           <span>✅ Plan d&apos;action</span>
                         </div>
-                        <Link href="/audit/questionnaire" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF] text-white font-bold px-8 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity">
+                        <Link href={`/audit/questionnaire?plan=${userPlan}`} className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF] text-white font-bold px-8 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity">
                           Commencer l&apos;audit
                           <div className="w-5 h-5"><Icons.ChartBar /></div>
                         </Link>
