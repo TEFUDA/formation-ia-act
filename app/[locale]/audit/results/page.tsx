@@ -330,7 +330,7 @@ export default function AuditResultsPage() {
     }
   }, []);
 
-  const categoryScores = results?.categoryScores || [
+  const categoryScores: CategoryScore[] = results?.categoryScores || [
     { category: 'inventory', icon: '📋', color: '#00F5FF', score: Math.min(100, score + Math.random() * 20 - 10) },
     { category: 'classification', icon: '⚠️', color: '#FF6B00', score: Math.min(100, score + Math.random() * 20 - 10) },
     { category: 'governance', icon: '🏛️', color: '#8B5CF6', score: Math.min(100, score + Math.random() * 20 - 10) },
