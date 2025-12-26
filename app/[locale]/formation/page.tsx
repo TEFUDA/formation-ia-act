@@ -597,7 +597,7 @@ export default function FormationPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-20">
+        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-28">
           <AnimatePresence mode="wait">
             {viewMode === 'lesson' && currentVideo && (
               <motion.div
@@ -605,7 +605,7 @@ export default function FormationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="p-4 lg:p-8 pb-16"
+                className="p-4 lg:p-8 pb-24"
               >
                 {/* Video Header - TOUJOURS VISIBLE */}
                 <div className="mb-6 bg-[#0A0A1B]/80 -mx-4 lg:-mx-8 px-4 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 backdrop-blur-xl border-b border-white/5">
@@ -624,9 +624,9 @@ export default function FormationPage() {
                   )}
                 </div>
 
-                {/* Video Player / Exercise Area */}
-                <HoloCard glow={currentModule.color} className="mb-8">
-                  <div className="aspect-video bg-black/50 relative flex items-center justify-center">
+                {/* Video Player / Exercise Area - Taille réduite */}
+                <HoloCard glow={currentModule.color} className="mb-4">
+                  <div className="aspect-[16/9] max-h-[50vh] bg-black/50 relative flex items-center justify-center">
                     {currentVideo.type === 'video' ? (
                       <>
                         <button 
@@ -795,35 +795,37 @@ export default function FormationPage() {
                   </div>
                 </HoloCard>
 
-                {/* Navigation - Boutons TOUJOURS visibles */}
-                <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
-                  <button
-                    onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
-                    disabled={selectedVideoIdx === 0}
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 disabled:bg-white/5 transition-all font-medium"
-                  >
-                    <div className="w-5 h-5"><Icons.ChevronLeft /></div>
-                    Précédent
-                  </button>
-                  
-                  <button
-                    onClick={completeVideo}
-                    className="px-8 py-4 rounded-xl font-semibold text-black flex items-center gap-2 transition-all hover:scale-105 shadow-lg"
-                    style={{ backgroundColor: currentModule.color }}
-                  >
-                    {selectedVideoIdx === currentModule.videos.length - 1 || 
-                     currentModule.videos[selectedVideoIdx + 1]?.type === 'quiz' ? (
-                      <>
-                        <div className="w-5 h-5"><Icons.Award /></div>
-                        Passer le quiz
-                      </>
-                    ) : (
-                      <>
-                        Marquer comme vu & Suivant
-                        <div className="w-5 h-5"><Icons.ChevronRight /></div>
-                      </>
-                    )}
-                  </button>
+                {/* Navigation - Barre fixe en bas */}
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-4 z-40">
+                  <div className="max-w-4xl mx-auto flex items-center justify-between">
+                    <button
+                      onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
+                      disabled={selectedVideoIdx === 0}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 disabled:bg-white/5 transition-all font-medium"
+                    >
+                      <div className="w-5 h-5"><Icons.ChevronLeft /></div>
+                      Précédent
+                    </button>
+                    
+                    <button
+                      onClick={completeVideo}
+                      className="px-8 py-4 rounded-xl font-bold text-black flex items-center gap-2 transition-all hover:scale-105 shadow-xl"
+                      style={{ backgroundColor: currentModule.color }}
+                    >
+                      {selectedVideoIdx === currentModule.videos.length - 1 || 
+                       currentModule.videos[selectedVideoIdx + 1]?.type === 'quiz' ? (
+                        <>
+                          <div className="w-5 h-5"><Icons.Award /></div>
+                          Passer le quiz
+                        </>
+                      ) : (
+                        <>
+                          Suivant
+                          <div className="w-5 h-5"><Icons.ChevronRight /></div>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -834,7 +836,7 @@ export default function FormationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="p-4 lg:p-8 pt-20 lg:pt-8 max-w-3xl mx-auto"
+                className="p-4 lg:p-8 pt-20 lg:pt-8 pb-28 max-w-3xl mx-auto"
               >
                 {!showQuizResult ? (
                   <>
@@ -955,26 +957,28 @@ export default function FormationPage() {
                       </HoloCard>
                     )}
 
-                    {/* Navigation Quiz - Bouton TOUJOURS visible */}
+                    {/* Navigation Quiz - Barre fixe en bas */}
                     {showFeedback && (
-                      <div className="flex justify-end mt-6 pt-4 border-t border-white/10">
-                        <button
-                          onClick={nextQuestion}
-                          className="px-8 py-4 rounded-xl font-bold text-black flex items-center gap-2 shadow-xl transition-all hover:scale-105"
-                          style={{ backgroundColor: currentModule.color }}
-                        >
-                          {currentQuestionIdx < currentQuiz.questions.length - 1 ? (
-                            <>
-                              Question suivante
-                              <div className="w-5 h-5"><Icons.ChevronRight /></div>
-                            </>
-                          ) : (
-                            <>
-                              Voir les résultats
-                              <div className="w-5 h-5"><Icons.Award /></div>
-                            </>
-                          )}
-                        </button>
+                      <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-4 z-40">
+                        <div className="max-w-3xl mx-auto flex justify-end">
+                          <button
+                            onClick={nextQuestion}
+                            className="px-8 py-4 rounded-xl font-bold text-black flex items-center gap-2 shadow-xl transition-all hover:scale-105"
+                            style={{ backgroundColor: currentModule.color }}
+                          >
+                            {currentQuestionIdx < currentQuiz.questions.length - 1 ? (
+                              <>
+                                Question suivante
+                                <div className="w-5 h-5"><Icons.ChevronRight /></div>
+                              </>
+                            ) : (
+                              <>
+                                Voir les résultats
+                                <div className="w-5 h-5"><Icons.Award /></div>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </>
