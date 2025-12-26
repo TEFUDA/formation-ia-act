@@ -626,7 +626,7 @@ export default function FormationPage() {
 
                 {/* Video Player - Uniquement pour les vidéos */}
                 {currentVideo.type === 'video' && (
-                  <HoloCard glow={currentModule.color} className="mb-4 max-h-[60vh] overflow-y-auto">
+                  <HoloCard glow={currentModule.color} className="flex-1 min-h-0 overflow-y-auto">
                     <div className="aspect-[16/9] max-h-[50vh] bg-black/50 relative flex items-center justify-center">
                       <button 
                         onClick={() => setIsPlaying(!isPlaying)}
