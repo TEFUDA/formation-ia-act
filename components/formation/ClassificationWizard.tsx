@@ -531,30 +531,32 @@ export default function ClassificationWizard({
               </button>
             )}
 
-            {/* Export / Complete */}
+            {/* Export - dès 1 système */}
+            {classifiedCount >= 1 && (
+              <button
+                onClick={exportResults}
+                className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold flex items-center justify-center gap-2 transition-colors mb-3"
+              >
+                <div className="w-5 h-5"><Icons.Download /></div>
+                Exporter mes classifications (CSV)
+              </button>
+            )}
+
+            {/* Valider - à partir de 5 systèmes */}
             {classifiedCount >= 5 && (
-              <div className="flex gap-4">
-                <button
-                  onClick={exportResults}
-                  className="flex-1 py-4 rounded-xl bg-white/10 hover:bg-white/20 font-semibold flex items-center justify-center gap-2 transition-colors"
-                >
-                  <div className="w-5 h-5"><Icons.Download /></div>
-                  Exporter mes classifications
-                </button>
-                <button
-                  onClick={completeExercise}
-                  className="flex-1 py-4 rounded-xl font-semibold text-black flex items-center justify-center gap-2"
-                  style={{ backgroundColor: moduleColor }}
-                >
-                  <div className="w-5 h-5"><Icons.Check /></div>
-                  Valider l'exercice
-                </button>
-              </div>
+              <button
+                onClick={completeExercise}
+                className="w-full py-4 rounded-xl font-semibold text-black flex items-center justify-center gap-2"
+                style={{ backgroundColor: moduleColor }}
+              >
+                <div className="w-5 h-5"><Icons.Check /></div>
+                Valider l'exercice
+              </button>
             )}
 
             {systems.length > 0 && classifiedCount < 5 && (
               <p className="text-center text-white/40 text-sm mt-4">
-                Classifiez au moins 5 systèmes pour valider cet exercice ({classifiedCount}/5)
+                Classifiez au moins 5 systèmes pour valider ({classifiedCount}/5)
               </p>
             )}
           </motion.div>
