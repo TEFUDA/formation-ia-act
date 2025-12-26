@@ -9,6 +9,7 @@ export interface Video {
   duration?: string;
   videoUrl?: string;
   exerciseFile?: string;
+  exerciseDuration?: string;
 }
 
 export interface Module {
@@ -87,7 +88,8 @@ export const MODULES: Module[] = [
         title: 'Checklist - Êtes-vous concerné ?',
         description: 'Auto-évaluation interactive',
         type: 'exercise',
-        exerciseFile: 'checklist-etes-vous-concerne.xlsx'
+        exerciseFile: 'checklist-etes-vous-concerne.xlsx',
+        exerciseDuration: '10-15 min'
       },
       {
         id: '1.3',
@@ -124,7 +126,8 @@ export const MODULES: Module[] = [
         id: '2.2',
         title: 'Exercice - Brainstorming IA',
         description: 'Listez vos systèmes par département',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseDuration: '15-20 min'
       },
       {
         id: '2.3',
@@ -138,7 +141,8 @@ export const MODULES: Module[] = [
         title: 'Exercice - Créer votre registre',
         description: 'Template interactif',
         type: 'exercise',
-        exerciseFile: 'template-registre-ia.xlsx'
+        exerciseFile: 'template-registre-ia.xlsx',
+        exerciseDuration: '20-30 min'
       },
       {
         id: '2.5',
@@ -169,7 +173,8 @@ export const MODULES: Module[] = [
         title: 'Exercice - Classification interactive',
         description: 'Classifiez vos systèmes avec le wizard',
         type: 'exercise',
-        exerciseFile: 'matrice-classification-risques.xlsx'
+        exerciseFile: 'matrice-classification-risques.xlsx',
+        exerciseDuration: '15-20 min'
       },
       {
         id: '3.3',
@@ -207,7 +212,8 @@ export const MODULES: Module[] = [
         title: 'Exercice - Email fournisseur',
         description: 'Demandez la documentation technique',
         type: 'exercise',
-        exerciseFile: 'template-documentation-technique.docx'
+        exerciseFile: 'template-documentation-technique.docx',
+        exerciseDuration: '10-15 min'
       },
       {
         id: '4.3',
@@ -245,7 +251,8 @@ export const MODULES: Module[] = [
         title: 'Exercice - Rédiger votre politique',
         description: 'Template personnalisable',
         type: 'exercise',
-        exerciseFile: 'modele-politique-ia.docx'
+        exerciseFile: 'modele-politique-ia.docx',
+        exerciseDuration: '20-30 min'
       },
       {
         id: '5.3',
@@ -258,7 +265,8 @@ export const MODULES: Module[] = [
         id: '5.4',
         title: 'Exercice - Générateur de mentions',
         description: 'Créez vos mentions personnalisées',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseDuration: '10-15 min'
       },
       {
         id: '5.5',
@@ -319,7 +327,8 @@ export const MODULES: Module[] = [
         title: 'Exercice - Votre plan 90 jours',
         description: 'Créez votre roadmap personnalisée',
         type: 'exercise',
-        exerciseFile: 'tableau-bord-conformite-ia.xlsx'
+        exerciseFile: 'tableau-bord-conformite-ia.xlsx',
+        exerciseDuration: '25-30 min'
       },
       {
         id: '7.3',
