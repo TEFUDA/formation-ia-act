@@ -597,7 +597,7 @@ export default function FormationPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-28">
+        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-28 h-screen overflow-y-auto">
           <AnimatePresence mode="wait">
             {viewMode === 'lesson' && currentVideo && (
               <motion.div
@@ -626,7 +626,7 @@ export default function FormationPage() {
 
                 {/* Video Player - Uniquement pour les vidéos */}
                 {currentVideo.type === 'video' && (
-                  <HoloCard glow={currentModule.color} className="mb-4">
+                  <HoloCard glow={currentModule.color} className="mb-4 max-h-[60vh] overflow-y-auto">
                     <div className="aspect-[16/9] max-h-[50vh] bg-black/50 relative flex items-center justify-center">
                       <button 
                         onClick={() => setIsPlaying(!isPlaying)}
@@ -660,7 +660,7 @@ export default function FormationPage() {
 
                 {/* Exercices Interactifs - SANS limite de taille */}
                 {currentVideo.type === 'exercise' && (
-                  <HoloCard glow={currentModule.color} className="mb-4">
+                  <HoloCard glow={currentModule.color} className="mb-4 max-h-[60vh] overflow-y-auto">
                     <div className="p-6">
                       {/* Module 1 - Checklist */}
                       {currentVideo.id === '1.2' && (
@@ -772,7 +772,7 @@ export default function FormationPage() {
 
                 {/* Scénarios Interactifs */}
                 {currentVideo.type === 'scenario' && (
-                  <HoloCard glow={currentModule.color} className="mb-4">
+                  <HoloCard glow={currentModule.color} className="mb-4 max-h-[60vh] overflow-y-auto">
                     <div className="p-6">
                       {currentModule.id === 6 ? (
                         <AuditSimulation 
