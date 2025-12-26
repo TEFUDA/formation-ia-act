@@ -624,133 +624,53 @@ export default function FormationPage() {
                   )}
                 </div>
 
-                {/* Video Player / Exercise Area - Taille réduite */}
-                <HoloCard glow={currentModule.color} className="mb-4">
-                  <div className="aspect-[16/9] max-h-[50vh] bg-black/50 relative flex items-center justify-center">
-                    {currentVideo.type === 'video' ? (
-                      <>
-                        <button 
-                          onClick={() => setIsPlaying(!isPlaying)}
-                          className="w-20 h-20 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: currentModule.color }}
-                        >
-                          <div className="w-8 h-8 text-black ml-1">
-                            {isPlaying ? <Icons.Pause /> : <Icons.Play />}
-                          </div>
-                        </button>
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                          <div className="flex items-center gap-4">
-                            <span className="text-white/60 text-sm">
-                              {currentVideo.duration 
-                                ? (currentVideo.duration.includes('min') || currentVideo.duration.includes('h') 
-                                    ? currentVideo.duration 
-                                    : `${currentVideo.duration} min`)
-                                : ''}
-                            </span>
-                            <div className="flex-1 h-1 bg-white/20 rounded-full">
-                              <div 
-                                className="h-full rounded-full" 
-                                style={{ width: '0%', backgroundColor: currentModule.color }}
-                              />
-                            </div>
+                {/* Video Player - Uniquement pour les vidéos */}
+                {currentVideo.type === 'video' && (
+                  <HoloCard glow={currentModule.color} className="mb-4">
+                    <div className="aspect-[16/9] max-h-[50vh] bg-black/50 relative flex items-center justify-center">
+                      <button 
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        className="w-20 h-20 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                        style={{ backgroundColor: currentModule.color }}
+                      >
+                        <div className="w-8 h-8 text-black ml-1">
+                          {isPlaying ? <Icons.Pause /> : <Icons.Play />}
+                        </div>
+                      </button>
+                      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                        <div className="flex items-center gap-4">
+                          <span className="text-white/60 text-sm">
+                            {currentVideo.duration 
+                              ? (currentVideo.duration.includes('min') || currentVideo.duration.includes('h') 
+                                  ? currentVideo.duration 
+                                  : `${currentVideo.duration} min`)
+                              : ''}
+                          </span>
+                          <div className="flex-1 h-1 bg-white/20 rounded-full">
+                            <div 
+                              className="h-full rounded-full" 
+                              style={{ width: '0%', backgroundColor: currentModule.color }}
+                            />
                           </div>
                         </div>
-                      </>
-                    ) : currentVideo.type === 'exercise' ? (
-                      <div className="p-6">
-                        {/* Module 1 - Checklist */}
-                        {currentVideo.id === '1.ex' && (
-                          <div className="text-center">
-                            <div className="text-6xl mb-4">📋</div>
-                            <h3 className="text-xl font-bold mb-2">Checklist "Êtes-vous concerné ?"</h3>
-                            <p className="text-white/60 mb-6 max-w-md mx-auto">
-                              Téléchargez le fichier Excel et remplissez-le pour déterminer si votre entreprise est concernée par l'AI Act.
-                            </p>
-                            {currentVideo.exerciseFile && (
-                              <a
-                                href={`/resources/${currentVideo.exerciseFile}`}
-                                download
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
-                                style={{ backgroundColor: currentModule.color }}
-                              >
-                                <div className="w-5 h-5"><Icons.Download /></div>
-                                Télécharger la checklist
-                              </a>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Module 2 - Exercice 1: Brainstorming */}
-                        {currentVideo.id === '2.ex1' && (
-                          <BrainstormingGrid 
-                            moduleColor={currentModule.color}
-                            onComplete={() => completeVideo()}
-                          />
-                        )}
-                        
-                        {/* Module 2 - Exercice 2: Registre */}
-                        {currentVideo.id === '2.ex2' && (
-                          <div className="text-center">
-                            <div className="text-6xl mb-4">📊</div>
-                            <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
-                            <p className="text-white/60 mb-6 max-w-md mx-auto">
-                              Utilisez ce template pour créer votre registre officiel des systèmes d'IA.
-                            </p>
-                            {currentVideo.exerciseFile && (
-                              <a
-                                href={`/resources/${currentVideo.exerciseFile}`}
-                                download
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
-                                style={{ backgroundColor: currentModule.color }}
-                              >
-                                <div className="w-5 h-5"><Icons.Download /></div>
-                                Télécharger le template
-                              </a>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Module 3 - Classification */}
-                        {currentVideo.id === '3.ex' && (
-                          <ClassificationWizard 
-                            moduleColor={currentModule.color}
-                            onComplete={() => completeVideo()}
-                          />
-                        )}
-                        
-                        {/* Module 4 - Email fournisseur */}
-                        {currentVideo.id === '4.ex' && (
-                          <SmartEmailEditor 
-                            moduleColor={currentModule.color}
-                            onComplete={() => completeVideo()}
-                          />
-                        )}
-                        
-                        {/* Module 5 - Mentions légales */}
-                        {currentVideo.id === '5.ex' && (
-                          <LegalMentionsGenerator 
-                            moduleColor={currentModule.color}
-                            onComplete={() => completeVideo()}
-                          />
-                        )}
-                        
-                        {/* Module 7 - Plan d'action 90 jours */}
-                        {currentVideo.id === '7.ex' && (
-                          <ActionPlanBuilder 
-                            moduleColor={currentModule.color}
-                            onComplete={() => completeVideo()}
-                          />
-                        )}
-                        
-                        {/* Default: exercices non interactifs avec fichier à télécharger */}
-                        {!['1.ex', '2.ex1', '2.ex2', '3.ex', '4.ex', '5.ex', '7.ex'].includes(currentVideo.id) && 
-                         currentVideo.exerciseFile && (
-                          <div className="text-center">
-                            <div className="text-6xl mb-4">✏️</div>
-                            <h3 className="text-xl font-bold mb-2">Exercice Pratique</h3>
-                            <p className="text-white/60 mb-6 max-w-md mx-auto">
-                              Durée estimée : {currentVideo.exerciseDuration}
-                            </p>
+                      </div>
+                    </div>
+                  </HoloCard>
+                )}
+
+                {/* Exercices Interactifs - SANS limite de taille */}
+                {currentVideo.type === 'exercise' && (
+                  <HoloCard glow={currentModule.color} className="mb-4">
+                    <div className="p-6">
+                      {/* Module 1 - Checklist */}
+                      {currentVideo.id === '1.ex' && (
+                        <div className="text-center py-8">
+                          <div className="text-6xl mb-4">📋</div>
+                          <h3 className="text-xl font-bold mb-2">Checklist "Êtes-vous concerné ?"</h3>
+                          <p className="text-white/60 mb-6 max-w-md mx-auto">
+                            Téléchargez le fichier Excel et remplissez-le pour déterminer si votre entreprise est concernée par l'AI Act.
+                          </p>
+                          {currentVideo.exerciseFile && (
                             <a
                               href={`/resources/${currentVideo.exerciseFile}`}
                               download
@@ -758,42 +678,129 @@ export default function FormationPage() {
                               style={{ backgroundColor: currentModule.color }}
                             >
                               <div className="w-5 h-5"><Icons.Download /></div>
-                              Télécharger le fichier
+                              Télécharger la checklist
                             </a>
-                          </div>
-                        )}
-                      </div>
-                    ) : currentVideo.type === 'scenario' ? (
-                      <div className="p-6">
-                        {currentModule.id === 6 ? (
-                          <AuditSimulation 
-                            moduleColor={currentModule.color}
-                            onComplete={(score) => {
-                              // Save score and complete video
-                              completeVideo();
-                            }}
-                          />
-                        ) : (
-                          <div className="text-center p-8">
-                            <div className="text-6xl mb-4">🎭</div>
-                            <h3 className="text-xl font-bold mb-2">Scénario Interactif</h3>
-                            <p className="text-white/60 mb-6 max-w-md mx-auto">
-                              Simulation avec timer et documents à produire
-                            </p>
-                            <button
-                              onClick={() => completeVideo()}
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Module 2 - Exercice 1: Brainstorming */}
+                      {currentVideo.id === '2.ex1' && (
+                        <BrainstormingGrid 
+                          moduleColor={currentModule.color}
+                          onComplete={() => completeVideo()}
+                        />
+                      )}
+                      
+                      {/* Module 2 - Exercice 2: Registre */}
+                      {currentVideo.id === '2.ex2' && (
+                        <div className="text-center py-8">
+                          <div className="text-6xl mb-4">📊</div>
+                          <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
+                          <p className="text-white/60 mb-6 max-w-md mx-auto">
+                            Utilisez ce template pour créer votre registre officiel des systèmes d'IA.
+                          </p>
+                          {currentVideo.exerciseFile && (
+                            <a
+                              href={`/resources/${currentVideo.exerciseFile}`}
+                              download
                               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
                               style={{ backgroundColor: currentModule.color }}
                             >
-                              <div className="w-5 h-5"><Icons.Target /></div>
-                              Lancer la simulation
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : null}
-                  </div>
-                </HoloCard>
+                              <div className="w-5 h-5"><Icons.Download /></div>
+                              Télécharger le template
+                            </a>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Module 3 - Classification */}
+                      {currentVideo.id === '3.ex' && (
+                        <ClassificationWizard 
+                          moduleColor={currentModule.color}
+                          onComplete={() => completeVideo()}
+                        />
+                      )}
+                      
+                      {/* Module 4 - Email fournisseur */}
+                      {currentVideo.id === '4.ex' && (
+                        <SmartEmailEditor 
+                          moduleColor={currentModule.color}
+                          onComplete={() => completeVideo()}
+                        />
+                      )}
+                      
+                      {/* Module 5 - Mentions légales */}
+                      {currentVideo.id === '5.ex' && (
+                        <LegalMentionsGenerator 
+                          moduleColor={currentModule.color}
+                          onComplete={() => completeVideo()}
+                        />
+                      )}
+                      
+                      {/* Module 7 - Plan d'action 90 jours */}
+                      {currentVideo.id === '7.ex' && (
+                        <ActionPlanBuilder 
+                          moduleColor={currentModule.color}
+                          onComplete={() => completeVideo()}
+                        />
+                      )}
+                      
+                      {/* Default: exercices non interactifs avec fichier à télécharger */}
+                      {!['1.ex', '2.ex1', '2.ex2', '3.ex', '4.ex', '5.ex', '7.ex'].includes(currentVideo.id) && 
+                       currentVideo.exerciseFile && (
+                        <div className="text-center py-8">
+                          <div className="text-6xl mb-4">✏️</div>
+                          <h3 className="text-xl font-bold mb-2">Exercice Pratique</h3>
+                          <p className="text-white/60 mb-6 max-w-md mx-auto">
+                            Durée estimée : {currentVideo.exerciseDuration}
+                          </p>
+                          <a
+                            href={`/resources/${currentVideo.exerciseFile}`}
+                            download
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
+                            style={{ backgroundColor: currentModule.color }}
+                          >
+                            <div className="w-5 h-5"><Icons.Download /></div>
+                            Télécharger le fichier
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </HoloCard>
+                )}
+
+                {/* Scénarios Interactifs */}
+                {currentVideo.type === 'scenario' && (
+                  <HoloCard glow={currentModule.color} className="mb-4">
+                    <div className="p-6">
+                      {currentModule.id === 6 ? (
+                        <AuditSimulation 
+                          moduleColor={currentModule.color}
+                          onComplete={(score) => {
+                            completeVideo();
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center py-8">
+                          <div className="text-6xl mb-4">🎭</div>
+                          <h3 className="text-xl font-bold mb-2">Scénario Interactif</h3>
+                          <p className="text-white/60 mb-6 max-w-md mx-auto">
+                            Simulation avec timer et documents à produire
+                          </p>
+                          <button
+                            onClick={() => completeVideo()}
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
+                            style={{ backgroundColor: currentModule.color }}
+                          >
+                            <div className="w-5 h-5"><Icons.Target /></div>
+                            Lancer la simulation
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </HoloCard>
+                )}
 
                 {/* Navigation - Barre fixe en bas */}
                 <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-4 z-40">
