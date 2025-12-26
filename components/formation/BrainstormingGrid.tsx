@@ -142,6 +142,7 @@ const Icons = {
   Download: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
   Check: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full"><polyline points="20 6 9 17 4 12"/></svg>,
   Lightbulb: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>,
+  FileText: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
 };
 
 // ============================================
@@ -463,20 +464,50 @@ export default function BrainstormingGrid({
       )}
 
       {/* Actions */}
-      <div className="flex gap-3">
-        <button
-          onClick={exportCSV}
-          disabled={totalSystems === 0}
-          className="flex-1 py-4 rounded-xl bg-white/10 hover:bg-white/20 font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-        >
-          <div className="w-5 h-5"><Icons.Download /></div>
-          Exporter en CSV
-        </button>
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3">
+          <button
+            onClick={exportCSV}
+            disabled={totalSystems === 0}
+            className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+          >
+            <div className="w-5 h-5"><Icons.Download /></div>
+            Exporter CSV
+          </button>
+          
+          <button
+            onClick={() => {
+              // Export PDF
+              const content = departments.filter(d => d.systems.length > 0)
+                .map(d => `${d.name}:\n${d.systems.map(s => `  - ${s}`).join('\n')}`)
+                .join('\n\n');
+              
+              const blob = new Blob([
+                `CARTOGRAPHIE DES SYSTÈMES IA\n`,
+                `Date: ${new Date().toLocaleDateString('fr-FR')}\n`,
+                `Total: ${totalSystems} systèmes dans ${departmentsWithSystems} départements\n\n`,
+                `${'='.repeat(50)}\n\n`,
+                content
+              ], { type: 'text/plain' });
+              
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `cartographie-ia-${new Date().toISOString().split('T')[0]}.txt`;
+              link.click();
+            }}
+            disabled={totalSystems === 0}
+            className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+          >
+            <div className="w-5 h-5"><Icons.FileText /></div>
+            Exporter TXT
+          </button>
+        </div>
         
         <button
           onClick={handleComplete}
           disabled={totalSystems < 5}
-          className="flex-1 py-4 rounded-xl font-semibold text-black disabled:opacity-50 transition-all"
+          className="w-full py-4 rounded-xl font-semibold text-black disabled:opacity-50 transition-all"
           style={{ backgroundColor: moduleColor }}
         >
           {totalSystems < 5 
