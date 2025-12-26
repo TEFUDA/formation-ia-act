@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -172,7 +172,6 @@ export default function FormationPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [quizAttempts, setQuizAttempts] = useState<Record<number, number>>({});
-  const quizNavRef = useRef<HTMLDivElement>(null);
 
   // User Progress (persisted in localStorage)
   const [progress, setProgress] = useState<UserProgress>({
@@ -252,24 +251,6 @@ export default function FormationPage() {
     return prevQuizScore !== undefined && prevQuiz && prevQuizScore >= prevQuiz.passingScore;
   };
 
-  // Is video unlocked? (previous video must be completed)
-  const isVideoUnlocked = (moduleId: number, videoIdx: number) => {
-    // Module must be unlocked first
-    if (!isModuleUnlocked(moduleId)) return false;
-    
-    // First video is always unlocked if module is unlocked
-    if (videoIdx === 0) return true;
-    
-    const module = MODULES[moduleId];
-    if (!module) return false;
-    
-    // Previous video must be completed
-    const prevVideo = module.videos[videoIdx - 1];
-    if (!prevVideo) return false;
-    
-    return isVideoCompleted(moduleId, prevVideo.id);
-  };
-
   // Is video completed?
   const isVideoCompleted = (moduleId: number, videoId: string) => {
     return progress.completedVideos.includes(`${moduleId}-${videoId}`);
@@ -319,11 +300,6 @@ export default function FormationPage() {
     setSelectedAnswer(answerId);
     setQuizAnswers({ ...quizAnswers, [questionId]: answerId });
     setShowFeedback(true);
-    
-    // Scroll vers le bouton après un court délai
-    setTimeout(() => {
-      quizNavRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
   };
 
   // Go to next question
@@ -400,9 +376,7 @@ export default function FormationPage() {
     const module = MODULES[moduleId];
     const video = module.videos[videoIdx];
     
-    // Check if module AND video are unlocked
     if (!isModuleUnlocked(moduleId)) return;
-    if (!isVideoUnlocked(moduleId, videoIdx)) return;
     
     setSelectedModule(moduleId);
     setSelectedVideoIdx(videoIdx);
@@ -577,29 +551,23 @@ export default function FormationPage() {
                           {module.videos.map((video, idx) => {
                             const isActive = selectedModule === module.id && selectedVideoIdx === idx;
                             const isComplete = isVideoCompleted(module.id, video.id);
-                            const isLocked = !isVideoUnlocked(module.id, idx);
 
                             return (
                               <button
                                 key={video.id}
                                 onClick={() => selectVideo(module.id, idx)}
-                                disabled={isLocked}
                                 className={`w-full p-2 rounded-lg flex items-center gap-2 text-left transition-all ${
-                                  isLocked
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : isActive 
-                                      ? 'bg-white/10' 
-                                      : 'hover:bg-white/5'
+                                  isActive 
+                                    ? 'bg-white/10' 
+                                    : 'hover:bg-white/5'
                                 }`}
                               >
                                 {/* Status Icon */}
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                  isComplete ? 'bg-green-500/20' : isLocked ? 'bg-white/5' : 'bg-white/5'
+                                  isComplete ? 'bg-green-500/20' : 'bg-white/5'
                                 }`}>
                                   {isComplete ? (
                                     <div className="w-3 h-3 text-green-400"><Icons.Check /></div>
-                                  ) : isLocked ? (
-                                    <div className="w-3 h-3 text-white/30"><Icons.Lock /></div>
                                   ) : (
                                     <span className="text-white/40 text-xs">{idx + 1}</span>
                                   )}
@@ -607,12 +575,12 @@ export default function FormationPage() {
 
                                 {/* Video Info */}
                                 <div className="flex-1 min-w-0">
-                                  <p className={`text-xs truncate ${isLocked ? 'text-white/40' : isActive ? 'text-white' : 'text-white/70'}`}>
+                                  <p className={`text-xs truncate ${isActive ? 'text-white' : 'text-white/70'}`}>
                                     {video.title}
                                   </p>
                                   <div className="flex items-center gap-2 mt-0.5">
                                     <ContentBadge type={video.type} color={module.color} />
-                                    {video.duration && <span className="text-white/30 text-xs">{video.duration}</span>}
+                                    <span className="text-white/30 text-xs">{video.duration} min</span>
                                   </div>
                                 </div>
                               </button>
@@ -629,7 +597,7 @@ export default function FormationPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0 pt-16 lg:pt-0">
+        <main className="flex-1 lg:ml-0 pt-16 lg:pt-0 pb-20">
           <AnimatePresence mode="wait">
             {viewMode === 'lesson' && currentVideo && (
               <motion.div
@@ -637,7 +605,7 @@ export default function FormationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="p-4 lg:p-8"
+                className="p-4 lg:p-8 pb-16"
               >
                 {/* Video Header */}
                 <div className="mb-6">
@@ -657,7 +625,7 @@ export default function FormationPage() {
                 </div>
 
                 {/* Video Player / Exercise Area */}
-                <HoloCard glow={currentModule.color} className="mb-6">
+                <HoloCard glow={currentModule.color} className="mb-8">
                   <div className="aspect-video bg-black/50 relative flex items-center justify-center">
                     {currentVideo.type === 'video' ? (
                       <>
@@ -836,12 +804,12 @@ export default function FormationPage() {
                   </div>
                 </HoloCard>
 
-                {/* Navigation */}
-                <div className="flex items-center justify-between">
+                {/* Navigation - Boutons bien visibles */}
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
                   <button
                     onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
                     disabled={selectedVideoIdx === 0}
-                    className="flex items-center gap-2 px-4 py-2 text-white/60 hover:text-white disabled:opacity-30 transition-colors"
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-all"
                   >
                     <div className="w-5 h-5"><Icons.ChevronLeft /></div>
                     Précédent
@@ -849,7 +817,7 @@ export default function FormationPage() {
                   
                   <button
                     onClick={completeVideo}
-                    className="px-6 py-3 rounded-xl font-semibold text-black flex items-center gap-2 transition-all hover:scale-105"
+                    className="px-8 py-4 rounded-xl font-semibold text-black flex items-center gap-2 transition-all hover:scale-105 shadow-lg"
                     style={{ backgroundColor: currentModule.color }}
                   >
                     {selectedVideoIdx === currentModule.videos.length - 1 || 
@@ -860,7 +828,7 @@ export default function FormationPage() {
                       </>
                     ) : (
                       <>
-                        Suivant
+                        Marquer comme vu & Suivant
                         <div className="w-5 h-5"><Icons.ChevronRight /></div>
                       </>
                     )}
@@ -996,12 +964,12 @@ export default function FormationPage() {
                       </HoloCard>
                     )}
 
-                    {/* Navigation */}
+                    {/* Navigation Quiz - Bouton bien visible */}
                     {showFeedback && (
-                      <div ref={quizNavRef} className="flex justify-end">
+                      <div className="flex justify-end mt-6 pt-4 border-t border-white/10">
                         <button
                           onClick={nextQuestion}
-                          className="px-6 py-3 rounded-xl font-semibold text-black flex items-center gap-2"
+                          className="px-8 py-4 rounded-xl font-semibold text-black flex items-center gap-2 shadow-lg transition-all hover:scale-105"
                           style={{ backgroundColor: currentModule.color }}
                         >
                           {currentQuestionIdx < currentQuiz.questions.length - 1 ? (
