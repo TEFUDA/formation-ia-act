@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import CertificateGenerator from '@/components/formation/CertificateGenerator';
+import FormationReportPDF from '@/components/formation/FormationReportPDF';
 
 // ============================================
 // ICONS
@@ -152,6 +153,21 @@ export default function CompletePage() {
               }));
             }}
           />
+          
+          {/* Rapport PDF Personnalisé */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8"
+          >
+            <FormationReportPDF 
+              moduleColor="#00FF88"
+              onGenerate={() => {
+                console.log('Rapport PDF généré');
+              }}
+            />
+          </motion.div>
         </motion.div>
       </main>
       
