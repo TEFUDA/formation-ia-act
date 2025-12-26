@@ -816,7 +816,7 @@ export default function FormationPage() {
                     
                     <button
                       onClick={completeVideo}
-                      className="px-8 py-4 rounded-xl font-bold text-black flex items-center gap-2 transition-all hover:scale-105 shadow-xl"
+                      className="px-4 lg:px-8 py-2 lg:py-4 rounded-xl font-bold text-black flex items-center gap-1 lg:gap-2 text-sm lg:text-base transition-all hover:scale-105 shadow-xl"
                       style={{ backgroundColor: currentModule.color }}
                     >
                       {selectedVideoIdx === currentModule.videos.length - 1 || 
