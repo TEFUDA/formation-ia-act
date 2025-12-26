@@ -16,7 +16,7 @@ interface Document {
 }
 
 interface AuditorState {
-  mood: 'friendly' | 'neutral' | 'impatient' | 'concerned' | 'angry' | 'impressed';
+  mood: 'friendly' | 'neutral' | 'impatient' | 'concerned' | 'angry' | 'impressed' | 'serious' | 'pleased';
   message: string;
   isTyping: boolean;
   isSpeaking: boolean;
