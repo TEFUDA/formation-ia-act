@@ -885,12 +885,11 @@ export default function FormationPage() {
                                   : 'rgba(239, 68, 68, 0.1)'
                               }}
                             >
-                              <p className="font-medium mb-1">
+                              <p className="font-medium">
                                 {currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
-                                  ? '✅ Correct !' 
-                                  : '❌ Incorrect'}
+                                  ? '✅ Bonne réponse !' 
+                                  : '❌ Mauvaise réponse'}
                               </p>
-                              <p className="text-white/70">{currentQuestion.explanation}</p>
                             </div>
 
                             <button
