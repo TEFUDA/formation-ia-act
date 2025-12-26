@@ -597,7 +597,7 @@ export default function FormationPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0 pt-16 lg:pt-0 pb-20">
+        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-20">
           <AnimatePresence mode="wait">
             {viewMode === 'lesson' && currentVideo && (
               <motion.div
@@ -607,20 +607,20 @@ export default function FormationPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="p-4 lg:p-8 pb-16"
               >
-                {/* Video Header */}
-                <div className="mb-6">
+                {/* Video Header - TOUJOURS VISIBLE */}
+                <div className="mb-6 bg-[#0A0A1B]/80 -mx-4 lg:-mx-8 px-4 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 backdrop-blur-xl border-b border-white/5">
                   <div className="flex items-center gap-2 mb-2">
                     <span 
-                      className="text-xs font-medium px-2 py-1 rounded-full"
+                      className="text-xs font-medium px-3 py-1.5 rounded-full"
                       style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
                     >
                       {currentModule.icon} {currentModule.code} - {currentModule.title}
                     </span>
                     <ContentBadge type={currentVideo.type} color={currentModule.color} />
                   </div>
-                  <h1 className="text-2xl lg:text-3xl font-bold mb-2">{currentVideo.title}</h1>
+                  <h1 className="text-xl lg:text-2xl font-bold text-white">{currentVideo.title}</h1>
                   {currentVideo.description && (
-                    <p className="text-white/60">{currentVideo.description}</p>
+                    <p className="text-white/60 text-sm mt-1">{currentVideo.description}</p>
                   )}
                 </div>
 
@@ -640,7 +640,11 @@ export default function FormationPage() {
                         </button>
                         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                           <div className="flex items-center gap-4">
-                            <span className="text-white/60 text-sm">{currentVideo.duration} min</span>
+                            <span className="text-white/60 text-sm">
+                              {currentVideo.duration.includes('min') || currentVideo.duration.includes('h') 
+                                ? currentVideo.duration 
+                                : `${currentVideo.duration} min`}
+                            </span>
                             <div className="flex-1 h-1 bg-white/20 rounded-full">
                               <div 
                                 className="h-full rounded-full" 
@@ -789,12 +793,12 @@ export default function FormationPage() {
                   </div>
                 </HoloCard>
 
-                {/* Navigation - Boutons bien visibles */}
+                {/* Navigation - Boutons TOUJOURS visibles */}
                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
                   <button
                     onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
                     disabled={selectedVideoIdx === 0}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-all"
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 disabled:bg-white/5 transition-all font-medium"
                   >
                     <div className="w-5 h-5"><Icons.ChevronLeft /></div>
                     Précédent
@@ -828,24 +832,24 @@ export default function FormationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="p-4 lg:p-8 max-w-3xl mx-auto"
+                className="p-4 lg:p-8 pt-20 lg:pt-8 max-w-3xl mx-auto"
               >
                 {!showQuizResult ? (
                   <>
-                    {/* Quiz Header */}
-                    <div className="mb-6">
-                      <div className="flex items-center gap-2 mb-2">
+                    {/* Quiz Header - VISIBLE */}
+                    <div className="mb-6 bg-[#0A0A1B]/80 -mx-4 lg:-mx-8 px-4 lg:px-8 py-4 rounded-xl border border-white/10">
+                      <div className="flex items-center justify-between mb-2">
                         <span 
-                          className="text-xs font-medium px-2 py-1 rounded-full"
+                          className="text-sm font-medium px-3 py-1.5 rounded-full"
                           style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
                         >
-                          {currentModule.icon} {currentModule.code}
+                          {currentModule.icon} {currentModule.code} - Quiz
                         </span>
-                        <span className="text-white/40 text-sm">
+                        <span className="text-white/60 text-sm font-medium">
                           Question {currentQuestionIdx + 1} / {currentQuiz.questions.length}
                         </span>
                       </div>
-                      <h1 className="text-2xl font-bold">{currentQuiz.title}</h1>
+                      <h1 className="text-xl lg:text-2xl font-bold text-white">{currentQuiz.title}</h1>
                       
                       {/* Progress Bar */}
                       <div className="mt-4 h-2 bg-white/10 rounded-full overflow-hidden">
@@ -949,12 +953,12 @@ export default function FormationPage() {
                       </HoloCard>
                     )}
 
-                    {/* Navigation Quiz - Bouton bien visible */}
+                    {/* Navigation Quiz - Bouton TOUJOURS visible */}
                     {showFeedback && (
                       <div className="flex justify-end mt-6 pt-4 border-t border-white/10">
                         <button
                           onClick={nextQuestion}
-                          className="px-8 py-4 rounded-xl font-semibold text-black flex items-center gap-2 shadow-lg transition-all hover:scale-105"
+                          className="px-8 py-4 rounded-xl font-bold text-black flex items-center gap-2 shadow-xl transition-all hover:scale-105"
                           style={{ backgroundColor: currentModule.color }}
                         >
                           {currentQuestionIdx < currentQuiz.questions.length - 1 ? (
