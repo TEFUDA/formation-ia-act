@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -172,6 +172,7 @@ export default function FormationPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [quizAttempts, setQuizAttempts] = useState<Record<number, number>>({});
+  const quizNavRef = useRef<HTMLDivElement>(null);
 
   // User Progress (persisted in localStorage)
   const [progress, setProgress] = useState<UserProgress>({
@@ -300,6 +301,11 @@ export default function FormationPage() {
     setSelectedAnswer(answerId);
     setQuizAnswers({ ...quizAnswers, [questionId]: answerId });
     setShowFeedback(true);
+    
+    // Scroll vers le bouton après un court délai
+    setTimeout(() => {
+      quizNavRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
   };
 
   // Go to next question
@@ -966,7 +972,7 @@ export default function FormationPage() {
 
                     {/* Navigation */}
                     {showFeedback && (
-                      <div className="flex justify-end">
+                      <div ref={quizNavRef} className="flex justify-end">
                         <button
                           onClick={nextQuestion}
                           className="px-6 py-3 rounded-xl font-semibold text-black flex items-center gap-2"
