@@ -618,9 +618,9 @@ export default function FormationPage() {
                     </span>
                     <ContentBadge type={currentVideo.type} color={currentModule.color} />
                   </div>
-                  <h1 className="text-xl lg:text-2xl font-bold text-white">{currentVideo.title}</h1>
+                  <h1 className="text-base lg:text-xl font-bold text-white leading-tight">{currentVideo.title}</h1>
                   {currentVideo.description && (
-                    <p className="text-white/60 text-sm mt-1">{currentVideo.description}</p>
+                    <p className="text-white/60 text-xs lg:text-sm mt-0.5 line-clamp-1">{currentVideo.description}</p>
                   )}
                 </div>
 
