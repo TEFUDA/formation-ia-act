@@ -397,7 +397,7 @@ export function getQuizByModuleId(moduleId: number): Quiz | undefined {
 export function calculateQuizScore(
   quiz: Quiz,
   answers: Record<string, string>
-): { score: number; passed: boolean; correctCount: number; totalQuestions: number } {
+): { score: number; passed: boolean; correctCount: number; totalCount: number } {
   let correctCount = 0;
   
   for (const question of quiz.questions) {
@@ -416,7 +416,7 @@ export function calculateQuizScore(
     score,
     passed,
     correctCount,
-    totalQuestions: quiz.questions.length
+    totalCount: quiz.questions.length
   };
 }
 
