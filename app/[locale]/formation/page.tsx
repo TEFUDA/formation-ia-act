@@ -597,7 +597,7 @@ export default function FormationPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0 pt-20 lg:pt-8 pb-28 h-screen overflow-y-auto">
+        <main className="flex-1 lg:ml-0 pt-16 lg:pt-4 pb-20 lg:pb-24 h-[100dvh] overflow-hidden flex flex-col">
           <AnimatePresence mode="wait">
             {viewMode === 'lesson' && currentVideo && (
               <motion.div
