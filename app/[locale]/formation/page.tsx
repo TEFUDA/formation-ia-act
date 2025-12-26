@@ -252,6 +252,24 @@ export default function FormationPage() {
     return prevQuizScore !== undefined && prevQuiz && prevQuizScore >= prevQuiz.passingScore;
   };
 
+  // Is video unlocked? (previous video must be completed)
+  const isVideoUnlocked = (moduleId: number, videoIdx: number) => {
+    // Module must be unlocked first
+    if (!isModuleUnlocked(moduleId)) return false;
+    
+    // First video is always unlocked if module is unlocked
+    if (videoIdx === 0) return true;
+    
+    const module = MODULES[moduleId];
+    if (!module) return false;
+    
+    // Previous video must be completed
+    const prevVideo = module.videos[videoIdx - 1];
+    if (!prevVideo) return false;
+    
+    return isVideoCompleted(moduleId, prevVideo.id);
+  };
+
   // Is video completed?
   const isVideoCompleted = (moduleId: number, videoId: string) => {
     return progress.completedVideos.includes(`${moduleId}-${videoId}`);
@@ -382,7 +400,9 @@ export default function FormationPage() {
     const module = MODULES[moduleId];
     const video = module.videos[videoIdx];
     
+    // Check if module AND video are unlocked
     if (!isModuleUnlocked(moduleId)) return;
+    if (!isVideoUnlocked(moduleId, videoIdx)) return;
     
     setSelectedModule(moduleId);
     setSelectedVideoIdx(videoIdx);
@@ -557,23 +577,29 @@ export default function FormationPage() {
                           {module.videos.map((video, idx) => {
                             const isActive = selectedModule === module.id && selectedVideoIdx === idx;
                             const isComplete = isVideoCompleted(module.id, video.id);
+                            const isLocked = !isVideoUnlocked(module.id, idx);
 
                             return (
                               <button
                                 key={video.id}
                                 onClick={() => selectVideo(module.id, idx)}
+                                disabled={isLocked}
                                 className={`w-full p-2 rounded-lg flex items-center gap-2 text-left transition-all ${
-                                  isActive 
-                                    ? 'bg-white/10' 
-                                    : 'hover:bg-white/5'
+                                  isLocked
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : isActive 
+                                      ? 'bg-white/10' 
+                                      : 'hover:bg-white/5'
                                 }`}
                               >
                                 {/* Status Icon */}
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                  isComplete ? 'bg-green-500/20' : 'bg-white/5'
+                                  isComplete ? 'bg-green-500/20' : isLocked ? 'bg-white/5' : 'bg-white/5'
                                 }`}>
                                   {isComplete ? (
                                     <div className="w-3 h-3 text-green-400"><Icons.Check /></div>
+                                  ) : isLocked ? (
+                                    <div className="w-3 h-3 text-white/30"><Icons.Lock /></div>
                                   ) : (
                                     <span className="text-white/40 text-xs">{idx + 1}</span>
                                   )}
@@ -581,12 +607,12 @@ export default function FormationPage() {
 
                                 {/* Video Info */}
                                 <div className="flex-1 min-w-0">
-                                  <p className={`text-xs truncate ${isActive ? 'text-white' : 'text-white/70'}`}>
+                                  <p className={`text-xs truncate ${isLocked ? 'text-white/40' : isActive ? 'text-white' : 'text-white/70'}`}>
                                     {video.title}
                                   </p>
                                   <div className="flex items-center gap-2 mt-0.5">
                                     <ContentBadge type={video.type} color={module.color} />
-                                    <span className="text-white/30 text-xs">{video.duration} min</span>
+                                    {video.duration && <span className="text-white/30 text-xs">{video.duration}</span>}
                                   </div>
                                 </div>
                               </button>
