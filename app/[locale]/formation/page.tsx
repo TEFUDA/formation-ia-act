@@ -641,9 +641,11 @@ export default function FormationPage() {
                         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                           <div className="flex items-center gap-4">
                             <span className="text-white/60 text-sm">
-                              {currentVideo.duration.includes('min') || currentVideo.duration.includes('h') 
-                                ? currentVideo.duration 
-                                : `${currentVideo.duration} min`}
+                              {currentVideo.duration 
+                                ? (currentVideo.duration.includes('min') || currentVideo.duration.includes('h') 
+                                    ? currentVideo.duration 
+                                    : `${currentVideo.duration} min`)
+                                : ''}
                             </span>
                             <div className="flex-1 h-1 bg-white/20 rounded-full">
                               <div 
