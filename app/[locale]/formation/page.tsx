@@ -663,7 +663,7 @@ export default function FormationPage() {
                   <HoloCard glow={currentModule.color} className="mb-4">
                     <div className="p-6">
                       {/* Module 1 - Checklist */}
-                      {currentVideo.id === '1.ex' && (
+                      {currentVideo.id === '1.2' && (
                         <div className="text-center py-8">
                           <div className="text-6xl mb-4">📋</div>
                           <h3 className="text-xl font-bold mb-2">Checklist "Êtes-vous concerné ?"</h3>
@@ -685,7 +685,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 2 - Exercice 1: Brainstorming */}
-                      {currentVideo.id === '2.ex1' && (
+                      {currentVideo.id === '2.2' && (
                         <BrainstormingGrid 
                           moduleColor={currentModule.color}
                           onComplete={() => completeVideo()}
@@ -693,7 +693,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 2 - Exercice 2: Registre */}
-                      {currentVideo.id === '2.ex2' && (
+                      {currentVideo.id === '2.4' && (
                         <div className="text-center py-8">
                           <div className="text-6xl mb-4">📊</div>
                           <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
@@ -715,7 +715,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 3 - Classification */}
-                      {currentVideo.id === '3.ex' && (
+                      {currentVideo.id === '3.2' && (
                         <ClassificationWizard 
                           moduleColor={currentModule.color}
                           onComplete={() => completeVideo()}
@@ -723,7 +723,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 4 - Email fournisseur */}
-                      {currentVideo.id === '4.ex' && (
+                      {currentVideo.id === '4.2' && (
                         <SmartEmailEditor 
                           moduleColor={currentModule.color}
                           onComplete={() => completeVideo()}
@@ -731,7 +731,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 5 - Mentions légales */}
-                      {currentVideo.id === '5.ex' && (
+                      {currentVideo.id === '5.4' && (
                         <LegalMentionsGenerator 
                           moduleColor={currentModule.color}
                           onComplete={() => completeVideo()}
@@ -739,7 +739,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Module 7 - Plan d'action 90 jours */}
-                      {currentVideo.id === '7.ex' && (
+                      {currentVideo.id === '7.2' && (
                         <ActionPlanBuilder 
                           moduleColor={currentModule.color}
                           onComplete={() => completeVideo()}
@@ -747,7 +747,7 @@ export default function FormationPage() {
                       )}
                       
                       {/* Default: exercices non interactifs avec fichier à télécharger */}
-                      {!['1.ex', '2.ex1', '2.ex2', '3.ex', '4.ex', '5.ex', '7.ex'].includes(currentVideo.id) && 
+                      {!['1.2', '2.2', '2.4', '3.2', '4.2', '5.4', '7.2'].includes(currentVideo.id) && 
                        currentVideo.exerciseFile && (
                         <div className="text-center py-8">
                           <div className="text-6xl mb-4">✏️</div>
