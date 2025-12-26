@@ -88,7 +88,7 @@ export const MODULES: Module[] = [
         title: 'Checklist - Êtes-vous concerné ?',
         description: 'Auto-évaluation interactive',
         type: 'exercise',
-        exerciseFile: 'checklist-etes-vous-concerne.xlsx',
+        exerciseFile: '01-checklist-urgence.xlsx',
         exerciseDuration: '10-15 min'
       },
       {
@@ -127,6 +127,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Brainstorming IA',
         description: 'Listez vos systèmes par département',
         type: 'exercise',
+        exerciseFile: '02-matrice-brainstorming-ia.xlsx',
         exerciseDuration: '15-20 min'
       },
       {
@@ -141,7 +142,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Créer votre registre',
         description: 'Template interactif',
         type: 'exercise',
-        exerciseFile: 'template-registre-ia.xlsx',
+        exerciseFile: '03-registre-ia-complet.xlsx',
         exerciseDuration: '20-30 min'
       },
       {
@@ -173,7 +174,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Classification interactive',
         description: 'Classifiez vos systèmes avec le wizard',
         type: 'exercise',
-        exerciseFile: 'matrice-classification-risques.xlsx',
+        exerciseFile: '04-calculateur-classification.xlsx',
         exerciseDuration: '15-20 min'
       },
       {
@@ -212,7 +213,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Email fournisseur',
         description: 'Demandez la documentation technique',
         type: 'exercise',
-        exerciseFile: 'template-documentation-technique.docx',
+        exerciseFile: '06-email-fournisseur-guide.docx',
         exerciseDuration: '10-15 min'
       },
       {
@@ -251,7 +252,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Rédiger votre politique',
         description: 'Template personnalisable',
         type: 'exercise',
-        exerciseFile: 'modele-politique-ia.docx',
+        exerciseFile: '07-politique-ia-template.docx',
         exerciseDuration: '20-30 min'
       },
       {
@@ -296,7 +297,8 @@ export const MODULES: Module[] = [
         id: '6.2',
         title: 'Scénario - Simulation d\'audit',
         description: 'Vivez un audit comme si vous y étiez',
-        type: 'scenario'
+        type: 'scenario',
+        exerciseFile: '08-simulation-audit-scenario.docx'
       },
       {
         id: '6.3',
@@ -327,7 +329,7 @@ export const MODULES: Module[] = [
         title: 'Exercice - Votre plan 90 jours',
         description: 'Créez votre roadmap personnalisée',
         type: 'exercise',
-        exerciseFile: 'tableau-bord-conformite-ia.xlsx',
+        exerciseFile: '10-plan-action-90j-personnel.xlsx',
         exerciseDuration: '25-30 min'
       },
       {
@@ -343,6 +345,96 @@ export const MODULES: Module[] = [
         type: 'quiz'
       }
     ]
+  }
+];
+
+// ============================================
+// RESSOURCES SUPPLÉMENTAIRES
+// ============================================
+export const RESOURCES = [
+  {
+    id: 'checklist-urgence',
+    name: 'Checklist Urgence AI Act',
+    file: '01-checklist-urgence.xlsx',
+    module: 1,
+    type: 'excel'
+  },
+  {
+    id: 'matrice-brainstorming',
+    name: 'Matrice Brainstorming IA',
+    file: '02-matrice-brainstorming-ia.xlsx',
+    module: 2,
+    type: 'excel'
+  },
+  {
+    id: 'registre-ia',
+    name: 'Registre IA Complet',
+    file: '03-registre-ia-complet.xlsx',
+    module: 2,
+    type: 'excel'
+  },
+  {
+    id: 'calculateur-classification',
+    name: 'Calculateur Classification',
+    file: '04-calculateur-classification.xlsx',
+    module: 3,
+    type: 'excel'
+  },
+  {
+    id: 'tableau-bord',
+    name: 'Tableau de Bord Suivi',
+    file: '05-tableau-de-bord-suivi.xlsx',
+    module: 7,
+    type: 'excel'
+  },
+  {
+    id: 'email-fournisseur',
+    name: 'Guide Email Fournisseur',
+    file: '06-email-fournisseur-guide.docx',
+    module: 4,
+    type: 'document'
+  },
+  {
+    id: 'politique-ia',
+    name: 'Template Politique IA',
+    file: '07-politique-ia-template.docx',
+    module: 5,
+    type: 'document'
+  },
+  {
+    id: 'simulation-audit',
+    name: 'Scénario Simulation Audit',
+    file: '08-simulation-audit-scenario.docx',
+    module: 6,
+    type: 'document'
+  },
+  {
+    id: 'checklist-documents',
+    name: 'Checklist Documents Obligatoires',
+    file: '09-checklist-documents-obligatoires.pdf',
+    module: 4,
+    type: 'pdf'
+  },
+  {
+    id: 'plan-action',
+    name: 'Plan Action 90 Jours',
+    file: '10-plan-action-90j-personnel.xlsx',
+    module: 7,
+    type: 'excel'
+  },
+  {
+    id: 'guide-dossiers',
+    name: 'Guide Dossiers Conformité',
+    file: '11-guide-dossiers-conformite.pdf',
+    module: 4,
+    type: 'pdf'
+  },
+  {
+    id: 'certificat',
+    name: 'Certificat Personnalisable',
+    file: '12-certificat-personnalisable.docx',
+    module: 7,
+    type: 'document'
   }
 ];
 
@@ -370,12 +462,10 @@ export function getNextContent(
   const module = MODULES.find(m => m.id === currentModuleId);
   if (!module) return null;
   
-  // Check if there's a next video in current module
   if (currentVideoIdx < module.videos.length - 1) {
     return { moduleId: currentModuleId, videoIdx: currentVideoIdx + 1 };
   }
   
-  // Check if there's a next module
   const nextModule = MODULES.find(m => m.id === currentModuleId + 1);
   if (nextModule) {
     return { moduleId: nextModule.id, videoIdx: 0 };
@@ -394,4 +484,8 @@ export function isModuleComplete(moduleId: number, completedVideos: string[]): b
   if (!module) return false;
   
   return module.videos.every(v => completedVideos.includes(`${moduleId}-${v.id}`));
+}
+
+export function getResourcesByModule(moduleId: number) {
+  return RESOURCES.filter(r => r.module === moduleId);
 }
