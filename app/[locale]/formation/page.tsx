@@ -608,10 +608,10 @@ export default function FormationPage() {
                 className="p-4 lg:p-8 pb-24"
               >
                 {/* Video Header - TOUJOURS VISIBLE */}
-                <div className="mb-6 bg-[#0A0A1B]/80 -mx-4 lg:-mx-8 px-4 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 backdrop-blur-xl border-b border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 lg:mb-4 bg-[#0A0A1B]/80 -mx-4 lg:-mx-8 px-4 lg:px-8 py-2 lg:py-3 z-10 backdrop-blur-xl border-b border-white/5 flex-shrink-0">
+                  <div className="flex items-center gap-2 mb-1">
                     <span 
-                      className="text-xs font-medium px-3 py-1.5 rounded-full"
+                      className="text-[10px] lg:text-xs font-medium px-2 lg:px-3 py-1 rounded-full"
                       style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
                     >
                       {currentModule.icon} {currentModule.code} - {currentModule.title}
