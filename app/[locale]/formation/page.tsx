@@ -652,8 +652,8 @@ export default function FormationPage() {
                       </>
                     ) : currentVideo.type === 'exercise' ? (
                       <div className="p-6">
-                        {/* Render specific interactive component based on module and video */}
-                        {currentModule.id === 1 && currentVideo.id.includes('checklist') && (
+                        {/* Module 1 - Checklist */}
+                        {currentVideo.id === '1.ex' && (
                           <div className="text-center">
                             <div className="text-6xl mb-4">📋</div>
                             <h3 className="text-xl font-bold mb-2">Checklist "Êtes-vous concerné ?"</h3>
@@ -674,14 +674,16 @@ export default function FormationPage() {
                           </div>
                         )}
                         
-                        {currentModule.id === 2 && currentVideo.id.includes('brainstorming') && (
+                        {/* Module 2 - Exercice 1: Brainstorming */}
+                        {currentVideo.id === '2.ex1' && (
                           <BrainstormingGrid 
                             moduleColor={currentModule.color}
                             onComplete={() => completeVideo()}
                           />
                         )}
                         
-                        {currentModule.id === 2 && currentVideo.id.includes('registre') && (
+                        {/* Module 2 - Exercice 2: Registre */}
+                        {currentVideo.id === '2.ex2' && (
                           <div className="text-center">
                             <div className="text-6xl mb-4">📊</div>
                             <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
@@ -702,57 +704,40 @@ export default function FormationPage() {
                           </div>
                         )}
                         
-                        {currentModule.id === 3 && currentVideo.id.includes('classification') && (
+                        {/* Module 3 - Classification */}
+                        {currentVideo.id === '3.ex' && (
                           <ClassificationWizard 
                             moduleColor={currentModule.color}
                             onComplete={() => completeVideo()}
                           />
                         )}
                         
-                        {currentModule.id === 4 && currentVideo.id.includes('email') && (
+                        {/* Module 4 - Email fournisseur */}
+                        {currentVideo.id === '4.ex' && (
                           <SmartEmailEditor 
                             moduleColor={currentModule.color}
                             onComplete={() => completeVideo()}
                           />
                         )}
                         
-                        {currentModule.id === 5 && currentVideo.id.includes('politique') && (
-                          <div className="text-center">
-                            <div className="text-6xl mb-4">📜</div>
-                            <h3 className="text-xl font-bold mb-2">Template Politique IA</h3>
-                            <p className="text-white/60 mb-6 max-w-md mx-auto">
-                              Personnalisez ce modèle de politique IA pour votre entreprise.
-                            </p>
-                            {currentVideo.exerciseFile && (
-                              <a
-                                href={`/resources/${currentVideo.exerciseFile}`}
-                                download
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-black transition-all hover:scale-105"
-                                style={{ backgroundColor: currentModule.color }}
-                              >
-                                <div className="w-5 h-5"><Icons.Download /></div>
-                                Télécharger le template
-                              </a>
-                            )}
-                          </div>
-                        )}
-                        
-                        {currentModule.id === 5 && currentVideo.id.includes('mentions') && (
+                        {/* Module 5 - Mentions légales */}
+                        {currentVideo.id === '5.ex' && (
                           <LegalMentionsGenerator 
                             moduleColor={currentModule.color}
                             onComplete={() => completeVideo()}
                           />
                         )}
                         
-                        {currentModule.id === 7 && currentVideo.id.includes('plan') && (
+                        {/* Module 7 - Plan d'action 90 jours */}
+                        {currentVideo.id === '7.ex' && (
                           <ActionPlanBuilder 
                             moduleColor={currentModule.color}
                             onComplete={() => completeVideo()}
                           />
                         )}
                         
-                        {/* Default exercise display for other exercises */}
-                        {!(['brainstorming', 'classification', 'email', 'mentions', 'plan'].some(k => currentVideo.id.includes(k))) && 
+                        {/* Default: exercices non interactifs avec fichier à télécharger */}
+                        {!['1.ex', '2.ex1', '2.ex2', '3.ex', '4.ex', '5.ex', '7.ex'].includes(currentVideo.id) && 
                          currentVideo.exerciseFile && (
                           <div className="text-center">
                             <div className="text-6xl mb-4">✏️</div>
