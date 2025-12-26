@@ -8,6 +8,7 @@ export interface Video {
   type: 'video' | 'exercise' | 'quiz' | 'scenario';
   duration?: string;
   videoUrl?: string;
+  exerciseFile?: string;
 }
 
 export interface Module {
@@ -85,7 +86,8 @@ export const MODULES: Module[] = [
         id: '1.2',
         title: 'Checklist - Êtes-vous concerné ?',
         description: 'Auto-évaluation interactive',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'checklist-etes-vous-concerne.xlsx'
       },
       {
         id: '1.3',
@@ -135,7 +137,8 @@ export const MODULES: Module[] = [
         id: '2.4',
         title: 'Exercice - Créer votre registre',
         description: 'Template interactif',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'template-registre-ia.xlsx'
       },
       {
         id: '2.5',
@@ -165,7 +168,8 @@ export const MODULES: Module[] = [
         id: '3.2',
         title: 'Exercice - Classification interactive',
         description: 'Classifiez vos systèmes avec le wizard',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'matrice-classification-risques.xlsx'
       },
       {
         id: '3.3',
@@ -202,7 +206,8 @@ export const MODULES: Module[] = [
         id: '4.2',
         title: 'Exercice - Email fournisseur',
         description: 'Demandez la documentation technique',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'template-documentation-technique.docx'
       },
       {
         id: '4.3',
@@ -239,7 +244,8 @@ export const MODULES: Module[] = [
         id: '5.2',
         title: 'Exercice - Rédiger votre politique',
         description: 'Template personnalisable',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'modele-politique-ia.docx'
       },
       {
         id: '5.3',
@@ -312,7 +318,8 @@ export const MODULES: Module[] = [
         id: '7.2',
         title: 'Exercice - Votre plan 90 jours',
         description: 'Créez votre roadmap personnalisée',
-        type: 'exercise'
+        type: 'exercise',
+        exerciseFile: 'tableau-bord-conformite-ia.xlsx'
       },
       {
         id: '7.3',
