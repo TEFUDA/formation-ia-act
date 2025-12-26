@@ -803,7 +803,7 @@ export default function FormationPage() {
                 )}
 
                 {/* Navigation - Barre fixe en bas */}
-                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-4 z-40">
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-2 lg:p-4 z-40">
                   <div className="max-w-4xl mx-auto flex items-center justify-between">
                     <button
                       onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
