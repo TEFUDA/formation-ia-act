@@ -808,7 +808,7 @@ export default function FormationPage() {
                     <button
                       onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
                       disabled={selectedVideoIdx === 0}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 disabled:bg-white/5 transition-all font-medium"
+                      className="flex items-center gap-1 lg:gap-2 px-3 lg:px-5 py-2 lg:py-3 rounded-xl bg-white/10 text-sm lg:text-base text-sm lg:text-base text-white hover:bg-white/20 disabled:opacity-30 disabled:bg-white/5 transition-all font-medium"
                     >
                       <div className="w-5 h-5"><Icons.ChevronLeft /></div>
                       Précédent
