@@ -836,7 +836,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       { 
         id: 'a', 
         text: "Garder son calme. Convoquer immédiatement une réunion de crise avec DSI, DRH, Juridique et l'équipe IA.", 
-        shortText: "Réunion de crise organisée",
+        shortText: "Je convoque une réunion de crise immédiate",
         effect: { stress: -15, trust: 5, reputation: 10 }, 
         nextNode: 'notif_crisis_meeting',
         isOptimal: true 
@@ -844,21 +844,21 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       { 
         id: 'b', 
         text: "Foncer tête baissée pour rassembler tous les documents disponibles.", 
-        shortText: "Action solo immédiate",
+        shortText: "Je fonce rassembler les documents seul",
         effect: { stress: 15, time: -120, evidence: 5 }, 
         nextNode: 'notif_solo_action'
       },
       { 
         id: 'c', 
         text: "Appeler le DG pour lui annoncer la nouvelle en premier.", 
-        shortText: "Informer la hiérarchie d'abord",
+        shortText: "J'appelle le DG en priorité",
         effect: { stress: 5, reputation: 5 }, 
         nextNode: 'notif_call_dg'
       },
       { 
         id: 'd', 
         text: "Vérifier si c'est un vrai email ou du phishing...", 
-        shortText: "Vérification prudente",
+        shortText: "Je vérifie d'abord si c'est un vrai email",
         effect: { time: -60 }, 
         nextNode: 'notif_verify_email'
       }
@@ -892,7 +892,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "On a les bases. Chacun se concentre sur son périmètre : Thomas les accès techniques, Sophie les systèmes RH, Claire le cadre légal. On se retrouve à 11h.",
-        shortText: "Répartition claire des rôles",
+        shortText: "Oui, on se répartit les rôles maintenant",
         effect: { evidence: 15, stress: -10, reputation: 5 },
         nextNode: 'notif_team_dispatch',
         isOptimal: true
@@ -900,7 +900,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Honnêtement, il y a des trous. Focus sur les documents les plus critiques.",
-        shortText: "Aveu + priorisation",
+        shortText: "Pas totalement, mais on priorise l'essentiel",
         effect: { evidence: 5, stress: 5 },
         nextNode: 'notif_honest_assessment'
       }
@@ -926,14 +926,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Audit surprise cet après-midi. J'aurais dû commencer par prévenir l'équipe. Aide-moi à organiser une réunion rapide.",
-        shortText: "Corriger le tir",
+        shortText: "Audit surprise ! Aide-moi à organiser une réunion",
         effect: { stress: 5, reputation: -5 },
         nextNode: 'notif_team_dispatch'
       },
       {
         id: 'b',
         text: "Pas le temps d'expliquer ! Trouve-moi le registre IA, vite !",
-        shortText: "Continuer seul",
+        shortText: "Pas le temps d'expliquer, trouve-moi le registre !",
         effect: { stress: 10, reputation: -10 },
         nextNode: 'prep_start'
       }
@@ -959,14 +959,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Philippe, désolé de vous interrompre. Audit de conformité IA aujourd'hui à 14h. Je gère, mais vous devrez peut-être être disponible pour l'accueil.",
-        shortText: "Bref et factuel",
+        shortText: "Audit IA cet après-midi, je gère, soyez disponible",
         effect: { trust: 5, reputation: 5 },
         nextNode: 'notif_dg_reaction_good'
       },
       {
         id: 'b',
         text: "Philippe, c'est la catastrophe ! On a un audit IA cet après-midi et on n'est pas prêts !",
-        shortText: "Panique transmise",
+        shortText: "C'est la catastrophe ! On n'est pas prêts !",
         effect: { stress: 15, reputation: -10 },
         nextNode: 'notif_dg_reaction_bad'
       }
@@ -1014,7 +1014,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "L'AIPD du système RH n'est pas finalisée, la matrice de classification est incomplète, et les procédures de supervision ne sont pas formalisées.",
-        shortText: "Lister les manques",
+        shortText: "AIPD non finalisée, matrice incomplète, procédures manquantes",
         effect: { stress: 10 },
         nextNode: 'notif_gap_analysis'
       }
@@ -1082,7 +1082,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Priorité 1 : l'AIPD. Même incomplète, c'est mieux qu'un trou. Tu t'en charges avec Emma. Je gère la matrice.",
-        shortText: "Prioriser l'AIPD",
+        shortText: "Priorité 1 : l'AIPD. Tu t'en charges avec Emma",
         effect: { evidence: 10, time: -120, stress: 5 },
         nextNode: 'prep_aipd_rush',
         isOptimal: true
@@ -1090,14 +1090,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On ne peut pas tout faire. Focus sur ce qui est prêt et solide. On expliquera le reste.",
-        shortText: "Miser sur l'existant",
+        shortText: "Focus sur ce qui est prêt, on expliquera le reste",
         effect: { evidence: -5, stress: -5 },
         nextNode: 'prep_existing_focus'
       },
       {
         id: 'c',
         text: "Qu'est-ce qu'on a d'autre qui manque ? Je veux un état des lieux complet.",
-        shortText: "Inventaire exhaustif",
+        shortText: "Qu'est-ce qu'il manque d'autre ? État des lieux complet",
         effect: { time: -60, stress: 10 },
         nextNode: 'prep_full_inventory'
       }
@@ -1125,7 +1125,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Emma, c'est exactement ce qu'il nous faut ! Montre-moi ça tout de suite.",
-        shortText: "Valoriser son travail",
+        shortText: "Excellent ! Montre-moi ça tout de suite",
         effect: { evidence: 15, stress: -10, trust: 5 },
         nextNode: 'prep_emma_table',
         isOptimal: true
@@ -1133,7 +1133,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "C'est gentil Emma, mais là je n'ai pas le temps de vérifier un travail de stagiaire.",
-        shortText: "Refuser poliment",
+        shortText: "Merci, mais je n'ai pas le temps maintenant",
         effect: { stress: 5 },
         nextNode: 'prep_continue_alone'
       }
@@ -1157,7 +1157,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Emma, tu viens de me sauver. Je peux compter sur toi pendant l'audit pour m'assister si besoin ?",
-        shortText: "L'intégrer à l'équipe",
+        shortText: "Tu viens de me sauver ! Tu m'assistes pendant l'audit ?",
         effect: { stress: -5, reputation: 5 },
         nextNode: 'prep_emma_yes',
         isOptimal: true
@@ -1165,7 +1165,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Excellent travail. Continue comme ça.",
-        shortText: "Simple remerciement",
+        shortText: "Bon travail, merci",
         effect: {},
         nextNode: 'prep_continue_prep'
       }
@@ -1213,7 +1213,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "OK, focus : AIPD en priorité, puis documentation fournisseur. Le reste, on expliquera qu'on travaille dessus.",
-        shortText: "Priorisation stratégique",
+        shortText: "OK, AIPD d'abord, puis doc fournisseur",
         effect: { evidence: 10, stress: -5 },
         nextNode: 'prep_continue_prep',
         isOptimal: true
@@ -1221,7 +1221,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Appelez le fournisseur maintenant ! Dites-leur que c'est urgent !",
-        shortText: "Pression fournisseur",
+        shortText: "Appelez le fournisseur maintenant, c'est urgent !",
         effect: { stress: 10, time: -60 },
         nextNode: 'prep_vendor_call'
       }
@@ -1247,7 +1247,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Marc, l'AI Act nous impose d'avoir cette documentation. C'est dans notre contrat. Envoyez-moi au moins les infos de l'article 13 : données d'entraînement, métriques, limitations.",
-        shortText: "Négociation ferme",
+        shortText: "L'AI Act l'impose. Envoyez au moins les infos Article 13",
         effect: { evidence: 10, stress: 5 },
         nextNode: 'prep_vendor_concede',
         isOptimal: true
@@ -1255,7 +1255,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Bon, envoyez ce que vous pouvez. On fera avec.",
-        shortText: "Accepter le minimum",
+        shortText: "Bon, envoyez ce que vous pouvez",
         effect: { evidence: -5 },
         nextNode: 'prep_continue_prep'
       }
@@ -1301,7 +1301,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Fais un export statique des logs clés en backup. PDF, Excel, peu importe. Si le live plante, on aura ça.",
-        shortText: "Préparer un backup",
+        shortText: "Fais un export statique en backup au cas où",
         effect: { evidence: 10, time: -30 },
         nextNode: 'prep_backup_ready',
         isOptimal: true
@@ -1309,7 +1309,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Ça ira. Les serveurs plantent rarement. Ne perdons pas de temps.",
-        shortText: "Prendre le risque",
+        shortText: "Ça ira, ne perdons pas de temps",
         effect: {},
         nextNode: 'prep_risk_taken'
       }
@@ -1346,7 +1346,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Parfait Claire. Résume-moi les 3 points clés.",
-        shortText: "Synthèse rapide",
+        shortText: "Parfait ! Résume-moi les 3 points clés",
         effect: { evidence: 5, stress: -5, time: -30 },
         nextNode: 'prep_claire_summary',
         isOptimal: true
@@ -1354,7 +1354,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Merci, pose ça là, je lirai plus tard.",
-        shortText: "Reporter",
+        shortText: "Merci, je lirai plus tard",
         effect: { stress: 5 },
         nextNode: 'prep_final_check'
       }
@@ -1391,7 +1391,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Faire un dernier point avec l'équipe pour s'assurer que chacun connaît son rôle.",
-        shortText: "Coordination finale",
+        shortText: "Je fais un dernier point d'équipe",
         effect: { stress: -10, trust: 5 },
         nextNode: 'prep_team_briefing',
         isOptimal: true
@@ -1399,14 +1399,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Relire une dernière fois les documents clés.",
-        shortText: "Révision solo",
+        shortText: "Je relis les documents clés",
         effect: { evidence: 5, time: -60 },
         nextNode: 'prep_solo_review'
       },
       {
         id: 'c',
         text: "Prendre 5 minutes pour respirer et se recentrer.",
-        shortText: "Pause mentale",
+        shortText: "Je prends 5 minutes pour respirer",
         effect: { stress: -15 },
         nextNode: 'prep_breathing'
       }
@@ -1490,7 +1490,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Bonjour Madame Durand, bienvenue dans nos locaux. Je suis [Votre nom], Responsable Conformité IA. Puis-je vous offrir un café avant de nous installer ?",
-        shortText: "Accueil chaleureux",
+        shortText: "Bienvenue ! Puis-je vous offrir un café ?",
         effect: { trust: 15, stress: -5 },
         nextNode: 'accueil_coffee_accepted',
         isOptimal: true
@@ -1498,14 +1498,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Bonjour. Suivez-moi, notre salle de réunion est prête.",
-        shortText: "Direct et efficace",
+        shortText: "Bonjour, suivez-moi vers la salle",
         effect: { trust: 0 },
         nextNode: 'accueil_to_room'
       },
       {
         id: 'c',
         text: "Ah, vous êtes déjà là ? Je... la salle n'est peut-être pas tout à fait...",
-        shortText: "Déstabilisé",
+        shortText: "Euh... vous êtes déjà là ?",
         effect: { trust: -15, stress: 15 },
         nextNode: 'accueil_unprepared',
         isRisky: true
@@ -1534,7 +1534,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Depuis 2 ans dans ce rôle spécifique. Avant j'étais DPO, donc la transition était naturelle. L'AI Act a beaucoup changé notre façon de travailler.",
-        shortText: "Parcours professionnel",
+        shortText: "Depuis 2 ans, après un poste de DPO",
         effect: { trust: 5 },
         nextNode: 'accueil_to_room',
         isOptimal: true
@@ -1542,7 +1542,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "C'est vrai que c'est nouveau pour tout le monde. On fait de notre mieux.",
-        shortText: "Humble",
+        shortText: "C'est nouveau pour tout le monde, on fait de notre mieux",
         effect: { trust: 0 },
         nextNode: 'accueil_to_room'
       }
@@ -1579,7 +1579,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Tout est clair. Notre équipe est mobilisée et nos documents sont prêts. Par où souhaitez-vous commencer ?",
-        shortText: "Prêt et proactif",
+        shortText: "Tout est clair, par où commençons-nous ?",
         effect: { trust: 10 },
         nextNode: 'accueil_role_question',
         isOptimal: true
@@ -1587,14 +1587,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Pouvez-vous préciser les sanctions en cas de non-conformité ?",
-        shortText: "Question sur les risques",
+        shortText: "Quelles sanctions en cas de non-conformité ?",
         effect: { trust: -5, stress: 10 },
         nextNode: 'accueil_sanctions_question'
       },
       {
         id: 'c',
         text: "Nos avocats peuvent-ils être présents ?",
-        shortText: "Demander un conseil juridique",
+        shortText: "Nos avocats peuvent-ils être présents ?",
         effect: { trust: -10, stress: 5 },
         nextNode: 'accueil_lawyers_question'
       }
@@ -1635,7 +1635,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Je suis le Responsable Conformité IA, officiellement nommé par la Direction Générale. Voici ma lettre de mission qui définit mon périmètre, mes responsabilités et mon autorité.",
-        shortText: "Rôle officiel documenté",
+        shortText: "Responsable Conformité IA nommé par la DG. Voici ma lettre de mission",
         requiresDocument: 'lettre_mission',
         effect: { trust: 20, evidence: 15 },
         nextNode: 'accueil_role_approved',
@@ -1644,14 +1644,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Je suis le DPO et j'ai étendu mon périmètre à l'IA depuis l'entrée en vigueur du règlement.",
-        shortText: "DPO étendu",
+        shortText: "Je suis DPO et j'ai étendu mon périmètre à l'IA",
         effect: { trust: 5, evidence: 5 },
         nextNode: 'accueil_role_dpo'
       },
       {
         id: 'c',
         text: "C'est un peu informel. Plusieurs personnes s'occupent de l'IA dans l'entreprise.",
-        shortText: "Pas de rôle défini",
+        shortText: "C'est informel, plusieurs personnes s'en occupent",
         effect: { trust: -20, evidence: -15, stress: 10 },
         nextNode: 'accueil_role_problem',
         isCriticalMistake: true
@@ -1680,7 +1680,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, il y a 6 mois. Nous avons suspendu un projet de vidéosurveillance IA car il relevait de l'annexe III sans analyse d'impact préalable. Le projet a repris après mise en conformité.",
-        shortText: "Exemple concret positif",
+        shortText: "Oui, on a suspendu un projet vidéosurveillance il y a 6 mois",
         effect: { trust: 20, evidence: 15 },
         nextNode: 'accueil_perimeter_question',
         isOptimal: true
@@ -1688,14 +1688,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Pas encore, mais je suis prêt à le faire si nécessaire.",
-        shortText: "Prêt en théorie",
+        shortText: "Pas encore, mais je suis prêt à le faire",
         effect: { trust: 5 },
         nextNode: 'accueil_perimeter_question'
       },
       {
         id: 'c',
         text: "En pratique, la direction n'aime pas qu'on bloque des projets...",
-        shortText: "Autorité limitée",
+        shortText: "La direction n'aime pas qu'on bloque des projets...",
         effect: { trust: -10, evidence: -5 },
         nextNode: 'accueil_authority_weak'
       }
@@ -1723,14 +1723,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "C'est temporaire. Un recrutement est en cours pour séparer les fonctions d'ici 6 mois. En attendant, j'ai une équipe dédiée pour chaque périmètre.",
-        shortText: "Plan de transition",
+        shortText: "C'est temporaire, un recrutement est en cours",
         effect: { trust: 10 },
         nextNode: 'accueil_perimeter_question'
       },
       {
         id: 'b',
         text: "Les deux réglementations sont complémentaires. Je gère.",
-        shortText: "Minimiser le problème",
+        shortText: "Les deux sont complémentaires, je gère",
         effect: { trust: -5 },
         nextNode: 'accueil_perimeter_question'
       }
@@ -1761,7 +1761,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Nous avons identifié et documenté 14 systèmes d'IA répartis dans 5 départements. Voici notre registre complet avec pour chaque système : nom, fournisseur, usage, classification de risque, et date de dernière revue.",
-        shortText: "Registre complet",
+        shortText: "14 systèmes documentés. Voici notre registre",
         requiresDocument: 'registre_ia',
         effect: { trust: 20, evidence: 25 },
         nextNode: 'accueil_registry_review',
@@ -1770,14 +1770,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On utilise une dizaine de systèmes IA environ. J'ai commencé un inventaire mais il n'est pas finalisé.",
-        shortText: "Registre incomplet",
+        shortText: "Une dizaine environ, l'inventaire n'est pas finalisé",
         effect: { trust: -15, evidence: -15 },
         nextNode: 'accueil_registry_incomplete'
       },
       {
         id: 'c',
         text: "C'est difficile à dire précisément. Chaque département utilise ses propres outils...",
-        shortText: "Pas de visibilité",
+        shortText: "Difficile à dire, chaque département utilise ses outils",
         effect: { trust: -30, evidence: -25, stress: 15 },
         nextNode: 'accueil_registry_missing',
         isCriticalMistake: true
@@ -1844,7 +1844,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Le système de recrutement tombe sous l'annexe III, point 4a : 'IA utilisée pour le recrutement ou la sélection de personnes'. Nous avons analysé chaque système selon cette grille. Voici notre matrice complète.",
-        shortText: "Analyse juridique détaillée",
+        shortText: "Annexe III, point 4a. Voici notre matrice d'analyse",
         requiresDocument: 'classification_matrix',
         effect: { trust: 20, evidence: 25 },
         nextNode: 'doc_classification_approved',
@@ -1853,14 +1853,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "C'est du recrutement, donc c'est forcément haut risque selon le règlement.",
-        shortText: "Réponse approximative",
+        shortText: "Recrutement = haut risque, c'est dans le règlement",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'doc_classification_weak'
       },
       {
         id: 'c',
         text: "Nous avons suivi les recommandations d'un consultant externe pour la classification.",
-        shortText: "Classification externalisée",
+        shortText: "Un consultant nous a aidés pour la classification",
         effect: { trust: -5, evidence: -5 },
         nextNode: 'doc_classification_external'
       }
@@ -1899,14 +1899,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, voici le rapport du consultant et notre validation interne point par point.",
-        shortText: "Documentation disponible",
+        shortText: "Oui, voici le rapport et notre validation interne",
         effect: { trust: 5, evidence: 5 },
         nextNode: 'doc_aipd_question'
       },
       {
         id: 'b',
         text: "Je... je dois le chercher. Donnez-moi un instant.",
-        shortText: "Document introuvable",
+        shortText: "Je dois le chercher, un instant...",
         effect: { trust: -10, stress: 10 },
         nextNode: 'doc_aipd_question'
       }
@@ -1925,7 +1925,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui. Notre AIPD couvre les risques de discrimination (genre, âge, origine), l'impact sur le droit au travail, les mesures de mitigation, et le processus de supervision humaine. La voici.",
-        shortText: "AIPD complète",
+        shortText: "Oui, discrimination, droit au travail, mitigation. La voici",
         requiresDocument: 'aipd_rh',
         effect: { trust: 25, evidence: 30 },
         nextNode: 'doc_aipd_review',
@@ -1934,21 +1934,21 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Nous avons fait une analyse d'impact RGPD qui couvre les aspects IA aussi.",
-        shortText: "Seulement AIPD RGPD",
+        shortText: "On a fait une AIPD RGPD qui couvre aussi l'IA",
         effect: { trust: -15, evidence: -15 },
         nextNode: 'doc_aipd_rgpd'
       },
       {
         id: 'c',
         text: "L'analyse est en cours mais pas encore finalisée.",
-        shortText: "AIPD non finalisée",
+        shortText: "Elle est en cours mais pas encore finalisée",
         effect: { trust: -20, evidence: -20 },
         nextNode: 'doc_aipd_missing'
       },
       {
         id: 'd',
         text: "Notre fournisseur nous a certifié que le système était conforme et équitable.",
-        shortText: "Confiance au fournisseur",
+        shortText: "Le fournisseur nous a certifié la conformité",
         effect: { trust: -25, evidence: -25, stress: 10 },
         nextNode: 'doc_aipd_vendor_trust',
         isRisky: true
@@ -1977,7 +1977,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, nous avons des audits trimestriels. Voici le dernier rapport : le biais est passé de 15% à 3%, en-dessous de notre seuil d'acceptabilité de 5%.",
-        shortText: "Métriques de suivi",
+        shortText: "Oui, audits trimestriels. Biais passé de 15% à 3%",
         requiresDocument: 'tests_biais',
         effect: { trust: 20, evidence: 20 },
         nextNode: 'doc_bias_approved',
@@ -1986,7 +1986,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Nous faisons confiance au paramétrage, mais nous n'avons pas de mesure précise.",
-        shortText: "Pas de suivi quantifié",
+        shortText: "On fait confiance, pas de mesure précise",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'doc_bias_weak'
       }
@@ -2061,7 +2061,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Nous réalisons des audits trimestriels d'équité avec des métriques par genre, âge et origine. Voici le dernier rapport montrant nos résultats et les corrections appliquées.",
-        shortText: "Audits réguliers documentés",
+        shortText: "Audits trimestriels d'équité. Voici le dernier rapport",
         requiresDocument: 'tests_biais',
         effect: { trust: 25, evidence: 20 },
         nextNode: 'doc_transparency_question',
@@ -2070,14 +2070,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Le fournisseur fait des tests de son côté et nous envoie un rapport annuel.",
-        shortText: "Tests externalisés",
+        shortText: "Le fournisseur teste et nous envoie un rapport annuel",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'doc_bias_external'
       },
       {
         id: 'c',
         text: "On surveille les plaintes. On n'en a pas eu.",
-        shortText: "Approche réactive",
+        shortText: "On surveille les plaintes. On n'en a pas eu",
         effect: { trust: -20, evidence: -15 },
         nextNode: 'doc_bias_reactive'
       }
@@ -2117,7 +2117,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, à plusieurs niveaux : mention dans l'offre d'emploi, information dans le formulaire avec case de consentement explicite, et email de confirmation. Voici les captures d'écran.",
-        shortText: "Transparence multi-niveaux",
+        shortText: "Oui : offre d'emploi, formulaire, email. Voici les captures",
         requiresDocument: 'mentions_legales',
         effect: { trust: 25, evidence: 20 },
         nextNode: 'doc_transparency_approved',
@@ -2126,14 +2126,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "C'est mentionné dans nos CGU que les candidats acceptent.",
-        shortText: "Seulement CGU",
+        shortText: "C'est mentionné dans les CGU",
         effect: { trust: -15, evidence: -15 },
         nextNode: 'doc_transparency_cgu'
       },
       {
         id: 'c',
         text: "Notre chatbot s'appelle 'Luna' et a un avatar humain... C'est peut-être pas assez clair.",
-        shortText: "Transparence insuffisante",
+        shortText: "Notre chatbot Luna a un avatar humain... peut-être pas clair",
         effect: { trust: -30, evidence: -25, stress: 15 },
         nextNode: 'doc_transparency_violation',
         isCriticalMistake: true
@@ -2186,7 +2186,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, chaque décision est loguée avec : timestamp, données d'entrée, score, et décision finale avec validation humaine. Les logs sont conservés 5 ans. Voici un export anonymisé.",
-        shortText: "Traçabilité complète",
+        shortText: "Oui, chaque décision loguée avec timestamp. Voici l'export",
         requiresDocument: 'logs_decisions',
         effect: { trust: 20, evidence: 20 },
         nextNode: 'doc_documentation_vendor',
@@ -2195,14 +2195,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On garde les résultats mais pas le détail du raisonnement de l'IA.",
-        shortText: "Traçabilité partielle",
+        shortText: "On garde les résultats mais pas le raisonnement IA",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'doc_logs_partial'
       },
       {
         id: 'c',
         text: "On n'a pas mis en place de système de logs spécifique pour l'IA.",
-        shortText: "Pas de logs",
+        shortText: "On n'a pas de système de logs spécifique pour l'IA",
         effect: { trust: -20, evidence: -20 },
         nextNode: 'doc_logs_missing'
       }
@@ -2242,7 +2242,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Voici les dossiers complets : notice d'utilisation, spécifications, informations sur les données d'entraînement, métriques de performance, et instructions de supervision. Tout est classé par système.",
-        shortText: "Documentation complète",
+        shortText: "Voici les dossiers complets classés par système",
         requiresDocument: 'doc_technique_rh',
         effect: { trust: 25, evidence: 20 },
         nextNode: 'entretiens_start',
@@ -2251,14 +2251,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Nous avons les notices d'utilisation et quelques specs, mais pas les informations sur les données d'entraînement.",
-        shortText: "Documentation partielle",
+        shortText: "On a les notices, pas les infos données d'entraînement",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'doc_vendor_incomplete'
       },
       {
         id: 'c',
         text: "Nous utilisons ces outils mais nous n'avons pas demandé de documentation détaillée.",
-        shortText: "Pas de documentation",
+        shortText: "On n'a pas demandé de documentation détaillée",
         effect: { trust: -25, evidence: -20 },
         nextNode: 'doc_vendor_missing'
       }
@@ -2312,7 +2312,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Pour le recrutement : l'IA propose un score et un classement, mais JAMAIS de décision automatique. Un recruteur humain formé examine chaque dossier et prend la décision finale. Nous loguons chaque validation.",
-        shortText: "IA propose, humain dispose",
+        shortText: "L'IA propose un score, jamais de décision auto. Humain décide",
         requiresDocument: 'procedures_supervision',
         effect: { trust: 30, evidence: 25 },
         nextNode: 'entretiens_supervision_approved',
@@ -2321,14 +2321,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Les managers peuvent annuler les décisions de l'IA s'ils ne sont pas d'accord.",
-        shortText: "Override possible",
+        shortText: "Les managers peuvent annuler les décisions IA",
         effect: { trust: 0, evidence: 0 },
         nextNode: 'entretiens_supervision_clarify'
       },
       {
         id: 'c',
         text: "Pour les candidatures clairement non qualifiées, le système rejette automatiquement. Ça fait gagner du temps.",
-        shortText: "Rejet automatique",
+        shortText: "Le système rejette automatiquement les CV non qualifiés",
         effect: { trust: -35, evidence: -30, stress: 20 },
         nextNode: 'entretiens_supervision_violation',
         isCriticalMistake: true
@@ -2347,7 +2347,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, nous avons un programme de formation spécifique sur l'automation bias. Voici les attestations et le contenu du module.",
-        shortText: "Formation documentée",
+        shortText: "Oui, programme sur l'automation bias. Voici les attestations",
         requiresDocument: 'attestations',
         effect: { trust: 15, evidence: 15 },
         nextNode: 'entretiens_demo_request',
@@ -2356,7 +2356,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Ils ont reçu une présentation du système lors de son déploiement.",
-        shortText: "Formation basique",
+        shortText: "Présentation du système lors du déploiement",
         effect: { trust: -5 },
         nextNode: 'entretiens_demo_request'
       }
@@ -2373,14 +2373,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "L'humain. Une candidature non validée explicitement par le recruteur n'avance pas dans le processus.",
-        shortText: "Humain par défaut",
+        shortText: "L'humain. Sans validation explicite, ça n'avance pas",
         effect: { trust: 15, evidence: 10 },
         nextNode: 'entretiens_demo_request'
       },
       {
         id: 'b',
         text: "En pratique, les recruteurs suivent généralement les recommandations de l'IA...",
-        shortText: "IA suivie par défaut",
+        shortText: "En pratique, les recruteurs suivent généralement l'IA...",
         effect: { trust: -20, evidence: -15 },
         nextNode: 'entretiens_supervision_concern'
       }
@@ -2421,7 +2421,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Bien sûr. *Vous ouvrez l'interface* Voici le tableau de bord d'un recruteur. Je vais vous montrer le parcours complet d'analyse d'une candidature.",
-        shortText: "Démo complète",
+        shortText: "Bien sûr, voici le tableau de bord. Je vous montre le parcours",
         effect: { trust: 15, evidence: 10 },
         nextNode: 'entretiens_demo_start',
         isOptimal: true
@@ -2429,14 +2429,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Je n'ai pas les accès en production. Je peux vous montrer notre environnement de test.",
-        shortText: "Environnement de test",
+        shortText: "Je n'ai pas les accès prod. Voici l'environnement de test",
         effect: { trust: -10, evidence: -5 },
         nextNode: 'entretiens_demo_test'
       },
       {
         id: 'c',
         text: "C'est compliqué, le système est géré par notre fournisseur en SaaS.",
-        shortText: "Pas d'accès",
+        shortText: "C'est compliqué, le système est en SaaS chez le fournisseur",
         effect: { trust: -25, evidence: -20, stress: 15 },
         nextNode: 'entretiens_demo_refused',
         isRisky: true
@@ -2485,7 +2485,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Le score combine : correspondance compétences (40%), expérience pertinente (30%), formation (20%), et signaux comportementaux du CV (10%). Voici la documentation technique.",
-        shortText: "Explication détaillée",
+        shortText: "Compétences 40%, expérience 30%, formation 20%. Voici la doc",
         requiresDocument: 'doc_technique_rh',
         effect: { trust: 25, evidence: 20 },
         nextNode: 'entretiens_demo_sensitive',
@@ -2494,14 +2494,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "C'est un algorithme propriétaire du fournisseur. On n'a pas tous les détails.",
-        shortText: "Algorithme opaque",
+        shortText: "Algorithme propriétaire, on n'a pas tous les détails",
         effect: { trust: -20, evidence: -20 },
         nextNode: 'entretiens_explainability_issue'
       },
       {
         id: 'c',
         text: "Je ne suis pas data scientist, je ne peux pas expliquer les détails techniques.",
-        shortText: "Manque de compréhension",
+        shortText: "Je ne suis pas data scientist, je ne peux pas expliquer",
         effect: { trust: -25, evidence: -15, stress: 10 },
         nextNode: 'entretiens_competence_issue'
       }
@@ -2540,7 +2540,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Non. Nous avons volontairement exclu ces données. Pas de photos, pas de noms, pas d'adresses, pas de dates de naissance. C'est un choix de design pour minimiser les risques.",
-        shortText: "Données sensibles exclues",
+        shortText: "Non, pas de photos ni noms ni âge. Choix de design",
         effect: { trust: 30, evidence: 25 },
         nextNode: 'entretiens_demo_approved',
         isOptimal: true
@@ -2548,14 +2548,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Il a accès au CV complet, donc potentiellement au prénom et à des indices d'âge.",
-        shortText: "Accès partiel",
+        shortText: "Accès au CV complet, donc potentiellement prénom et âge",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'entretiens_sensitive_risk'
       },
       {
         id: 'c',
         text: "Oui, mais on fait confiance à l'algorithme pour ne pas en tenir compte.",
-        shortText: "Accès complet, confiance algo",
+        shortText: "Oui, mais l'algorithme n'en tient pas compte",
         effect: { trust: -30, evidence: -25, stress: 15 },
         nextNode: 'entretiens_sensitive_problem',
         isRisky: true
@@ -2607,7 +2607,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui. Notre procédure couvre : détection, arrêt si nécessaire, notification aux personnes sous 72h, signalement à l'autorité si impact significatif, analyse post-incident. Nous faisons un exercice annuel.",
-        shortText: "Procédure complète testée",
+        shortText: "Oui : détection, arrêt, notification 72h. Exercice annuel",
         requiresDocument: 'procedure_incident',
         effect: { trust: 25, evidence: 25 },
         nextNode: 'entretiens_incident_history',
@@ -2616,14 +2616,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On arrêterait le système et on appellerait le fournisseur pour comprendre.",
-        shortText: "Procédure informelle",
+        shortText: "On arrêterait le système et on appellerait le fournisseur",
         effect: { trust: -10, evidence: -10 },
         nextNode: 'entretiens_incident_weak'
       },
       {
         id: 'c',
         text: "On n'a jamais eu d'incident, donc on n'a pas formalisé de procédure.",
-        shortText: "Pas de procédure",
+        shortText: "Jamais eu d'incident, pas de procédure formalisée",
         effect: { trust: -20, evidence: -20 },
         nextNode: 'entretiens_incident_missing'
       }
@@ -2640,7 +2640,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Notre registre recense 3 incidents mineurs sur 18 mois : un faux positif de fraude, un bug d'affichage, une latence anormale. Aucun n'a nécessité de notification externe. Voici les analyses post-incident.",
-        shortText: "Registre avec incidents documentés",
+        shortText: "3 incidents mineurs en 18 mois, tous analysés. Voici le registre",
         requiresDocument: 'registre_incidents',
         effect: { trust: 20, evidence: 15 },
         nextNode: 'cloture_start',
@@ -2649,7 +2649,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "Le registre est vide. On n'a vraiment pas eu d'incident.",
-        shortText: "Registre vide",
+        shortText: "Le registre est vide, on n'a vraiment pas eu d'incident",
         effect: { trust: -10, evidence: -5 },
         nextNode: 'entretiens_incident_empty'
       }
@@ -2688,14 +2688,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Oui, nous avons des alertes automatiques sur les métriques clés : taux de rejet anormalement élevé, temps de réponse, disparités statistiques.",
-        shortText: "Monitoring en place",
+        shortText: "Oui, alertes automatiques sur les métriques clés",
         effect: { trust: 10, evidence: 10 },
         nextNode: 'cloture_start'
       },
       {
         id: 'b',
         text: "Pas de système automatisé. On compte sur les remontées des utilisateurs.",
-        shortText: "Détection manuelle",
+        shortText: "Pas de système auto, on compte sur les remontées utilisateurs",
         effect: { trust: -10 },
         nextNode: 'cloture_start'
       }
@@ -2725,7 +2725,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Notre auto-évaluation identifie trois axes prioritaires : 1) Finaliser les AIPD manquantes sous 60 jours, 2) Renforcer la formation des équipes métier, 3) Améliorer la traçabilité. Voici notre plan d'action chiffré.",
-        shortText: "Lucidité + plan d'action",
+        shortText: "3 axes : AIPD sous 60j, formation, traçabilité. Voici le plan",
         effect: { trust: 25, evidence: 20 },
         nextNode: 'cloture_self_approved',
         isOptimal: true
@@ -2733,14 +2733,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On sait qu'on doit améliorer la documentation. C'est en cours.",
-        shortText: "Conscience partielle",
+        shortText: "La documentation à améliorer. C'est en cours",
         effect: { trust: 5, evidence: 5 },
         nextNode: 'cloture_partial'
       },
       {
         id: 'c',
         text: "Je pense qu'on est plutôt bien. On attend vos retours.",
-        shortText: "Pas de recul critique",
+        shortText: "On est plutôt bien. On attend vos retours",
         effect: { trust: -20, evidence: -10 },
         nextNode: 'cloture_no_awareness'
       }
@@ -2790,7 +2790,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'a',
         text: "Nous avons mis en place : veille réglementaire via alertes et cabinet spécialisé, revues trimestrielles du registre, budget formation sanctuarisé, audits internes annuels. Prochaine revue dans 6 semaines.",
-        shortText: "Organisation pérenne",
+        shortText: "Veille réglementaire, revues trimestrielles, audits annuels",
         effect: { trust: 20, evidence: 15 },
         nextNode: 'cloture_future_approved',
         isOptimal: true
@@ -2798,14 +2798,14 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
       {
         id: 'b',
         text: "On suit les newsletters et on réagira si nécessaire.",
-        shortText: "Veille passive",
+        shortText: "On suit les newsletters et on réagira si nécessaire",
         effect: { trust: -10 },
         nextNode: 'cloture_passive'
       },
       {
         id: 'c',
         text: "Le règlement est encore jeune, on verra comment ça évolue.",
-        shortText: "Attentisme",
+        shortText: "Le règlement est jeune, on verra comment ça évolue",
         effect: { trust: -20, evidence: -10 },
         nextNode: 'cloture_attentisme'
       }
