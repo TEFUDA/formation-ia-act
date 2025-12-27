@@ -2340,6 +2340,21 @@ export default function LandingPage() {
               Pas de théorie creuse. Des <span className="text-white font-bold">outils prêts à l'emploi</span>, 
               des <span className="text-white font-bold">stratégies testées</span>, et la <span className="text-white font-bold">confiance</span> d'être prêt pour n'importe quel contrôle.
             </p>
+            
+            {/* Pitch en 1 phrase */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="mt-8 inline-block"
+            >
+              <div className="bg-gradient-to-r from-[#8B5CF6]/20 via-[#00F5FF]/20 to-[#00FF88]/20 border border-white/20 rounded-2xl px-8 py-5">
+                <p className="text-lg sm:text-xl text-white font-medium">
+                  📣 <span className="text-[#FFB800] font-bold">La seule formation</span> où vous construisez <span className="text-[#00FF88] font-bold">VOTRE</span> conformité AI Act pendant que vous apprenez,
+                  <br className="hidden sm:block" /> avec des <span className="text-[#00F5FF] font-bold">outils intégrés</span> et des <span className="text-[#00F5FF] font-bold">vidéos de correction</span>.
+                </p>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* TRANSFORMATION AVANT/APRÈS */}
@@ -3694,12 +3709,10 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Scary stats row */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-[#FF4444]/30">
+                {/* Scary stats row - SIMPLIFIÉ */}
+                <div className="flex flex-wrap justify-center gap-6 mt-8 pt-8 border-t border-[#FF4444]/30">
                   {[
-                    { value: "150M€", label: "d'amendes RGPD en France en 2024", icon: "💸" },
                     { value: "89%", label: "des entreprises ne sont PAS prêtes", icon: "😰" },
-                    { value: "3 ans", label: "de prison pour les dirigeants", icon: "⛓️" },
                     { value: "24h", label: "pour stopper vos systèmes IA", icon: "🛑" },
                   ].map((stat, i) => (
                     <motion.div 
@@ -3708,7 +3721,7 @@ export default function LandingPage() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className="text-center p-4 bg-black/30 rounded-lg"
+                      className="text-center p-4 bg-black/30 rounded-lg min-w-[160px]"
                     >
                       <span className="text-2xl">{stat.icon}</span>
                       <p className="text-[#FF4444] font-black text-xl mt-1">{stat.value}</p>
@@ -3720,51 +3733,23 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
 
-          {/* FEAR AMPLIFICATION - Ce qui va vous arriver */}
+          {/* FEAR - Version simplifiée en une ligne */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             whileInView={{ opacity: 1, y: 0 }} 
             viewport={{ once: true }}
             className="mb-12"
           >
-            <h3 className="text-2xl font-bold text-center mb-8">
-              <span className="text-[#FF4444]">Ce qui arrive</span> aux entreprises non conformes :
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="flex flex-wrap justify-center gap-4 text-center">
               {[
-                { 
-                  icon: "💀", 
-                  title: "Fermeture immédiate", 
-                  desc: "Vos systèmes IA peuvent être stoppés sous 24h par les autorités. Plus de chatbot, plus de scoring, plus d'automatisation. Votre business s'arrête.",
-                  color: "#FF4444"
-                },
-                { 
-                  icon: "📰", 
-                  title: "Humiliation publique", 
-                  desc: "Votre nom sera publié sur la liste noire des entreprises sanctionnées. Vos clients, investisseurs et partenaires le sauront. Votre réputation sera détruite.",
-                  color: "#FF6B00"
-                },
-                { 
-                  icon: "⚖️", 
-                  title: "Responsabilité personnelle", 
-                  desc: "En tant que dirigeant, VOUS êtes personnellement responsable. Amendes, interdiction de gérer, voire poursuites pénales. Votre patrimoine personnel est en jeu.",
-                  color: "#FFB800"
-                },
+                { icon: "💀", text: "Fermeture immédiate", color: "#FF4444" },
+                { icon: "📰", text: "Humiliation publique", color: "#FF6B00" },
+                { icon: "⚖️", text: "Responsabilité personnelle", color: "#FFB800" },
               ].map((item, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ scale: 1.02, y: -5 }}
-                >
-                  <div className="h-full p-6 bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl hover:border-[#FF4444]/50 transition-all">
-                    <span className="text-5xl">{item.icon}</span>
-                    <h4 className="text-xl font-bold mt-4 mb-2" style={{ color: item.color }}>{item.title}</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </motion.div>
+                <div key={i} className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-white/80 text-sm font-medium">{item.text}</span>
+                </div>
               ))}
             </div>
           </motion.div>
