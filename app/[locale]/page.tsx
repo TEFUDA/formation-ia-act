@@ -2660,8 +2660,8 @@ export default function LandingPage() {
                     </div>
 
                     <div className="absolute -bottom-4 -right-4 bg-[#0A0A1B] border border-[#FF6B00]/30 rounded-xl p-3">
-                      <p className="text-[#FF6B00] font-bold text-lg">4 400+ lignes</p>
-                      <p className="text-white/40 text-xs">de code dédié</p>
+                      <p className="text-[#FF6B00] font-bold text-lg">120+ scénarios</p>
+                      <p className="text-white/40 text-xs">d'audit réalistes</p>
                     </div>
                   </div>
                 </div>
