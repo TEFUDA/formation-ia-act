@@ -2777,44 +2777,6 @@ export default function LandingPage() {
               ))}
             </div>
           </motion.div>
-                      "Peur panique à l'idée d'un contrôle",
-                      "Nuits blanches à penser aux amendes",
-                      "Équipe dans le flou total"
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-white/70">
-                        <span className="text-[#FF4444] mt-1">✗</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* APRÈS */}
-              <div className="relative">
-                <div className="absolute -top-4 left-4 bg-[#00FF88] text-black text-sm font-bold px-4 py-1 rounded-full z-10">
-                  🚀 APRÈS la formation
-                </div>
-                <div className="p-6 bg-gradient-to-br from-[#00FF88]/10 to-transparent border border-[#00FF88]/30 rounded-2xl h-full">
-                  <ul className="space-y-4 mt-4">
-                    {[
-                      "Clarté totale sur vos obligations",
-                      "Registre IA complet et à jour",
-                      "Documentation prête pour l'audit",
-                      "Confiance absolue face aux contrôles",
-                      "Tranquillité d'esprit retrouvée",
-                      "Équipe formée et autonome"
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-white">
-                        <span className="text-[#00FF88] mt-1">✓</span>
-                        <span className="font-medium">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </motion.div>
 
           {/* CE QUE VOUS ALLEZ MAÎTRISER */}
           <motion.div 
