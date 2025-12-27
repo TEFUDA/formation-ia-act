@@ -205,26 +205,26 @@ export default function QualiopiPage() {
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="bg-white/5 rounded-xl p-6 text-center border border-white/10">
                     <p className="text-white/40 text-sm mb-2">Pack Solo</p>
-                    <p className="text-2xl font-bold text-white mb-4">4 900€ HT</p>
+                    <p className="text-2xl font-bold text-white mb-4">4 990€ HT</p>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-white/60">
                         <span>OPCO (50%)</span>
-                        <span className="text-[#00FF88]">-2 450€</span>
+                        <span className="text-[#00FF88]">-2 495€</span>
                       </div>
                       <div className="h-px bg-white/10" />
                       <div className="flex justify-between font-bold">
                         <span>Reste à charge</span>
-                        <span className="text-[#00FF88]">2 450€</span>
+                        <span className="text-[#00FF88]">2 495€</span>
                       </div>
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-[#00FF88]/10 to-[#00F5FF]/10 rounded-xl p-6 text-center border-2 border-[#00FF88]/30">
                     <p className="text-[#00FF88] text-sm mb-2 font-medium">Pack Équipe ⭐</p>
-                    <p className="text-2xl font-bold text-white mb-4">19 500€ HT</p>
+                    <p className="text-2xl font-bold text-white mb-4">9 990€ HT</p>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-white/60">
                         <span>OPCO (100%)</span>
-                        <span className="text-[#00FF88]">-19 500€</span>
+                        <span className="text-[#00FF88]">-9 990€</span>
                       </div>
                       <div className="h-px bg-white/10" />
                       <div className="flex justify-between font-bold">
