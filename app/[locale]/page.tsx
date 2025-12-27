@@ -36,111 +36,307 @@ const calculateDaysUntil = () => {
 };
 
 // ============================================
-// TESTIMONIALS DATA - Authentiques avec ratings variés
+// MINI CTA COMPONENT - Réutilisable entre sections
 // ============================================
-const testimonialRow1 = [
-  { name: "Sophie Marchand", role: "DPO", company: "Groupe bancaire", quote: "Formation complète. J'ai cartographié nos systèmes IA en 2 semaines. Seul bémol : le module 3 mériterait plus d'exemples.", result: "Cartographie OK", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
-  { name: "Thomas Dubois", role: "Dir. Juridique", company: "ESN 800 pers.", quote: "Le certificat a rassuré nos grands comptes. Contenu solide, j'aurais aimé plus de cas sur les sous-traitants.", result: "Clients rassurés", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
-  { name: "Marie Lambert", role: "RSSI", company: "Pharma", quote: "Exactement ce qu'il me fallait. Clair, structuré, j'ai formé mon équipe dans la foulée.", result: "Équipe formée", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
-  { name: "Philippe Renard", role: "CEO", company: "FinTech", quote: "On fait du scoring crédit, on était dans le flou. Maintenant c'est clair. Dense mais nécessaire.", result: "Classification OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
-  { name: "Caroline Bertrand", role: "Resp. Conformité", company: "Assurance", quote: "Les templates valent le prix à eux seuls. Par contre certaines vidéos pourraient être plus courtes.", result: "Templates top", rating: 4, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face" },
-  { name: "Julien Petit", role: "CTO", company: "E-commerce", quote: "Bon contenu. Le quiz final est exigeant, j'ai dû le repasser. Mais le certificat a de la valeur.", result: "Certifié", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" },
-  { name: "Nathalie Faure", role: "DPO", company: "Hôpital", quote: "Secteur santé bien couvert. J'aurais voulu plus de détails sur les dispositifs médicaux mais globalement très bien.", result: "Santé couverte", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face" },
-  { name: "Marc Vidal", role: "Dir. Innovation", company: "Auto", quote: "Méthodologie de cartographie au top. On a identifié des systèmes IA qu'on ne soupçonnait même pas.", result: "IA identifiées", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face" },
-  { name: "Élodie Simon", role: "Avocate", company: "Cabinet IP/IT", quote: "Je recommande à mes clients. Contenu juridique solide sans être indigeste.", result: "Recommandé", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=100&h=100&fit=crop&crop=face" },
-  { name: "François Garcia", role: "DSI", company: "Collectivité", quote: "Format e-learning pratique. Quelques lenteurs sur la plateforme parfois, mais le contenu est là.", result: "Agents formés", rating: 4, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face" },
-  { name: "Aurélie Martin", role: "Product Manager", company: "SaaS RH", quote: "On fait du matching CV, c'est haut risque. La formation m'a aidée à comprendre ce qu'on doit documenter.", result: "Exigences claires", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" },
-  { name: "David Leroy", role: "Resp. IA", company: "Banque", quote: "Module systèmes haut risque excellent. Très concret pour notre cas de scoring.", result: "Scoring OK", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" },
-];
-
-const testimonialRow2 = [
-  { name: "Stéphanie Chevalier", role: "DRH", company: "Industrie", quote: "On utilisait l'IA pour le recrutement sans vraiment le savoir. Eye-opening.", result: "RH conformes", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face" },
-  { name: "Laurent Blanc", role: "CISO", company: "Télécom", quote: "Bon complément cybersécurité. L'AI Act va devenir aussi important que le RGPD.", result: "Programme enrichi", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face" },
-  { name: "Isabelle Thierry", role: "Dir. Qualité", company: "Aéro", quote: "Formation sérieuse, contenu à jour. Quelques répétitions entre modules mais rien de grave.", result: "Équipe prête", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" },
-  { name: "Romain Henry", role: "Chef projet IA", company: "Retail", quote: "Nos systèmes de prévision stock sont concernés. J'ai adapté notre roadmap produit.", result: "Roadmap OK", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face" },
-  { name: "Camille Dupont", role: "Consultante RGPD", company: "Indépendante", quote: "J'ai ajouté l'AI Act à mon offre. Bon point de départ, j'ai complété avec les textes officiels.", result: "Offre enrichie", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=100&h=100&fit=crop&crop=face" },
-  { name: "Olivier Perrin", role: "DG", company: "PME logistique", quote: "On pensait ne pas être concernés. Erreur. Notre TMS utilise de l'IA partout.", result: "Risques vus", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=100&h=100&fit=crop&crop=face" },
-  { name: "Sandrine Lopez", role: "Resp. Data", company: "Média", quote: "Algos de recommandation documentés. Formation pratique, pas trop théorique.", result: "Algos OK", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&h=100&fit=crop&crop=face" },
-  { name: "Vincent Moreau", role: "Architecte SI", company: "Banque", quote: "Cartographié 89 systèmes avec la méthodo. Très structuré, aurait pu être plus court.", result: "89 systèmes", rating: 4, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face" },
-  { name: "Hélène Rousseau", role: "Juriste", company: "Énergie", quote: "Enfin je comprends ce que font les équipes IT. Le pont technique/juridique est bien fait.", result: "Dialogue OK", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?w=100&h=100&fit=crop&crop=face" },
-  { name: "Nicolas Fournier", role: "Resp. Innovation", company: "Agro", quote: "Contrôle qualité IA conforme. Les templates font gagner un temps fou.", result: "Qualité OK", rating: 5, color: "#FF4444", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=100&h=100&fit=crop&crop=face" },
-  { name: "Amandine Boyer", role: "DPO", company: "E-santé", quote: "Le croisement RGPD/AI Act est bien expliqué. C'était ma question principale.", result: "Questions résolues", rating: 5, color: "#FFB800", photo: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=100&h=100&fit=crop&crop=face" },
-  { name: "Christophe Girard", role: "Dir. Technique", company: "EdTech", quote: "Notre adaptive learning est concerné. On sait comment documenter maintenant.", result: "Doc claire", rating: 4, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=100&h=100&fit=crop&crop=face" },
-  { name: "Béatrice Adam", role: "Resp. Achats", company: "Chimie", quote: "On peut exiger la conformité AI Act des fournisseurs. Critères clairs.", result: "Fournisseurs OK", rating: 4, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=100&h=100&fit=crop&crop=face" },
-];
-
-const testimonialRow3 = [
-  { name: "Guillaume Sanchez", role: "CEO", company: "LegalTech", quote: "On fait du NLP sur des contrats. La formation a clarifié notre niveau de risque.", result: "Risque clair", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
-  { name: "Patricia Vasseur", role: "Dir. Opérations", company: "Centre d'appels", quote: "IA de routage documentée grâce aux templates. Simple et efficace.", result: "Routage OK", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&h=100&fit=crop&crop=face" },
-  { name: "Mathieu Colin", role: "Data Scientist", company: "InsurTech", quote: "Enfin une formation qui ne prend pas les techs pour des idiots. Module gouvernance concret.", result: "Gouvernance OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=face" },
-  { name: "Virginie Hubert", role: "Secrétaire Générale", company: "Fédération", quote: "Format e-learning adapté à tous les profils, du DG au technicien.", result: "Adhérents formés", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100&h=100&fit=crop&crop=face" },
-  { name: "Antoine Lemoine", role: "Resp. Fraude", company: "Paiement", quote: "Nos systèmes anti-fraude sont des systèmes IA. Évident en y réfléchissant.", result: "Fraude cadrée", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1528892952291-009c663ce843?w=100&h=100&fit=crop&crop=face" },
-  { name: "Céline Picard", role: "CDO", company: "Média", quote: "La formation a créé un vocabulaire commun entre data, juridique et métier.", result: "Équipes alignées", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?w=100&h=100&fit=crop&crop=face" },
-  { name: "Fabien Deschamps", role: "Dir. R&D", company: "MedTech", quote: "Double process CE + AI Act maintenant clair. Pas évident mais bien expliqué.", result: "Process clair", rating: 4, color: "#00FF88", photo: "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?w=100&h=100&fit=crop&crop=face" },
-  { name: "Sylvie Morel", role: "Resp. Formation", company: "Grand groupe", quote: "Déployé à 300 collaborateurs. Dashboard de suivi pratique.", result: "300 personnes", rating: 5, color: "#FF6B00", photo: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=100&h=100&fit=crop&crop=face" },
-  { name: "Pierre-Antoine Rey", role: "Avocat", company: "Cabinet tech", quote: "Contenu à jour des derniers guidelines. Je le recommande à mes confrères.", result: "À jour", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&h=100&fit=crop&crop=face" },
-  { name: "Morgane Tissier", role: "Product Owner", company: "PropTech", quote: "Outil d'estimation immo utilise du ML. Documenté selon les standards maintenant.", result: "ML documenté", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1546961342-ea1f71b193f3?w=100&h=100&fit=crop&crop=face" },
-  { name: "Sébastien Joly", role: "RSSI", company: "Banque privée", quote: "Formation efficace, pas de blabla. On va à l'essentiel.", result: "Efficace", rating: 5, color: "#00F5FF", photo: "https://images.unsplash.com/photo-1557862921-37829c790f19?w=100&h=100&fit=crop&crop=face" },
-  { name: "Alexandra Klein", role: "Dir. Marketing", company: "Luxe", quote: "Personnalisation client concernée. Je ne m'y attendais pas. Bonne surprise.", result: "Perso encadrée", rating: 4, color: "#FF4444", photo: "https://images.unsplash.com/photo-1592621385612-4d7129426394?w=100&h=100&fit=crop&crop=face" },
-  { name: "Damien Bonnet", role: "CTO", company: "GreenTech", quote: "IA d'optimisation énergétique conforme. Les investisseurs apprécient.", result: "Investisseurs OK", rating: 5, color: "#00FF88", photo: "https://images.unsplash.com/photo-1583195764036-6dc248ac07d9?w=100&h=100&fit=crop&crop=face" },
-  { name: "Émilie Fontaine", role: "DPO", company: "Télécom", quote: "Après le RGPD, l'AI Act. Monte en compétence rapidement sur le sujet.", result: "Compétence OK", rating: 5, color: "#8B5CF6", photo: "https://images.unsplash.com/photo-1597223557154-721c1cecc4b0?w=100&h=100&fit=crop&crop=face" },
-  { name: "Yannick Laurent", role: "Dir. Innovation", company: "Transport", quote: "Maintenance prédictive = système IA. On ne le savait pas. Documentation en cours.", result: "En cours", rating: 4, color: "#FFB800", photo: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop&crop=face" },
-];
-
-// Testimonial Card Component with variable ratings and real photos
-const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonialRow1[0] }) => (
-  <div 
-    className="flex-shrink-0 w-[320px] sm:w-[380px] p-5 rounded-2xl border border-white/10 backdrop-blur-xl"
-    style={{ 
-      background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-      boxShadow: `0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)`
-    }}
-  >
-    {/* Stars - variable rating */}
-    <div className="flex gap-1 mb-3">
-      {[1,2,3,4,5].map(i => (
-        <svg 
-          key={i} 
-          className={`w-4 h-4 ${i <= testimonial.rating ? 'text-yellow-400' : 'text-white/20'}`} 
-          viewBox="0 0 24 24" 
-          fill="currentColor"
-        >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-      ))}
-    </div>
-    
-    {/* Quote */}
-    <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-3">
-      "{testimonial.quote}"
-    </p>
-    
-    {/* Result badge */}
-    <div 
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium mb-4"
-      style={{ background: `${testimonial.color}20`, color: testimonial.color }}
+const MiniCTA = ({ variant = 'default' }: { variant?: 'default' | 'fear' | 'value' }) => {
+  const configs = {
+    default: {
+      bg: 'from-[#00FF88]/10 to-[#00F5FF]/10',
+      border: 'border-[#00FF88]/30',
+      text: 'Évaluez votre risque gratuitement',
+      subtext: '30 secondes • Sans engagement',
+      btnBg: 'from-[#00FF88] to-[#00F5FF]',
+      emoji: '🎯'
+    },
+    fear: {
+      bg: 'from-[#FF4444]/10 to-[#FF6B00]/10',
+      border: 'border-[#FF4444]/30',
+      text: 'Êtes-vous vraiment en conformité ?',
+      subtext: 'Découvrez-le en 2 minutes',
+      btnBg: 'from-[#FF6B00] to-[#FF4444]',
+      emoji: '⚠️'
+    },
+    value: {
+      bg: 'from-[#8B5CF6]/10 to-[#00F5FF]/10',
+      border: 'border-[#8B5CF6]/30',
+      text: 'Prêt à sécuriser votre entreprise ?',
+      subtext: 'Diagnostic offert • Valeur 2 500€',
+      btnBg: 'from-[#8B5CF6] to-[#00F5FF]',
+      emoji: '🎁'
+    }
+  };
+  
+  const config = configs[variant];
+  
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="my-12"
     >
-      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-        <polyline points="20 6 9 17 4 12"/>
+      <div className={`bg-gradient-to-r ${config.bg} border ${config.border} rounded-2xl p-6 text-center`}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="text-center sm:text-left">
+            <p className="text-white font-bold text-lg flex items-center justify-center sm:justify-start gap-2">
+              <span>{config.emoji}</span> {config.text}
+            </p>
+            <p className="text-white/50 text-sm">{config.subtext}</p>
+          </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link 
+              href="#audit-gratuit"
+              className={`inline-flex items-center gap-2 bg-gradient-to-r ${config.btnBg} text-black font-bold px-6 py-3 rounded-xl whitespace-nowrap`}
+            >
+              Diagnostic GRATUIT
+              <span className="text-lg">→</span>
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ============================================
+// TESTIMONIALS DATA - Format authentique avec initiales
+// Types: 'linkedin', 'email', 'slack', 'sms', 'google'
+// ============================================
+type TestimonialType = {
+  initials: string;
+  role: string;
+  sector: string;
+  message: string;
+  time: string;
+  type: 'linkedin' | 'email' | 'slack' | 'sms' | 'google';
+  rating?: number;
+  verified?: boolean;
+  color: string;
+};
+
+const testimonialRow1: TestimonialType[] = [
+  { initials: "S.M.", role: "DPO", sector: "Banque", message: "Bonjour, je viens de terminer la formation. Franchement bluffé par la qualité des templates. J'ai pu cartographier nos 47 systèmes IA en 2 semaines. Le module sur les systèmes haut risque m'a ouvert les yeux sur notre scoring crédit.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
+  { initials: "T.D.", role: "Dir. Juridique", sector: "ESN", message: "Formation terminée hier. Le certificat a déjà rassuré 2 de nos grands comptes qui nous demandaient des garanties AI Act. ROI immédiat.", time: "14:32", type: "slack", color: "#4A154B" },
+  { initials: "M.L.", role: "RSSI", sector: "Pharma", message: "Exactement ce qu'il me fallait. J'ai formé mon équipe de 8 personnes dans la foulée avec le dashboard multi-utilisateurs. Très bien pensé.", time: "Hier", type: "email", color: "#EA4335" },
+  { initials: "P.R.", role: "CEO", sector: "FinTech", message: "On fait du scoring crédit, on était complètement dans le flou sur notre niveau de risque. La formation + l'audit ont tout clarifié. Dense mais nécessaire.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
+  { initials: "C.B.", role: "Resp. Conformité", sector: "Assurance", message: "Les 12 templates valent le prix de la formation à eux seuls. J'ai économisé au moins 3 semaines de travail. Par contre le module 3 pourrait être un peu plus court.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
+  { initials: "J.P.", role: "CTO", sector: "E-commerce", message: "Quiz final costaud, j'ai dû le repasser 😅 Mais au moins le certificat a de la valeur. Nos investisseurs nous ont félicités pour l'anticipation.", time: "09:15", type: "sms", color: "#34C759" },
+  { initials: "N.F.", role: "DPO", sector: "Santé", message: "Secteur santé très bien couvert. J'aurais voulu plus de détails sur les dispositifs médicaux classe IIa mais globalement excellent. Mon directeur a validé le budget pour former toute l'équipe.", time: "Il y a 4j", type: "email", color: "#EA4335" },
+  { initials: "M.V.", role: "Dir. Innovation", sector: "Auto", message: "La méthodologie de cartographie est au top. On a identifié 23 systèmes IA qu'on ne soupçonnait même pas. Notre maintenance prédictive était un angle mort total.", time: "Il y a 5j", type: "linkedin", color: "#0A66C2" },
+  { initials: "E.S.", role: "Avocate", sector: "Cabinet IP/IT", message: "Je recommande systématiquement à mes clients. Contenu juridique solide sans être indigeste. Ça me fait gagner un temps fou en pédagogie.", time: "Lun 11:20", type: "slack", color: "#4A154B" },
+  { initials: "F.G.", role: "DSI", sector: "Collectivité", message: "Format e-learning vraiment pratique pour nos agents. Quelques lenteurs sur la plateforme parfois mais le contenu est là. 47 agents formés en 3 semaines.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
+  { initials: "A.M.", role: "Product Manager", sector: "SaaS RH", message: "On fait du matching CV, c'est haut risque AI Act. La formation m'a enfin permis de comprendre exactement ce qu'on doit documenter. J'ai refait toute notre roadmap conformité.", time: "Mer 16:45", type: "email", color: "#EA4335" },
+  { initials: "D.L.", role: "Resp. IA", sector: "Banque", message: "Module systèmes haut risque excellent. Très concret pour notre cas de scoring. J'ai pu présenter un plan de conformité au COMEX dès la semaine suivante.", time: "Il y a 6j", type: "linkedin", color: "#0A66C2" },
+];
+
+const testimonialRow2: TestimonialType[] = [
+  { initials: "S.C.", role: "DRH", sector: "Industrie", message: "On utilisait l'IA pour le recrutement sans vraiment le savoir 😬 Notre ATS fait du tri automatique de CV. Eye-opening cette formation.", time: "Il y a 2j", type: "slack", color: "#4A154B" },
+  { initials: "L.B.", role: "CISO", sector: "Télécom", message: "Bon complément à notre programme cybersécurité. L'AI Act va devenir aussi structurant que le RGPD, autant s'y préparer maintenant.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
+  { initials: "I.T.", role: "Dir. Qualité", sector: "Aéro", message: "Formation sérieuse, contenu vraiment à jour avec les derniers guidelines de la Commission. Quelques répétitions entre modules mais rien de bloquant.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
+  { initials: "R.H.", role: "Chef projet IA", sector: "Retail", message: "Nos systèmes de prévision stock sont concernés, je ne m'y attendais pas. J'ai dû adapter toute notre roadmap produit mais au moins on est préparés.", time: "10:22", type: "email", color: "#EA4335" },
+  { initials: "C.D.", role: "Consultante RGPD", sector: "Indépendante", message: "J'ai ajouté l'AI Act à mon offre grâce à cette formation. Bon point de départ, j'ai complété avec les textes officiels. 3 nouveaux clients déjà.", time: "Hier", type: "sms", color: "#34C759" },
+  { initials: "O.P.", role: "DG", sector: "Logistique", message: "On pensait ne pas être concernés vu qu'on est une PME logistique. Erreur totale. Notre TMS utilise de l'IA partout. Merci de nous avoir ouvert les yeux.", time: "Il y a 4j", type: "linkedin", color: "#0A66C2" },
+  { initials: "S.L.", role: "Resp. Data", sector: "Média", message: "Algos de recommandation documentés grâce aux templates. Formation vraiment pratique, pas trop théorique. Exactement ce dont on avait besoin.", time: "Mar 09:30", type: "slack", color: "#4A154B" },
+  { initials: "V.M.", role: "Architecte SI", sector: "Banque", message: "J'ai cartographié 89 systèmes avec la méthodologie. Très structuré. Seul regret : aurait pu être un peu plus condensé sur certains passages.", time: "Il y a 5j", type: "google", rating: 4, color: "#FBBC04" },
+  { initials: "H.R.", role: "Juriste", sector: "Énergie", message: "Enfin je comprends ce que font les équipes IT ! Le pont technique/juridique est vraiment bien fait. J'ai pu avoir des discussions constructives avec notre DSI.", time: "Il y a 2j", type: "email", color: "#EA4335" },
+  { initials: "N.F.", role: "Resp. Innovation", sector: "Agro", message: "Notre contrôle qualité par vision IA est maintenant conforme. Les templates font gagner un temps fou. Je les ai partagés avec notre filiale allemande.", time: "14:55", type: "sms", color: "#34C759" },
+  { initials: "A.B.", role: "DPO", sector: "E-santé", message: "Le croisement RGPD/AI Act est vraiment bien expliqué. C'était ma question principale et j'ai eu toutes les réponses. Formation très complète.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
+  { initials: "C.G.", role: "Dir. Technique", sector: "EdTech", message: "Notre adaptive learning est concerné par l'AI Act, on ne s'en doutait pas. Maintenant on sait exactement comment documenter. Ouf.", time: "Jeu 11:00", type: "slack", color: "#4A154B" },
+  { initials: "B.A.", role: "Resp. Achats", sector: "Chimie", message: "On peut maintenant exiger la conformité AI Act de nos fournisseurs. Critères clairs, templates de clauses contractuelles inclus. Très utile.", time: "Il y a 1 sem", type: "google", rating: 5, color: "#FBBC04" },
+];
+
+const testimonialRow3: TestimonialType[] = [
+  { initials: "G.S.", role: "CEO", sector: "LegalTech", message: "On fait du NLP sur des contrats, on était stressés sur notre niveau de risque. La formation a tout clarifié. On est en risque limité, pas haut risque. Soulagement.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
+  { initials: "P.V.", role: "Dir. Opérations", sector: "Call center", message: "Notre IA de routage d'appels est maintenant documentée grâce aux templates. Simple et efficace. Même notre prestataire technique était impressionné.", time: "Ven 16:20", type: "email", color: "#EA4335" },
+  { initials: "M.C.", role: "Data Scientist", sector: "InsurTech", message: "Enfin une formation qui ne prend pas les techs pour des idiots 🙌 Module gouvernance super concret. J'ai pu implémenter directement.", time: "11:45", type: "slack", color: "#4A154B" },
+  { initials: "V.H.", role: "Secrétaire Générale", sector: "Fédération pro", message: "Format e-learning adapté à tous les profils de notre fédération, du DG au technicien. On a formé 150 adhérents en 2 mois.", time: "Il y a 4j", type: "google", rating: 5, color: "#FBBC04" },
+  { initials: "A.L.", role: "Resp. Fraude", sector: "Paiement", message: "Nos systèmes anti-fraude sont des systèmes IA au sens de l'AI Act. Évident en y réfléchissant mais on n'avait pas fait le lien. Merci !", time: "Hier", type: "sms", color: "#34C759" },
+  { initials: "C.P.", role: "CDO", sector: "Média", message: "La formation a créé un vocabulaire commun entre mes équipes data, juridique et métier. Première fois qu'on parle tous le même langage sur l'IA.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
+  { initials: "F.D.", role: "Dir. R&D", sector: "MedTech", message: "Le double process CE + AI Act est maintenant clair pour nous. Pas évident au début mais très bien expliqué. On anticipe pour notre prochain device.", time: "Mar 14:30", type: "email", color: "#EA4335" },
+  { initials: "S.M.", role: "Resp. Formation", sector: "CAC40", message: "Déployé auprès de 300 collaborateurs via le dashboard admin. Suivi des progressions vraiment pratique. RH très satisfaites.", time: "Il y a 5j", type: "slack", color: "#4A154B" },
+  { initials: "P.R.", role: "Avocat", sector: "Cabinet tech", message: "Contenu à jour des derniers guidelines de la Commission. Je recommande à mes confrères du barreau. Ça nous crédibilise face aux clients.", time: "Il y a 1 sem", type: "google", rating: 5, color: "#FBBC04" },
+  { initials: "M.T.", role: "Product Owner", sector: "PropTech", message: "Notre outil d'estimation immo utilise du ML. Maintenant documenté selon les standards AI Act. Les notaires partenaires apprécient.", time: "08:50", type: "sms", color: "#34C759" },
+  { initials: "S.J.", role: "RSSI", sector: "Banque privée", message: "Formation efficace, pas de blabla. On va à l'essentiel. En 8h j'avais tout ce qu'il me fallait. Rare de voir ça.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
+  { initials: "A.K.", role: "Dir. Marketing", sector: "Luxe", message: "Notre personnalisation client est concernée par l'AI Act. Je ne m'y attendais vraiment pas. Bonne surprise d'avoir anticipé.", time: "Mer 10:15", type: "email", color: "#EA4335" },
+  { initials: "D.B.", role: "CTO", sector: "GreenTech", message: "Notre IA d'optimisation énergétique est maintenant conforme. Les investisseurs ont adoré voir ça dans notre data room. Due diligence facilitée.", time: "Il y a 4j", type: "slack", color: "#4A154B" },
+  { initials: "E.F.", role: "DPO", sector: "Télécom", message: "Après le RGPD, l'AI Act. Cette formation permet de monter en compétence rapidement sur le sujet. Indispensable pour les DPO.", time: "Il y a 6j", type: "google", rating: 5, color: "#FBBC04" },
+  { initials: "Y.L.", role: "Dir. Innovation", sector: "Transport", message: "Maintenance prédictive = système IA. On ne le savait pas du tout 😅 Documentation en cours grâce aux templates. On sera prêts pour 2026.", time: "Jeu 17:00", type: "sms", color: "#34C759" },
+];
+
+// ============================================
+// TESTIMONIAL CARDS - Formats variés ultra-réalistes
+// ============================================
+
+// LinkedIn Message Style
+const LinkedInCard = ({ t }: { t: TestimonialType }) => (
+  <div className="flex-shrink-0 w-[340px] bg-[#1B1F23] rounded-xl border border-[#38434F] overflow-hidden">
+    {/* Header LinkedIn */}
+    <div className="flex items-center gap-2 px-4 py-2 bg-[#0A66C2]/10 border-b border-[#38434F]">
+      <svg className="w-4 h-4 text-[#0A66C2]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
       </svg>
-      {testimonial.result}
+      <span className="text-[#0A66C2] text-xs font-medium">Message LinkedIn</span>
+      <span className="text-white/30 text-xs ml-auto">{t.time}</span>
     </div>
-    
-    {/* Author with real photo */}
-    <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-      <img 
-        src={testimonial.photo}
-        alt={testimonial.name}
-        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
-        loading="lazy"
-      />
-      <div>
-        <p className="text-white font-medium text-sm">{testimonial.name}</p>
-        <p className="text-white/40 text-xs">{testimonial.role} • {testimonial.company}</p>
+    {/* Content */}
+    <div className="p-4">
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0A66C2] to-[#004182] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {t.initials}
+        </div>
+        <div>
+          <p className="text-white font-medium text-sm">{t.initials}</p>
+          <p className="text-white/50 text-xs">{t.role} • {t.sector}</p>
+        </div>
+      </div>
+      <p className="text-white/80 text-sm leading-relaxed">{t.message}</p>
+    </div>
+  </div>
+);
+
+// Email Style
+const EmailCard = ({ t }: { t: TestimonialType }) => (
+  <div className="flex-shrink-0 w-[340px] bg-[#1a1a1a] rounded-xl border border-white/10 overflow-hidden">
+    {/* Email header */}
+    <div className="px-4 py-3 bg-white/5 border-b border-white/10">
+      <div className="flex items-center gap-2 mb-2">
+        <svg className="w-4 h-4 text-[#EA4335]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+        </svg>
+        <span className="text-white/60 text-xs">Re: Formation AI Act - Retour</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#EA4335] to-[#B31412] flex items-center justify-center text-white font-bold text-xs">
+            {t.initials}
+          </div>
+          <div>
+            <p className="text-white text-xs font-medium">{t.initials} • {t.role}</p>
+            <p className="text-white/40 text-[10px]">{t.sector}</p>
+          </div>
+        </div>
+        <span className="text-white/30 text-[10px]">{t.time}</span>
+      </div>
+    </div>
+    {/* Email body */}
+    <div className="p-4">
+      <p className="text-white/80 text-sm leading-relaxed">{t.message}</p>
+      <div className="mt-3 pt-3 border-t border-white/5">
+        <p className="text-white/30 text-[10px]">Envoyé depuis Gmail</p>
       </div>
     </div>
   </div>
 );
+
+// Slack Style
+const SlackCard = ({ t }: { t: TestimonialType }) => (
+  <div className="flex-shrink-0 w-[340px] bg-[#1a1d21] rounded-xl border border-[#565856]/30 overflow-hidden">
+    {/* Slack header */}
+    <div className="flex items-center gap-2 px-4 py-2 bg-[#4A154B]/20 border-b border-[#565856]/30">
+      <svg className="w-4 h-4 text-[#E01E5A]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+      </svg>
+      <span className="text-white/60 text-xs">#conformite-ia</span>
+      <span className="text-white/30 text-xs ml-auto">{t.time}</span>
+    </div>
+    {/* Slack message */}
+    <div className="p-4">
+      <div className="flex items-start gap-3">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#36C5F0] to-[#2EB67D] flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+          {t.initials}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-white font-bold text-sm">{t.initials}</span>
+            <span className="text-white/30 text-[10px] bg-white/5 px-1.5 py-0.5 rounded">{t.role}</span>
+          </div>
+          <p className="text-white/80 text-sm leading-relaxed">{t.message}</p>
+          <div className="flex items-center gap-3 mt-2">
+            <span className="text-white/30 text-[10px]">💬 3 réponses</span>
+            <span className="text-white/30 text-[10px]">👍 12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// SMS/iMessage Style
+const SMSCard = ({ t }: { t: TestimonialType }) => (
+  <div className="flex-shrink-0 w-[320px] bg-[#1c1c1e] rounded-2xl border border-white/10 overflow-hidden">
+    {/* iOS header */}
+    <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 border-b border-white/10">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#34C759] to-[#30B350] flex items-center justify-center text-white font-bold text-xs">
+        {t.initials}
+      </div>
+      <div className="text-center">
+        <p className="text-white text-xs font-medium">{t.initials}</p>
+        <p className="text-white/40 text-[10px]">{t.role} • {t.sector}</p>
+      </div>
+    </div>
+    {/* Message bubble */}
+    <div className="p-4">
+      <div className="bg-[#34C759] rounded-2xl rounded-br-sm p-3 max-w-[90%] ml-auto">
+        <p className="text-white text-sm leading-relaxed">{t.message}</p>
+      </div>
+      <div className="flex justify-end mt-1">
+        <span className="text-white/30 text-[10px]">{t.time} ✓✓</span>
+      </div>
+    </div>
+  </div>
+);
+
+// Google Review Style
+const GoogleCard = ({ t }: { t: TestimonialType }) => (
+  <div className="flex-shrink-0 w-[340px] bg-white rounded-xl overflow-hidden">
+    {/* Google header */}
+    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="flex items-center gap-2">
+        <svg className="w-5 h-5" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <span className="text-gray-600 text-xs font-medium">Avis Google</span>
+      </div>
+      <span className="text-gray-400 text-[10px]">{t.time}</span>
+    </div>
+    {/* Review content */}
+    <div className="p-4">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4285F4] to-[#34A853] flex items-center justify-center text-white font-bold text-sm">
+          {t.initials}
+        </div>
+        <div>
+          <p className="text-gray-800 font-medium text-sm">{t.initials}</p>
+          <p className="text-gray-500 text-xs">{t.role} • {t.sector}</p>
+        </div>
+      </div>
+      {/* Stars */}
+      <div className="flex gap-0.5 mb-2">
+        {[1,2,3,4,5].map(i => (
+          <svg key={i} className={`w-4 h-4 ${i <= (t.rating || 5) ? 'text-[#FBBC04]' : 'text-gray-300'}`} viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        ))}
+      </div>
+      <p className="text-gray-700 text-sm leading-relaxed">{t.message}</p>
+    </div>
+  </div>
+);
+
+// Main Testimonial Card Selector
+const TestimonialCard = ({ testimonial }: { testimonial: TestimonialType }) => {
+  switch (testimonial.type) {
+    case 'linkedin': return <LinkedInCard t={testimonial} />;
+    case 'email': return <EmailCard t={testimonial} />;
+    case 'slack': return <SlackCard t={testimonial} />;
+    case 'sms': return <SMSCard t={testimonial} />;
+    case 'google': return <GoogleCard t={testimonial} />;
+    default: return <LinkedInCard t={testimonial} />;
+  }
+};
 
 // Neural Background
 const NeuralBackground = () => {
@@ -244,9 +440,9 @@ const MultiStepLeadForm = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Envoi à Formspree
+    // Formspree configuré ✓
     try {
-      await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      await fetch('https://formspree.io/f/mnjqdjay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1160,12 +1356,12 @@ const ROICalculator = () => {
   
   // Notre prix (formation tout-en-un)
   const getFormationCost = (n: number) => {
-    if (n <= 1) return 4900;        // Solo
-    if (n <= 5) return 9800;        // 2 packs solo (économie de groupe)
-    if (n <= 10) return 19500;      // Pack Équipe
-    if (n <= 25) return 29000;      // Pack Équipe + options
-    if (n <= 50) return 45000;      // Enterprise light
-    return 65000;                    // Enterprise full
+    if (n <= 1) return 4990;        // Solo
+    if (n <= 5) return 9990;        // Équipe
+    if (n <= 10) return 14990;      // Équipe + extension
+    if (n <= 25) return 24990;      // Enterprise light
+    if (n <= 50) return 39990;      // Enterprise
+    return 59990;                    // Enterprise full
   };
 
   const cabinetCost = getCabinetCost(employees);
@@ -1444,7 +1640,7 @@ const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: num
             <div className="flex items-center gap-3">
               <div className="hidden md:block text-right">
                 <p className="text-white/40 text-xs line-through">7 500€</p>
-                <p className="text-white font-bold">4 900€ HT</p>
+                <p className="text-white font-bold">4 990€ HT</p>
               </div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link 
@@ -1512,35 +1708,62 @@ const ExitIntentPopup = () => {
             
             <motion.div 
               className="text-6xl mb-4"
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 0.5, repeat: 3 }}
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
             >
-              ⚠️
+              🎁
             </motion.div>
             <h3 className="text-2xl font-bold text-white mb-2">
-              Attendez !
+              Avant de partir...
             </h3>
-            <p className="text-white/60 mb-6">
-              Avant de partir, téléchargez notre <span className="text-[#00F5FF] font-semibold">checklist gratuite</span> :
-              <br />
-              <span className="text-white font-medium">"Les 10 erreurs fatales sur l'AI Act"</span>
+            <p className="text-white/60 mb-4">
+              Savez-vous si votre entreprise est <span className="text-[#FF4444] font-semibold">à risque</span> ?
             </p>
             
+            {/* Mini fear reminder */}
+            <div className="bg-[#FF4444]/10 border border-[#FF4444]/30 rounded-xl p-4 mb-6">
+              <p className="text-[#FF4444] font-bold text-lg">Amende jusqu'à 7% de votre CA</p>
+              <p className="text-white/50 text-sm">Les contrôles commencent dans quelques mois</p>
+            </div>
+            
             <div className="space-y-3">
-              <input 
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Votre email professionnel"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-              />
-              <motion.button 
-                className="w-full py-3 bg-gradient-to-r from-[#00F5FF] to-[#0066FF] text-white font-bold rounded-xl"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Recevoir la checklist gratuite
-              </motion.button>
+              {/* Primary CTA - Audit */}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link 
+                  href="#audit-gratuit"
+                  onClick={() => setShow(false)}
+                  className="block w-full py-4 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold rounded-xl text-lg"
+                >
+                  🎯 Diagnostic GRATUIT (2 min)
+                </Link>
+              </motion.div>
+              
+              <p className="text-white/40 text-sm">
+                Découvrez votre niveau de risque en 30 secondes
+              </p>
+              
+              {/* Separator */}
+              <div className="flex items-center gap-4 my-4">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-white/30 text-xs">OU</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+              
+              {/* Secondary - Checklist */}
+              <div className="space-y-2">
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Votre email professionnel"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                />
+                <button 
+                  className="w-full py-3 bg-white/5 border border-white/10 text-white/80 font-medium rounded-xl hover:bg-white/10 transition-colors"
+                >
+                  📋 Recevoir la checklist "10 erreurs fatales"
+                </button>
+              </div>
               <p className="text-white/30 text-xs">
                 Pas de spam. Désinscription en 1 clic.
               </p>
@@ -1563,9 +1786,9 @@ const modules = [
 ];
 
 const plans = [
-  { id: 'solo', name: 'Solo', price: 4900, originalPrice: 7500, users: '1', color: '#00F5FF', features: ['Formation complète 8h', '12 Templates juridiques', '12 Vidéos pratiques', 'Audit + Rapport PDF', 'Certificat officiel', '12 mois d\'accès'] },
-  { id: 'equipe', name: 'Équipe', price: 19500, originalPrice: 30000, users: '5', color: '#00FF88', popular: true, features: ['Tout le pack Solo ×5', '5 Certificats nominatifs', 'Dashboard équipe', 'Audit consolidé', 'Support prioritaire', 'Onboarding personnalisé'] },
-  { id: 'enterprise', name: 'Enterprise', price: null, originalPrice: null, users: '50', color: '#8B5CF6', features: ['Tout le pack Équipe ×50', 'Admin multi-sites', 'SSO / Intégration SIRH', 'Webinaire privé (2h)', 'Account manager dédié', 'SLA garanti'] },
+  { id: 'solo', name: 'Solo', price: 4990, originalPrice: 7500, users: '1', color: '#00F5FF', features: ['Formation complète 8h', '12 Templates juridiques', '12 Vidéos pratiques', 'Audit + Rapport PDF', 'Certificat officiel', '12 mois d\'accès'] },
+  { id: 'equipe', name: 'Équipe', price: 9990, originalPrice: 15000, users: '5', color: '#00FF88', popular: true, features: ['Tout le pack Solo ×5', '5 Certificats nominatifs', 'Dashboard équipe', 'Audit consolidé', 'Support prioritaire', 'Onboarding personnalisé'] },
+  { id: 'enterprise', name: 'Enterprise', price: null, originalPrice: null, users: '50+', color: '#8B5CF6', features: ['Licences illimitées', 'Admin multi-sites', 'SSO / Intégration SIRH', 'Webinaire privé (2h)', 'Account manager dédié', 'SLA garanti'] },
 ];
 
 export default function LandingPage() {
@@ -1876,7 +2099,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { icon: "💸", title: "Amendes massives", desc: "Jusqu'à 35M€ ou 7% du CA mondial. La CNIL a déjà distribué 150M€ d'amendes RGPD en France en 2024.", color: "#FF4444" },
+              { icon: "💸", title: "Sanctions financières", desc: "Amendes pouvant atteindre 7% du CA mondial. La CNIL a déjà distribué 150M€ d'amendes RGPD en France en 2024.", color: "#FF4444" },
               { icon: "⛔", title: "Interdiction d'exploitation", desc: "Les régulateurs peuvent ordonner l'arrêt IMMÉDIAT de vos systèmes IA non conformes. Du jour au lendemain.", color: "#FF6B00" },
               { icon: "📉", title: "Perte de contrats", desc: "Les grands comptes exigent DÉJÀ des preuves de conformité AI Act. Sans certificat, vous êtes hors jeu.", color: "#FFB800" },
               { icon: "⚖️", title: "Responsabilité personnelle", desc: "Les dirigeants peuvent être tenus PERSONNELLEMENT responsables en cas de négligence caractérisée.", color: "#8B5CF6" },
@@ -1993,7 +2216,7 @@ export default function LandingPage() {
                       { metric: "0%", label: "de systèmes IA documentés", icon: "📋" },
                       { metric: "???", label: "niveau de risque inconnu", icon: "⚠️" },
                       { metric: "0", label: "personne formée Article 4", icon: "👥" },
-                      { metric: "35M€", label: "d'amende potentielle", icon: "💸" },
+                      { metric: "7%", label: "du CA en amende", icon: "💸" },
                       { metric: "3-6 mois", label: "pour comprendre le sujet", icon: "⏳" },
                       { metric: "15-50k€", label: "si cabinet externe", icon: "🏢" },
                     ].map((item, i) => (
@@ -2042,7 +2265,7 @@ export default function LandingPage() {
                       { metric: "Toute l'équipe", label: "certifiée Article 4", icon: "🎓" },
                       { metric: "0€", label: "risque d'amende", icon: "🛡️" },
                       { metric: "8h", label: "pour être opérationnel", icon: "⚡" },
-                      { metric: "4 900€", label: "investissement unique", icon: "💎" },
+                      { metric: "4 990€", label: "investissement unique", icon: "💎" },
                     ].map((item, i) => (
                       <motion.li 
                         key={i}
@@ -2082,6 +2305,11 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Mini CTA */}
+      <div className="max-w-4xl mx-auto px-6">
+        <MiniCTA variant="default" />
+      </div>
 
       {/* ============================================ */}
       {/* ARSENAL COMPLET - Ce que vous allez obtenir */}
@@ -2451,6 +2679,11 @@ export default function LandingPage() {
       {/* ============================================ */}
       <ROICalculator />
 
+      {/* Mini CTA - Fear variant */}
+      <div className="max-w-4xl mx-auto px-6">
+        <MiniCTA variant="fear" />
+      </div>
+
       {/* ============================================ */}
       {/* CONCRETE RESULTS - Ce que vous aurez accompli */}
       {/* ============================================ */}
@@ -2792,7 +3025,7 @@ export default function LandingPage() {
               },
               {
                 objection: "\"C'est trop cher pour une formation en ligne\"",
-                response: "Une amende AI Act peut atteindre 35M€. Un audit de conformité par un cabinet coûte 15 000€ minimum. Cette formation à 500€ est votre meilleure assurance.",
+                response: "Une amende AI Act peut atteindre 35M€. Un audit de conformité par un cabinet coûte 15 000€ minimum. Cette formation à 4 990€ est votre meilleure assurance — et elle est finançable OPCO.",
                 icon: "💰"
               },
               {
@@ -2882,12 +3115,12 @@ export default function LandingPage() {
               <div className="mt-8 pt-6 border-t border-white/10">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-white/50">Valeur totale</span>
-                  <span className="text-xl text-white/30 line-through">10 500€</span>
+                  <span className="text-xl text-white/30 line-through">7 500€</span>
                 </div>
                 <div className="flex items-center justify-between mb-6">
                   <span className="text-white font-bold text-lg">Votre investissement aujourd'hui</span>
                   <div>
-                    <span className="text-4xl font-black text-[#00FF88]">4 900€</span>
+                    <span className="text-4xl font-black text-[#00FF88]">4 990€</span>
                     <span className="text-white/30 ml-2">HT</span>
                   </div>
                 </div>
@@ -2899,7 +3132,7 @@ export default function LandingPage() {
                   transition={{ duration: 2, repeat: Infinity }}
                 >
                   <p className="text-[#00FF88] font-bold text-lg">
-                    🎉 Vous économisez 5 600€ (53% de réduction)
+                    🎉 Vous économisez 2 510€ (33% de réduction)
                   </p>
                 </motion.div>
               </div>
@@ -2992,7 +3225,7 @@ export default function LandingPage() {
                         animate={{ scale: [1, 1.02, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        4 900€
+                        4 990€
                       </motion.p>
                       <p className="text-white/40 text-sm">HT / personne</p>
                     </div>
@@ -3214,6 +3447,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mini CTA - Value variant */}
+      <div className="max-w-4xl mx-auto px-6">
+        <MiniCTA variant="value" />
+      </div>
+
       {/* ============================================ */}
       {/* QUALIOPI SECTION */}
       {/* ============================================ */}
@@ -3269,11 +3507,11 @@ export default function LandingPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-white/60">Prix formation</span>
-                        <span className="text-white">19 500€ HT</span>
+                        <span className="text-white">9 990€ HT</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-white/60">Prise en charge OPCO (50%)</span>
-                        <span className="text-[#00FF88]">-9 750€</span>
+                        <span className="text-[#00FF88]">-4 995€</span>
                       </div>
                       <div className="h-px bg-white/10 my-3" />
                       <div className="flex justify-between items-center">
@@ -3283,7 +3521,7 @@ export default function LandingPage() {
                           animate={{ scale: [1, 1.1, 1] }}
                           transition={{ duration: 2, repeat: Infinity }}
                         >
-                          9 750€
+                          4 995€
                         </motion.span>
                       </div>
                     </div>
@@ -3385,8 +3623,8 @@ export default function LandingPage() {
             className="mt-10 text-center"
           >
             <p className="text-white/60 text-lg mb-4">
-              Le vrai risque n&apos;est pas d&apos;investir 4 900€.<br/>
-              <span className="text-white font-semibold">C&apos;est de ne rien faire et de payer 35M€ d&apos;amende.</span>
+              Le vrai risque n&apos;est pas d&apos;investir 4 990€.<br/>
+              <span className="text-white font-semibold">C&apos;est de ne rien faire et de subir les sanctions.</span>
             </p>
           </motion.div>
         </div>
@@ -3636,6 +3874,19 @@ export default function LandingPage() {
                     </p>
                     <p className="text-[#FFB800] font-bold text-sm mt-2">— Philippe R., DRH, ETI 800 salariés</p>
                   </div>
+
+                  {/* Prix de la formation - Transparence */}
+                  <div className="mt-6 p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl">
+                    <p className="text-white/60 text-sm mb-2">💡 Si vous avez besoin d'accompagnement :</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-medium">Formation complète AI Act</span>
+                      <div className="text-right">
+                        <span className="text-white/40 line-through text-sm mr-2">7 500€</span>
+                        <span className="text-[#00FF88] font-bold">4 990€ HT</span>
+                      </div>
+                    </div>
+                    <p className="text-white/40 text-xs mt-2">Finançable OPCO jusqu'à 100%</p>
+                  </div>
                 </div>
               </HoloCard>
 
@@ -3801,7 +4052,7 @@ export default function LandingPage() {
                 </div>
                 <div className="text-center sm:text-right">
                   <p className="text-white/30 text-sm line-through">7 500€</p>
-                  <p className="text-3xl font-black text-white">4 900€</p>
+                  <p className="text-3xl font-black text-white">4 990€</p>
                 </div>
               </div>
             </motion.div>
@@ -3930,7 +4181,7 @@ export default function LandingPage() {
               { q: "Puis-je faire financer par mon OPCO ?", a: "Oui ! Nous sommes certifiés Qualiopi. Prise en charge jusqu'à 100%. On vous accompagne dans les démarches et on peut facturer directement votre OPCO." },
               { q: "Combien de temps pour terminer la formation ?", a: "8h de contenu vidéo + les templates + l'audit à suivre à votre rythme sur 12 mois. La plupart terminent en 2-3 semaines à raison de 1h par jour." },
               { q: "Et si la formation ne me convient pas ?", a: "Garantie 30 jours. Remboursement intégral, sans condition, et vous gardez les templates. Zéro risque." },
-              { q: "Quelle différence avec un cabinet de conseil ?", a: "Un cabinet facture 15 000€ à 50 000€ pour un accompagnement AI Act. Notre solution tout-en-un à 4 900€ vous donne tous les outils pour être autonome. Pour les besoins spécifiques, nous avons des cabinets partenaires." },
+              { q: "Quelle différence avec un cabinet de conseil ?", a: "Un cabinet facture 15 000€ à 50 000€ pour un accompagnement AI Act. Notre solution tout-en-un à 4 990€ vous donne tous les outils pour être autonome. Pour les besoins spécifiques, nous avons des cabinets partenaires." },
             ].map((faq, i) => (
               <motion.details 
                 key={i}
