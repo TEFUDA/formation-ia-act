@@ -82,7 +82,7 @@ export default function TemplatesPage() {
             {/* Included badge */}
             <div className="inline-flex items-center gap-2 bg-[#00FF88]/10 border border-[#00FF88]/20 rounded-full px-5 py-2.5">
               <span className="text-[#00FF88] text-lg">✓</span>
-              <span className="text-[#00FF88] font-medium">Inclus dans la formation à 4 900€</span>
+              <span className="text-[#00FF88] font-medium">Inclus dans la formation à 4 990€</span>
             </div>
           </motion.div>
 
@@ -155,7 +155,7 @@ export default function TemplatesPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link href="/pricing" className="bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold px-8 py-4 rounded-xl flex items-center gap-2 hover:opacity-90 transition-opacity">
-                    Voir l&apos;offre à 4 900€
+                    Voir l&apos;offre à 4 990€
                     <div className="w-5 h-5"><Icons.ArrowRight /></div>
                   </Link>
                   <Link href="/login" className="text-white/60 hover:text-white transition-colors px-6 py-4">
