@@ -1973,6 +1973,91 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* TRUST BAR - Réassurance immédiate */}
+      {/* ============================================ */}
+      <section className="relative z-10 py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Qualiopi */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative p-6 rounded-2xl overflow-hidden group"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,255,136,0.02) 100%)',
+                border: '1px solid rgba(0,255,136,0.2)',
+              }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="text-center">
+                    <div className="text-lg font-black text-[#1a1a2e]">Q</div>
+                    <div className="text-[6px] font-bold text-[#E30613] uppercase">Qualiopi</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg mb-1">100% finançable OPCO</h3>
+                  <p className="text-white/60 text-sm">Certification Qualiopi. Prise en charge jusqu'à 100% par votre OPCO.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Garantie */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative p-6 rounded-2xl overflow-hidden group"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,245,255,0.1) 0%, rgba(0,245,255,0.02) 100%)',
+                border: '1px solid rgba(0,245,255,0.2)',
+              }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#00F5FF] to-[#00FF88] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <svg className="w-7 h-7 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg mb-1">Garantie 30 jours</h3>
+                  <p className="text-white/60 text-sm">Pas satisfait ? Remboursement intégral sous 48h. Sans condition.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Support */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative p-6 rounded-2xl overflow-hidden group"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(139,92,246,0.02) 100%)',
+                border: '1px solid rgba(139,92,246,0.2)',
+              }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg mb-1">Support expert</h3>
+                  <p className="text-white/60 text-sm">Réponse sous 24h. Une vraie équipe, pas un chatbot.</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* PROBLEM AGITATION SECTION */}
       {/* ============================================ */}
       <section className="relative z-10 py-20 px-6">
