@@ -19,28 +19,37 @@ const Icons = {
   Zap: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
 };
 
-// Plans data
-const plansData: Record<string, { name: string; price: number; users: string; color: string; features: string[] }> = {
+// Plans data - Synchronisé avec la landing page
+const plansData: Record<string, { name: string; price: number; originalPrice: number; users: string; color: string; features: string[] }> = {
   solo: {
     name: 'Solo',
-    price: 500,
+    price: 4990,
+    originalPrice: 7500,
     users: '1',
     color: '#00F5FF',
-    features: ['1 utilisateur', '6 modules complets', 'Certificat officiel', 'Accès 12 mois', 'Support email'],
+    features: [
+      'Formation complète 8h',
+      '12 Templates juridiques',
+      '12 Vidéos pratiques',
+      'Audit + Rapport PDF',
+      'Certificat officiel',
+      '12 mois d\'accès'
+    ],
   },
   equipe: {
     name: 'Équipe',
-    price: 2000,
+    price: 9990,
+    originalPrice: 15000,
     users: '5',
     color: '#00FF88',
-    features: ['5 utilisateurs', '6 modules complets', 'Certificats officiels', 'Dashboard admin', 'Support prioritaire'],
-  },
-  enterprise: {
-    name: 'Enterprise',
-    price: 18000,
-    users: '50',
-    color: '#8B5CF6',
-    features: ['50 utilisateurs', '6 modules complets', 'Certificats officiels', 'Dashboard avancé', 'Account manager dédié'],
+    features: [
+      'Tout le pack Solo ×5',
+      '5 Certificats nominatifs',
+      'Dashboard équipe',
+      'Audit consolidé',
+      'Support prioritaire',
+      'Onboarding personnalisé'
+    ],
   },
 };
 
@@ -246,12 +255,53 @@ export default function CheckoutPage() {
             </div>
             <span className="font-bold text-lg hidden sm:block">Formation-IA-Act.fr</span>
           </Link>
-          <Link href="/pricing" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
+          <Link href="/#tarifs" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
             <div className="w-5 h-5"><Icons.ArrowLeft /></div>
             Retour aux tarifs
           </Link>
         </div>
       </header>
+
+      {/* Urgency Banner - Dynamique */}
+      {(() => {
+        const endDate = new Date('2025-01-31T23:59:59');
+        const now = new Date();
+        const diffTime = endDate.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Message adaptatif selon les jours restants
+        let urgencyMessage = '';
+        let urgencyColor = 'from-[#FF4444]/20 via-[#FF6B00]/20 to-[#FFB800]/20';
+        let borderColor = 'border-[#FF4444]/30';
+        
+        if (diffDays <= 0) {
+          urgencyMessage = "⚠️ Dernières heures pour profiter du tarif de lancement !";
+          urgencyColor = 'from-[#FF4444]/30 via-[#FF4444]/20 to-[#FF4444]/30';
+        } else if (diffDays === 1) {
+          urgencyMessage = "⏰ Dernier jour — L'offre expire demain !";
+          urgencyColor = 'from-[#FF4444]/30 via-[#FF4444]/20 to-[#FF4444]/30';
+        } else if (diffDays <= 3) {
+          urgencyMessage = `🔥 Plus que ${diffDays} jours — Offre de lancement`;
+        } else if (diffDays <= 7) {
+          urgencyMessage = `⚡ J-${diffDays} — Tarif préférentiel jusqu'au 31 janvier`;
+        } else {
+          urgencyMessage = `🎯 Offre de lancement — Encore ${diffDays} jours pour en profiter`;
+          urgencyColor = 'from-[#FFB800]/20 via-[#FF6B00]/10 to-[#FFB800]/20';
+          borderColor = 'border-[#FFB800]/30';
+        }
+        
+        return (
+          <div className={`relative z-10 bg-gradient-to-r ${urgencyColor} border-y ${borderColor}`}>
+            <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-center gap-3 text-sm">
+              <span className="text-white/80">
+                <span className="font-semibold text-white">{urgencyMessage}</span>
+                <span className="hidden sm:inline"> • </span>
+                <span className="hidden sm:inline text-[#00FF88] font-bold">Économisez {(plan.originalPrice - plan.price).toLocaleString()}€</span>
+              </span>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Main */}
       <main className="relative z-10 flex-1 px-6 py-8">
@@ -397,9 +447,17 @@ export default function CheckoutPage() {
                   <div className="bg-white/5 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-white font-semibold">Plan {plan.name}</span>
-                      <span className="font-bold" style={{ color: plan.color }}>{plan.price.toLocaleString()}€</span>
+                      <div className="text-right">
+                        <span className="text-white/40 line-through text-sm mr-2">{plan.originalPrice.toLocaleString()}€</span>
+                        <span className="font-bold text-xl" style={{ color: plan.color }}>{plan.price.toLocaleString()}€</span>
+                      </div>
                     </div>
-                    <p className="text-white/40 text-sm">{plan.users} utilisateur{parseInt(plan.users) > 1 ? 's' : ''} • Accès 12 mois</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-white/40 text-sm">{plan.users} utilisateur{parseInt(plan.users) > 1 ? 's' : ''} • Accès 12 mois</p>
+                      <span className="text-xs bg-[#FF4444]/20 text-[#FF4444] px-2 py-0.5 rounded-full font-medium">
+                        -{Math.round((1 - plan.price / plan.originalPrice) * 100)}%
+                      </span>
+                    </div>
                   </div>
 
                   {/* Features */}
