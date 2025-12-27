@@ -16,20 +16,39 @@ const Icons = {
   Mail: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
 };
 
-// Pricing logic
+// Pricing logic - Tarifs formation e-learning AI Act
 const calculatePrice = (users: number) => {
   if (users <= 0) return { unitPrice: 0, total: 0, savings: 0, tier: '' };
   
+  const basePrice = 1490; // Prix de référence pour 1 personne
+  
   if (users === 1) {
-    return { unitPrice: 4990, total: 4990, savings: 0, tier: 'Solo' };
-  } else if (users >= 2 && users <= 5) {
-    const total = 9990;
-    const unitPrice = Math.round(total / users);
-    const savings = users * 4990 - total;
+    return { unitPrice: 1490, total: 1490, savings: 0, tier: 'Solo' };
+  } else if (users >= 2 && users <= 4) {
+    const unitPrice = 1290;
+    const total = users * unitPrice;
+    const savings = users * basePrice - total;
+    return { unitPrice, total, savings, tier: 'Duo-Quartet' };
+  } else if (users >= 5 && users <= 9) {
+    const unitPrice = 990;
+    const total = users * unitPrice;
+    const savings = users * basePrice - total;
     return { unitPrice, total, savings, tier: 'Équipe' };
+  } else if (users >= 10 && users <= 24) {
+    const unitPrice = 790;
+    const total = users * unitPrice;
+    const savings = users * basePrice - total;
+    return { unitPrice, total, savings, tier: 'Business' };
+  } else if (users >= 25 && users <= 49) {
+    const unitPrice = 590;
+    const total = users * unitPrice;
+    const savings = users * basePrice - total;
+    return { unitPrice, total, savings, tier: 'Corporate' };
   } else {
-    // Plus de 5 personnes = sur devis
-    return { unitPrice: 0, total: 0, savings: 0, tier: 'Devis personnalisé' };
+    const unitPrice = 490;
+    const total = users * unitPrice;
+    const savings = users * basePrice - total;
+    return { unitPrice, total, savings, tier: 'Enterprise' };
   }
 };
 
@@ -316,7 +335,7 @@ export default function DevisPage() {
         ${pricing.savings > 0 ? `
         <tr>
           <td colspan="4" style="text-align: right;" class="savings">
-            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 4990)) * 100)}% de réduction)
+            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 1490)) * 100)}% de réduction)
           </td>
         </tr>
         ` : ''}
@@ -640,9 +659,9 @@ export default function DevisPage() {
 
                       {/* Pricing tiers info */}
                       <div className="text-xs text-white/40 space-y-1">
-                        <p>💡 Tarifs :</p>
-                        <p>• 1 pers: 4 990€ | 2-5 pers: 9 990€ (pack équipe)</p>
-                        <p>• +5 pers: Devis personnalisé</p>
+                        <p>💡 Tarifs dégressifs :</p>
+                        <p>• 1 pers: 1 490€ | 2-4 pers: 1 290€/pers | 5-9 pers: 990€/pers</p>
+                        <p>• 10-24 pers: 790€/pers | 25-49 pers: 590€/pers | 50+ pers: 490€/pers</p>
                       </div>
                     </div>
                   </div>
