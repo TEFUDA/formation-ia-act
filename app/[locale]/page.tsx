@@ -211,6 +211,437 @@ const HoloCard = ({ children, glow = '#00F5FF', className = '' }: { children: Re
 );
 
 // ============================================
+// MULTI-STEP LEAD FORM - Pied dans la porte
+// ============================================
+const MultiStepLeadForm = () => {
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [formData, setFormData] = useState({
+    usageIA: '',
+    tailleEntreprise: '',
+    role: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    entreprise: '',
+    ca: ''
+  });
+
+  const totalSteps = 5;
+  const progress = (step / totalSteps) * 100;
+
+  const handleOptionClick = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    // Auto-advance après sélection
+    setTimeout(() => setStep(step + 1), 300);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    // Envoi à Formspree
+    try {
+      await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          _subject: '🚨 Nouveau lead Audit AI Act (Multi-step)',
+          source: 'landing-page-multistep'
+        })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    
+    setIsSubmitting(false);
+    setIsComplete(true);
+  };
+
+  const canProceedStep4 = formData.prenom.length >= 2 && formData.email.includes('@');
+  const canProceedStep5 = formData.telephone.length >= 10 && formData.entreprise.length >= 2;
+
+  // Options pour chaque étape
+  const usageIAOptions = [
+    { value: 'oui-beaucoup', label: 'Oui, plusieurs', icon: '🤖', desc: 'ChatGPT, scoring, automatisation...' },
+    { value: 'oui-peu', label: 'Oui, quelques-uns', icon: '🔧', desc: 'Quelques outils ponctuels' },
+    { value: 'je-ne-sais-pas', label: 'Je ne suis pas sûr', icon: '🤔', desc: "C'est justement ce qu'on va vérifier" },
+    { value: 'non', label: 'Non, aucun', icon: '❌', desc: 'Êtes-vous vraiment sûr ?' }
+  ];
+
+  const tailleOptions = [
+    { value: '1-10', label: '1-10', icon: '👤', desc: 'Startup / TPE' },
+    { value: '11-50', label: '11-50', icon: '👥', desc: 'PME' },
+    { value: '51-200', label: '51-200', icon: '🏢', desc: 'ETI' },
+    { value: '200+', label: '200+', icon: '🏛️', desc: 'Grande entreprise' }
+  ];
+
+  const roleOptions = [
+    { value: 'Direction', label: 'Direction', icon: '👔', desc: 'CEO, DG, Président...' },
+    { value: 'Tech/IT', label: 'Tech / IT', icon: '💻', desc: 'DSI, CTO, Dev...' },
+    { value: 'Juridique/DPO', label: 'Juridique / DPO', icon: '⚖️', desc: 'Compliance, Legal...' },
+    { value: 'RH', label: 'RH', icon: '🧑‍💼', desc: 'DRH, Recrutement...' },
+    { value: 'Autre', label: 'Autre', icon: '📊', desc: 'DAF, Marketing...' }
+  ];
+
+  if (isComplete) {
+    return (
+      <HoloCard glow="#00FF88">
+        <div className="p-8 text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="w-20 h-20 bg-[#00FF88]/20 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <span className="text-4xl">✅</span>
+          </motion.div>
+          <h3 className="text-2xl font-bold text-[#00FF88] mb-2">Parfait, {formData.prenom} !</h3>
+          <p className="text-white/70 mb-6">
+            Votre demande de diagnostic est enregistrée.<br />
+            Un expert vous contacte sous <span className="text-[#FFB800] font-bold">24h</span>.
+          </p>
+          <div className="bg-white/5 rounded-xl p-4 text-left">
+            <p className="text-white/60 text-sm mb-2">Récapitulatif :</p>
+            <ul className="text-sm space-y-1">
+              <li className="text-white/80">📧 {formData.email}</li>
+              <li className="text-white/80">📱 {formData.telephone}</li>
+              <li className="text-white/80">🏢 {formData.entreprise}</li>
+            </ul>
+          </div>
+          <p className="text-white/40 text-xs mt-6">
+            💡 En attendant, vérifiez vos spams si vous ne recevez pas notre confirmation.
+          </p>
+        </div>
+      </HoloCard>
+    );
+  }
+
+  return (
+    <HoloCard glow="#00F5FF">
+      <div className="p-6 sm:p-8">
+        {/* Header avec urgence */}
+        <div className="text-center mb-6">
+          <motion.div 
+            className="inline-flex items-center gap-2 bg-[#FF4444]/20 text-[#FF4444] px-4 py-2 rounded-full text-sm font-bold mb-4"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <span className="w-2 h-2 bg-[#FF4444] rounded-full animate-pulse" />
+            Plus que 7 créneaux cette semaine
+          </motion.div>
+          <h3 className="text-xl sm:text-2xl font-bold">Votre Diagnostic AI Act</h3>
+          <p className="text-white/60 text-sm mt-1">30 secondes • 100% gratuit</p>
+        </div>
+
+        {/* Barre de progression */}
+        <div className="mb-6">
+          <div className="flex justify-between text-xs text-white/40 mb-2">
+            <span>Étape {step}/{totalSteps}</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-[#00F5FF] to-[#00FF88] rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {/* ÉTAPE 1: Usage IA */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <h4 className="text-lg font-semibold text-center mb-4">
+                Utilisez-vous des <span className="text-[#00F5FF]">outils IA</span> ?
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {usageIAOptions.map((option) => (
+                  <motion.button
+                    key={option.value}
+                    onClick={() => handleOptionClick('usageIA', option.value)}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${
+                      formData.usageIA === option.value 
+                        ? 'border-[#00F5FF] bg-[#00F5FF]/10' 
+                        : 'border-white/10 bg-white/5 hover:border-white/30'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-2xl block mb-1">{option.icon}</span>
+                    <span className="font-semibold text-white text-sm block">{option.label}</span>
+                    <span className="text-white/50 text-xs">{option.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ÉTAPE 2: Taille entreprise */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <h4 className="text-lg font-semibold text-center mb-4">
+                <span className="text-[#00FF88]">Combien</span> de salariés ?
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {tailleOptions.map((option) => (
+                  <motion.button
+                    key={option.value}
+                    onClick={() => handleOptionClick('tailleEntreprise', option.value)}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${
+                      formData.tailleEntreprise === option.value 
+                        ? 'border-[#00FF88] bg-[#00FF88]/10' 
+                        : 'border-white/10 bg-white/5 hover:border-white/30'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-2xl block mb-1">{option.icon}</span>
+                    <span className="font-semibold text-white text-sm block">{option.label}</span>
+                    <span className="text-white/50 text-xs">{option.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+              <button 
+                onClick={() => setStep(step - 1)}
+                className="text-white/40 text-sm hover:text-white/60 transition-colors mt-2"
+              >
+                ← Retour
+              </button>
+            </motion.div>
+          )}
+
+          {/* ÉTAPE 3: Rôle */}
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <h4 className="text-lg font-semibold text-center mb-4">
+                Quel est votre <span className="text-[#FFB800]">rôle</span> ?
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {roleOptions.map((option) => (
+                  <motion.button
+                    key={option.value}
+                    onClick={() => handleOptionClick('role', option.value)}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${
+                      formData.role === option.value 
+                        ? 'border-[#FFB800] bg-[#FFB800]/10' 
+                        : 'border-white/10 bg-white/5 hover:border-white/30'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-2xl block mb-1">{option.icon}</span>
+                    <span className="font-semibold text-white text-sm block">{option.label}</span>
+                    <span className="text-white/50 text-xs">{option.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+              <button 
+                onClick={() => setStep(step - 1)}
+                className="text-white/40 text-sm hover:text-white/60 transition-colors mt-2"
+              >
+                ← Retour
+              </button>
+            </motion.div>
+          )}
+
+          {/* ÉTAPE 4: Contact basique */}
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <div className="text-center mb-4">
+                <span className="text-3xl block mb-2">📧</span>
+                <h4 className="text-lg font-semibold">
+                  Où envoyer votre <span className="text-[#00FF88]">score de risque</span> ?
+                </h4>
+              </div>
+              
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Prénom</label>
+                <input 
+                  type="text"
+                  value={formData.prenom}
+                  onChange={(e) => handleInputChange('prenom', e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                  placeholder="Jean"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Email professionnel</label>
+                <input 
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                  placeholder="jean@entreprise.fr"
+                />
+              </div>
+
+              <motion.button 
+                onClick={() => canProceedStep4 && setStep(5)}
+                disabled={!canProceedStep4}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
+                  canProceedStep4 
+                    ? 'bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black' 
+                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                }`}
+                whileHover={canProceedStep4 ? { scale: 1.02 } : {}}
+                whileTap={canProceedStep4 ? { scale: 0.98 } : {}}
+              >
+                Continuer →
+              </motion.button>
+
+              <button 
+                onClick={() => setStep(step - 1)}
+                className="text-white/40 text-sm hover:text-white/60 transition-colors w-full text-center"
+              >
+                ← Retour
+              </button>
+            </motion.div>
+          )}
+
+          {/* ÉTAPE 5: Finalisation */}
+          {step === 5 && (
+            <motion.div
+              key="step5"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-4"
+            >
+              <div className="text-center mb-4">
+                <span className="text-3xl block mb-2">📞</span>
+                <h4 className="text-lg font-semibold">
+                  Dernière étape, <span className="text-[#00FF88]">{formData.prenom}</span> !
+                </h4>
+                <p className="text-white/60 text-sm">Pour vous rappeler et planifier votre diagnostic</p>
+              </div>
+              
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Téléphone</label>
+                <input 
+                  type="tel"
+                  value={formData.telephone}
+                  onChange={(e) => handleInputChange('telephone', e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                  placeholder="06 12 34 56 78"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Entreprise</label>
+                <input 
+                  type="text"
+                  value={formData.entreprise}
+                  onChange={(e) => handleInputChange('entreprise', e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                  placeholder="Nom de votre entreprise"
+                />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Chiffre d&apos;affaires annuel</label>
+                <select 
+                  value={formData.ca}
+                  onChange={(e) => handleInputChange('ca', e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
+                >
+                  <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
+                  <option value="<1M" className="bg-[#0A0A1B]">Moins de 1M€</option>
+                  <option value="1-5M" className="bg-[#0A0A1B]">1M€ - 5M€</option>
+                  <option value="5-20M" className="bg-[#0A0A1B]">5M€ - 20M€</option>
+                  <option value="20-50M" className="bg-[#0A0A1B]">20M€ - 50M€</option>
+                  <option value=">50M" className="bg-[#0A0A1B]">Plus de 50M€</option>
+                </select>
+              </div>
+
+              <motion.button 
+                onClick={handleSubmit}
+                disabled={!canProceedStep5 || isSubmitting}
+                className={`w-full py-4 rounded-xl font-black text-lg transition-all relative overflow-hidden ${
+                  canProceedStep5 && !isSubmitting
+                    ? 'bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black' 
+                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                }`}
+                whileHover={canProceedStep5 ? { scale: 1.02 } : {}}
+                whileTap={canProceedStep5 ? { scale: 0.98 } : {}}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <motion.span 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      ⏳
+                    </motion.span>
+                    Envoi en cours...
+                  </span>
+                ) : (
+                  '🎯 OBTENIR MON DIAGNOSTIC GRATUIT'
+                )}
+              </motion.button>
+
+              <button 
+                onClick={() => setStep(step - 1)}
+                className="text-white/40 text-sm hover:text-white/60 transition-colors w-full text-center"
+              >
+                ← Retour
+              </button>
+
+              <p className="text-white/40 text-xs text-center">
+                🔒 Vos données restent confidentielles. Zéro spam.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Fear push - visible sur toutes les étapes */}
+        <div className="mt-6 p-3 bg-[#FF4444]/10 border border-[#FF4444]/30 rounded-xl">
+          <p className="text-[#FF4444] font-bold text-center text-xs">
+            ⚠️ Amende AI Act = 7% de votre CA
+          </p>
+          <p className="text-white/50 text-xs text-center mt-1">
+            Pour une entreprise à 50M€ → <span className="text-[#FFB800] font-bold">3,5 millions €</span>
+          </p>
+        </div>
+      </div>
+    </HoloCard>
+  );
+};
+
+// ============================================
 // TEASER SECTION - Interactive Preview
 // ============================================
 const miniAuditQuestions = [
@@ -2905,179 +3336,14 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Right: Formulaire */}
+            {/* Right: Formulaire Multi-Étapes */}
             <motion.div 
               initial={{ opacity: 0, x: 30 }} 
               whileInView={{ opacity: 1, x: 0 }} 
               viewport={{ once: true }}
             >
               <div className="sticky top-24">
-                <HoloCard glow="#00F5FF">
-                  <div className="p-8">
-                    <div className="text-center mb-6">
-                      <motion.div 
-                        className="inline-flex items-center gap-2 bg-[#FF4444]/20 text-[#FF4444] px-4 py-2 rounded-full text-sm font-bold mb-4"
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        <span className="w-2 h-2 bg-[#FF4444] rounded-full animate-pulse" />
-                        Plus que 7 créneaux cette semaine
-                      </motion.div>
-                      <h3 className="text-2xl font-bold">Réservez votre Diagnostic</h3>
-                      <p className="text-white/60 text-sm mt-2">Appel de 30 min — 100% gratuit — Sans engagement</p>
-                    </div>
-
-                    <form className="space-y-4" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-                      <input type="hidden" name="_subject" value="🚨 Nouveau lead Audit AI Act" />
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-white/60 text-sm mb-1 block">Prénom *</label>
-                          <input 
-                            type="text" 
-                            name="prenom"
-                            required
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-                            placeholder="Jean"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-white/60 text-sm mb-1 block">Nom *</label>
-                          <input 
-                            type="text" 
-                            name="nom"
-                            required
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-                            placeholder="Dupont"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Email professionnel *</label>
-                        <input 
-                          type="email" 
-                          name="email"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-                          placeholder="jean.dupont@entreprise.fr"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Téléphone *</label>
-                        <input 
-                          type="tel" 
-                          name="telephone"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-                          placeholder="06 12 34 56 78"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Entreprise *</label>
-                        <input 
-                          type="text" 
-                          name="entreprise"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
-                          placeholder="Nom de votre entreprise"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Chiffre d'affaires annuel *</label>
-                        <select 
-                          name="ca"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
-                        >
-                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
-                          <option value="1-5M" className="bg-[#0A0A1B]">1M€ - 5M€</option>
-                          <option value="5-20M" className="bg-[#0A0A1B]">5M€ - 20M€</option>
-                          <option value="20-50M" className="bg-[#0A0A1B]">20M€ - 50M€</option>
-                          <option value="50-100M" className="bg-[#0A0A1B]">50M€ - 100M€</option>
-                          <option value=">100M" className="bg-[#0A0A1B]">Plus de 100M€</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Votre fonction *</label>
-                        <select 
-                          name="role"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
-                        >
-                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
-                          <option value="DG/CEO" className="bg-[#0A0A1B]">DG / CEO / Président</option>
-                          <option value="DSI/CTO" className="bg-[#0A0A1B]">DSI / CTO / Dir. Technique</option>
-                          <option value="DPO" className="bg-[#0A0A1B]">DPO / Data Protection</option>
-                          <option value="Juridique" className="bg-[#0A0A1B]">Dir. Juridique / Compliance</option>
-                          <option value="RSSI" className="bg-[#0A0A1B]">RSSI / Cybersécurité</option>
-                          <option value="DRH" className="bg-[#0A0A1B]">DRH / Dir. RH</option>
-                          <option value="DAF" className="bg-[#0A0A1B]">DAF / Dir. Financier</option>
-                          <option value="Autre" className="bg-[#0A0A1B]">Autre direction</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="text-white/60 text-sm mb-1 block">Utilisez-vous des outils IA ? *</label>
-                        <select 
-                          name="usage_ia"
-                          required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
-                        >
-                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
-                          <option value="oui-beaucoup" className="bg-[#0A0A1B]">Oui, plusieurs outils</option>
-                          <option value="oui-peu" className="bg-[#0A0A1B]">Oui, quelques-uns</option>
-                          <option value="je-ne-sais-pas" className="bg-[#0A0A1B]">Je ne suis pas sûr</option>
-                          <option value="non" className="bg-[#0A0A1B]">Non, aucun</option>
-                        </select>
-                      </div>
-
-                      <motion.button 
-                        type="submit"
-                        className="w-full py-4 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-black text-lg rounded-xl relative overflow-hidden group"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                          🎯 JE VEUX MON DIAGNOSTIC GRATUIT
-                        </span>
-                        <motion.div 
-                          className="absolute inset-0 bg-white/20"
-                          initial={{ x: '-100%' }}
-                          whileHover={{ x: '100%' }}
-                          transition={{ duration: 0.5 }}
-                        />
-                      </motion.button>
-
-                      <p className="text-white/40 text-xs text-center">
-                        🔒 Vos données restent confidentielles. Un seul appel de 30 min, pas de harcèlement.
-                      </p>
-                    </form>
-
-                    {/* Final fear push */}
-                    <div className="mt-6 p-4 bg-[#FF4444]/10 border border-[#FF4444]/30 rounded-xl">
-                      <p className="text-[#FF4444] font-bold text-center text-sm">
-                        ⚠️ Chaque jour sans audit est un jour de risque supplémentaire
-                      </p>
-                      <p className="text-white/60 text-xs text-center mt-2">
-                        Les contrôles peuvent tomber n'importe quand. Une amende AI Act, c'est <span className="text-[#FF4444] font-bold">7% de votre CA</span>. 
-                        Pour une ETI à 50M€, ça fait <span className="text-[#FFB800] font-bold">3,5 millions d'euros</span>. 
-                        <br />Vous pouvez vraiment vous permettre ce risque ?
-                      </p>
-                    </div>
-                  </div>
-                </HoloCard>
-
-                {/* Trust badges */}
-                <div className="mt-4 flex items-center justify-center gap-6 text-white/30 text-xs">
-                  <span>🔐 Données sécurisées</span>
-                  <span>📞 Rappel sous 24h</span>
-                  <span>🚫 Zéro spam</span>
-                </div>
+                <MultiStepLeadForm />
               </div>
             </motion.div>
           </div>
