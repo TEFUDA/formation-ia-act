@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { MODULES } from '@/lib/formation/modules';
 
 const Icons = {
   Shield: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
@@ -24,15 +25,14 @@ const tabs = [
   { id: 'audit', label: 'Audit', icon: '🔍' },
 ];
 
-// Modules de base (statiques)
-const baseModules = [
-  { id: 1, title: "Fondamentaux de l'AI Act", duration: "45 min", lessons: 5, color: '#00F5FF' },
-  { id: 2, title: "Classification des Risques", duration: "1h", lessons: 6, color: '#00FF88' },
-  { id: 3, title: "Obligations Fournisseurs", duration: "1h30", lessons: 7, color: '#8B5CF6' },
-  { id: 4, title: "Obligations Déployeurs", duration: "1h", lessons: 5, color: '#FFB800' },
-  { id: 5, title: "Gouvernance IA", duration: "1h30", lessons: 8, color: '#FF6B00' },
-  { id: 6, title: "Mise en Conformité Pratique", duration: "2h", lessons: 10, color: '#FF4444' },
-];
+// Interface pour la progression utilisateur (synchronisée avec /formation)
+interface UserProgress {
+  completedVideos: string[];
+  quizScores: Record<number, number>;
+  currentModule: number;
+  currentVideo: string;
+  totalXP: number;
+}
 
 const templates = [
   { id: 1, name: "Registre IA", type: "Excel", icon: "📊", hasVideo: true, file: "template-registre-ia.xlsx" },
@@ -72,8 +72,15 @@ export default function DashboardPage() {
   const [auditScore, setAuditScore] = useState<number | null>(null);
   const [userPlan, setUserPlan] = useState<string>('solo');
   const [showDevPanel, setShowDevPanel] = useState(false);
-  const [modules, setModules] = useState(baseModules.map(m => ({ ...m, progress: 0, completed: false })));
-  const [nextLesson, setNextLesson] = useState({ module: 1, lesson: 1 });
+  
+  // Progression synchronisée avec /formation
+  const [userProgress, setUserProgress] = useState<UserProgress>({
+    completedVideos: [],
+    quizScores: {},
+    currentModule: 0,
+    currentVideo: '0.1',
+    totalXP: 0
+  });
 
   useEffect(() => {
     const savedScore = localStorage.getItem('auditScore');
@@ -85,47 +92,45 @@ export default function DashboardPage() {
       localStorage.setItem('userPlan', 'solo');
     }
     
-    // Charger la progression depuis localStorage
-    const savedProgress = localStorage.getItem('courseProgress');
+    // Charger la progression depuis la page formation
+    const savedProgress = localStorage.getItem('formationProgress');
     if (savedProgress) {
-      const completedLessons = JSON.parse(savedProgress);
-      
-      // Calculer la progression de chaque module
-      const updatedModules = baseModules.map(mod => {
-        const lessonsInModule = mod.lessons;
-        let completedCount = 0;
-        
-        for (let i = 1; i <= lessonsInModule; i++) {
-          if (completedLessons[`${mod.id}-${i}`]) {
-            completedCount++;
-          }
-        }
-        
-        const progress = Math.round((completedCount / lessonsInModule) * 100);
-        return {
-          ...mod,
-          progress,
-          completed: progress === 100
-        };
-      });
-      
-      setModules(updatedModules);
-      
-      // Trouver la prochaine leçon à faire
-      for (const mod of updatedModules) {
-        if (mod.progress < 100) {
-          // Trouver la première leçon non complétée dans ce module
-          for (let i = 1; i <= mod.lessons; i++) {
-            if (!completedLessons[`${mod.id}-${i}`]) {
-              setNextLesson({ module: mod.id, lesson: i });
-              break;
-            }
-          }
-          break;
-        }
+      try {
+        setUserProgress(JSON.parse(savedProgress));
+      } catch (e) {
+        console.error('Error loading formation progress:', e);
       }
     }
   }, []);
+
+  // Calculer la progression de chaque module
+  const getModuleProgress = (moduleId: number) => {
+    const module = MODULES.find(m => m.id === moduleId);
+    if (!module) return 0;
+    
+    const moduleVideoIds = module.videos.map(v => `${moduleId}-${v.id}`);
+    const completed = moduleVideoIds.filter(id => userProgress.completedVideos.includes(id)).length;
+    return module.videos.length > 0 ? Math.round((completed / module.videos.length) * 100) : 0;
+  };
+
+  // Vérifier si un module est débloqué
+  const isModuleUnlocked = (moduleId: number) => {
+    if (moduleId === 0) return true;
+    const prevQuizScore = userProgress.quizScores[moduleId - 1];
+    return prevQuizScore !== undefined && prevQuizScore >= 70;
+  };
+
+  // Modules avec progression dynamique
+  const modules = MODULES.map(m => ({
+    id: m.id,
+    title: m.title,
+    duration: m.duration,
+    lessons: m.videos.length,
+    color: m.color,
+    progress: getModuleProgress(m.id),
+    completed: getModuleProgress(m.id) === 100 && userProgress.quizScores[m.id] >= 70,
+    unlocked: isModuleUnlocked(m.id)
+  }));
 
   const changePlan = (plan: string) => {
     setUserPlan(plan);
@@ -192,7 +197,7 @@ export default function DashboardPage() {
             <span className="font-bold text-lg hidden sm:block">Formation-IA-Act.fr</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/certificate" className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-2">
+            <Link href="/formation/complete" className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-2">
               <div className="w-4 h-4"><Icons.Award /></div>
               <span className="hidden sm:inline">Certificat</span>
             </Link>
@@ -266,13 +271,38 @@ export default function DashboardPage() {
                   ))}
                 </div>
 
+                {/* Certificat disponible - affiché quand formation terminée */}
+                {totalProgress === 100 && (
+                  <div className="mb-8">
+                    <HoloCard glow="#00FF88">
+                      <div className="p-6 text-center">
+                        <span className="text-5xl mb-4 block">🏆</span>
+                        <h3 className="text-2xl font-bold mb-2 text-[#00FF88]">Félicitations !</h3>
+                        <p className="text-white/60 mb-4">Vous avez terminé la formation AI Act. Votre certificat est prêt !</p>
+                        <Link 
+                          href="/formation/complete"
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold px-8 py-4 rounded-xl text-lg hover:opacity-90 transition-opacity"
+                        >
+                          <div className="w-5 h-5"><Icons.Award /></div>
+                          Obtenir mon certificat
+                        </Link>
+                      </div>
+                    </HoloCard>
+                  </div>
+                )}
+
                 {/* Quick Actions */}
                 <h3 className="text-lg font-semibold mb-4">Actions rapides</h3>
                 <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                  <Link href={`/dashboard/cours?module=${nextLesson.module}&lesson=${nextLesson.lesson}`} className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors block">
+                  <Link href={`/formation?module=${userProgress.currentModule}`} className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors block">
                     <span className="text-2xl mb-2 block">▶️</span>
-                    <p className="font-medium">Continuer la formation</p>
-                    <p className="text-white/50 text-sm">Module {nextLesson.module} - Leçon {nextLesson.lesson}</p>
+                    <p className="font-medium">{totalProgress === 100 ? 'Revoir la formation' : 'Continuer la formation'}</p>
+                    <p className="text-white/50 text-sm">
+                      {totalProgress === 100 
+                        ? `${completedModules} modules complétés` 
+                        : `Module ${userProgress.currentModule} en cours`
+                      }
+                    </p>
                   </Link>
                   <button onClick={() => setActiveTab('templates')} className="p-4 bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-xl text-left hover:bg-[#00F5FF]/20 transition-colors">
                     <span className="text-2xl mb-2 block">📥</span>
@@ -337,7 +367,7 @@ export default function DashboardPage() {
 
                 <div className="space-y-4">
                   {modules.map((module, i) => {
-                    const isLocked = i > 0 && !modules[i - 1].completed && module.progress === 0;
+                    const isLocked = !module.unlocked;
                     return (
                       <HoloCard key={module.id} glow={module.color}>
                         <div className="p-5">
@@ -361,7 +391,7 @@ export default function DashboardPage() {
                             </div>
                             <button
                               disabled={isLocked}
-                              onClick={() => !isLocked && router.push(`/dashboard/cours?module=${module.id}&lesson=1`)}
+                              onClick={() => !isLocked && router.push(`/formation?module=${module.id}`)}
                               className="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-shrink-0"
                               style={{
                                 background: isLocked ? 'rgba(255,255,255,0.05)' : `${module.color}20`,
@@ -387,6 +417,23 @@ export default function DashboardPage() {
                     );
                   })}
                 </div>
+
+                {/* Certificat disponible quand formation terminée */}
+                {totalProgress === 100 && (
+                  <div className="mt-6">
+                    <Link 
+                      href="/formation/complete"
+                      className="w-full p-4 bg-gradient-to-r from-[#00FF88]/20 to-[#00F5FF]/20 border border-[#00FF88]/30 rounded-xl flex items-center justify-center gap-3 hover:from-[#00FF88]/30 hover:to-[#00F5FF]/30 transition-all"
+                    >
+                      <span className="text-2xl">🏆</span>
+                      <div className="text-left">
+                        <p className="font-bold text-[#00FF88]">Formation terminée !</p>
+                        <p className="text-white/60 text-sm">Cliquez pour obtenir votre certificat</p>
+                      </div>
+                      <div className="w-5 h-5 text-[#00FF88] ml-auto"><Icons.Award /></div>
+                    </Link>
+                  </div>
+                )}
               </motion.div>
             )}
 
