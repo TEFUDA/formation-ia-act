@@ -68,8 +68,9 @@ export default function CGVPage() {
                 <p><strong className="text-white">3.1 Prix</strong></p>
                 <p>Les prix sont indiqués en euros hors taxes (HT). La TVA applicable (20%) sera ajoutée au moment du paiement.</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Pack Solo (1 personne) : 4 900€ HT</li>
-                  <li>Pack Équipe (5 personnes) : 19 500€ HT</li>
+                  <li>Pack Solo (1 personne) : 4 990€ HT</li>
+                  <li>Pack Équipe (jusqu&apos;à 5 personnes) : 9 990€ HT</li>
+                  <li>Pack Entreprise (+5 personnes) : Sur devis</li>
                   <li>Pack Entreprise (50 personnes) : Sur devis</li>
                 </ul>
                 
