@@ -16,8 +16,8 @@ const plans = [
     id: 'solo',
     name: 'Solo',
     subtitle: '1 personne',
-    price: 4900,
-    priceDisplay: '4 900',
+    price: 4990,
+    priceDisplay: '4 990',
     color: '#00F5FF',
     icon: '👤',
     description: 'Idéal pour les indépendants, consultants et responsables conformité',
@@ -37,9 +37,9 @@ const plans = [
     id: 'equipe',
     name: 'Équipe',
     subtitle: "Jusqu'à 5 personnes",
-    price: 19500,
-    priceDisplay: '19 500',
-    pricePerPerson: '3 900',
+    price: 9990,
+    priceDisplay: '9 990',
+    pricePerPerson: '1 998',
     color: '#00FF88',
     icon: '👥',
     popular: true,
@@ -59,16 +59,15 @@ const plans = [
   {
     id: 'entreprise',
     name: 'Entreprise',
-    subtitle: "Jusqu'à 50 personnes",
+    subtitle: "Plus de 5 personnes",
     price: null,
     priceDisplay: 'Sur devis',
     color: '#8B5CF6',
     icon: '🏢',
     description: 'Déploiement à grande échelle avec accompagnement dédié',
     features: [
-      { text: 'Tout le contenu Équipe ×50', included: true, highlight: true },
-      { text: '50 accès individuels', included: true },
-      { text: '50 Certificats nominatifs', included: true },
+      { text: 'Nombre d\'accès illimité', included: true, highlight: true },
+      { text: 'Certificats nominatifs', included: true },
       { text: 'Admin multi-sites', included: true },
       { text: 'SSO / Intégration SIRH', included: true },
       { text: 'Personnalisation contenu', included: true },
@@ -260,7 +259,7 @@ export default function PricingPage() {
                     </ul>
                     <div className="mt-4 pt-4 border-t border-[#00FF88]/30">
                       <p className="text-white/60 text-sm">À partir de</p>
-                      <p className="text-3xl font-bold text-[#00FF88]">4 900€</p>
+                      <p className="text-3xl font-bold text-[#00FF88]">4 990€</p>
                       <p className="text-[#00F5FF] text-sm mt-1">Soit jusqu&apos;à 90% d&apos;économies</p>
                     </div>
                   </div>
