@@ -705,8 +705,6 @@ const TeaserSection = () => {
   );
 };
 
-);
-
 // Exit Intent Popup (Peep Laja)
 const ExitIntentPopup = () => {
   const [show, setShow] = useState(false);
