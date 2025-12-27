@@ -16,36 +16,28 @@ const Icons = {
   Mail: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
 };
 
-// Pricing logic - Tarifs formation e-learning AI Act
+// Pricing logic - Tarifs formation e-learning AI Act (minimum 5 personnes)
 const calculatePrice = (users: number) => {
-  if (users <= 0) return { unitPrice: 0, total: 0, savings: 0, tier: '' };
+  if (users < 5) return { unitPrice: 0, total: 0, savings: 0, tier: '' };
   
-  const basePrice = 1490; // Prix de référence pour 1 personne
+  const basePrice = 2000; // Prix de référence pour 5-9 personnes
   
-  if (users === 1) {
-    return { unitPrice: 1490, total: 1490, savings: 0, tier: 'Solo' };
-  } else if (users >= 2 && users <= 4) {
-    const unitPrice = 1290;
+  if (users >= 5 && users <= 9) {
+    const unitPrice = 2000;
     const total = users * unitPrice;
-    const savings = users * basePrice - total;
-    return { unitPrice, total, savings, tier: 'Duo-Quartet' };
-  } else if (users >= 5 && users <= 9) {
-    const unitPrice = 990;
-    const total = users * unitPrice;
-    const savings = users * basePrice - total;
-    return { unitPrice, total, savings, tier: 'Équipe' };
+    return { unitPrice, total, savings: 0, tier: 'Équipe' };
   } else if (users >= 10 && users <= 24) {
-    const unitPrice = 790;
+    const unitPrice = 1850;
     const total = users * unitPrice;
     const savings = users * basePrice - total;
     return { unitPrice, total, savings, tier: 'Business' };
   } else if (users >= 25 && users <= 49) {
-    const unitPrice = 590;
+    const unitPrice = 1790;
     const total = users * unitPrice;
     const savings = users * basePrice - total;
     return { unitPrice, total, savings, tier: 'Corporate' };
   } else {
-    const unitPrice = 490;
+    const unitPrice = 1760;
     const total = users * unitPrice;
     const savings = users * basePrice - total;
     return { unitPrice, total, savings, tier: 'Enterprise' };
@@ -100,7 +92,7 @@ const initialFormData: FormData = {
   contactEmail: '',
   contactPhone: '',
   contactRole: '',
-  users: 10,
+  users: 5,
   opcoFinancing: false,
   opcoName: '',
 };
@@ -125,7 +117,7 @@ export default function DevisPage() {
       case 2:
         return !!(formData.contactName && formData.contactEmail && formData.contactPhone);
       case 3:
-        return formData.users >= 1;
+        return formData.users >= 5;
       default:
         return true;
     }
@@ -335,7 +327,7 @@ export default function DevisPage() {
         ${pricing.savings > 0 ? `
         <tr>
           <td colspan="4" style="text-align: right;" class="savings">
-            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 1490)) * 100)}% de réduction)
+            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 2000)) * 100)}% de réduction)
           </td>
         </tr>
         ` : ''}
@@ -593,7 +585,7 @@ export default function DevisPage() {
                         <div className="flex items-center gap-4">
                           <input
                             type="range"
-                            min="1"
+                            min="5"
                             max="100"
                             value={formData.users}
                             onChange={(e) => updateForm('users', parseInt(e.target.value))}
@@ -601,10 +593,10 @@ export default function DevisPage() {
                           />
                           <input
                             type="number"
-                            min="1"
+                            min="5"
                             max="500"
                             value={formData.users}
-                            onChange={(e) => updateForm('users', Math.max(1, parseInt(e.target.value) || 1))}
+                            onChange={(e) => updateForm('users', Math.max(5, parseInt(e.target.value) || 5))}
                             className="w-20 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-center focus:outline-none focus:border-[#00FF88]"
                           />
                         </div>
@@ -660,8 +652,8 @@ export default function DevisPage() {
                       {/* Pricing tiers info */}
                       <div className="text-xs text-white/40 space-y-1">
                         <p>💡 Tarifs dégressifs :</p>
-                        <p>• 1 pers: 1 490€ | 2-4 pers: 1 290€/pers | 5-9 pers: 990€/pers</p>
-                        <p>• 10-24 pers: 790€/pers | 25-49 pers: 590€/pers | 50+ pers: 490€/pers</p>
+                        <p>• 5-9 pers: 2 000€/pers | 10-24 pers: 1 850€/pers</p>
+                        <p>• 25-49 pers: 1 790€/pers | 50+ pers: 1 760€/pers</p>
                       </div>
                     </div>
                   </div>
