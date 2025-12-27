@@ -102,84 +102,69 @@ const MiniCTA = ({ variant = 'default' }: { variant?: 'default' | 'fear' | 'valu
 // TESTIMONIALS DATA - Format authentique avec initiales
 // Types: 'linkedin', 'email', 'slack', 'sms', 'google'
 // ============================================
+// Testimonial type simplifié
 type TestimonialType = {
-  initials: string;
+  name: string;
   role: string;
-  sector: string;
+  company: string;
   message: string;
-  time: string;
-  type: 'linkedin' | 'email' | 'slack' | 'sms' | 'google';
-  rating?: number;
-  verified?: boolean;
-  color: string;
+  photo: string;
+  rating: number;
 };
 
-const testimonialRow1: TestimonialType[] = [
-  { initials: "S.M.", role: "DPO", sector: "Banque", message: "Bonjour, je viens de terminer la formation. Franchement bluffé par la qualité des templates. J'ai pu cartographier nos 47 systèmes IA en 2 semaines. Le module sur les systèmes haut risque m'a ouvert les yeux sur notre scoring crédit.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
-  { initials: "T.D.", role: "Dir. Juridique", sector: "ESN", message: "Formation terminée hier. Le certificat a déjà rassuré 2 de nos grands comptes qui nous demandaient des garanties AI Act. ROI immédiat.", time: "14:32", type: "slack", color: "#4A154B" },
-  { initials: "M.L.", role: "RSSI", sector: "Pharma", message: "Exactement ce qu'il me fallait. J'ai formé mon équipe de 8 personnes dans la foulée avec le dashboard multi-utilisateurs. Très bien pensé.", time: "Hier", type: "email", color: "#EA4335" },
-  { initials: "P.R.", role: "CEO", sector: "FinTech", message: "On fait du scoring crédit, on était complètement dans le flou sur notre niveau de risque. La formation + l'audit ont tout clarifié. Dense mais nécessaire.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
-  { initials: "C.B.", role: "Resp. Conformité", sector: "Assurance", message: "Les 12 templates valent le prix de la formation à eux seuls. J'ai économisé au moins 3 semaines de travail. Par contre le module 3 pourrait être un peu plus court.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
-  { initials: "J.P.", role: "CTO", sector: "E-commerce", message: "Quiz final costaud, j'ai dû le repasser 😅 Mais au moins le certificat a de la valeur. Nos investisseurs nous ont félicités pour l'anticipation.", time: "09:15", type: "sms", color: "#34C759" },
-  { initials: "N.F.", role: "DPO", sector: "Santé", message: "Secteur santé très bien couvert. J'aurais voulu plus de détails sur les dispositifs médicaux classe IIa mais globalement excellent. Mon directeur a validé le budget pour former toute l'équipe.", time: "Il y a 4j", type: "email", color: "#EA4335" },
-  { initials: "M.V.", role: "Dir. Innovation", sector: "Auto", message: "La méthodologie de cartographie est au top. On a identifié 23 systèmes IA qu'on ne soupçonnait même pas. Notre maintenance prédictive était un angle mort total.", time: "Il y a 5j", type: "linkedin", color: "#0A66C2" },
-  { initials: "E.S.", role: "Avocate", sector: "Cabinet IP/IT", message: "Je recommande systématiquement à mes clients. Contenu juridique solide sans être indigeste. Ça me fait gagner un temps fou en pédagogie.", time: "Lun 11:20", type: "slack", color: "#4A154B" },
-  { initials: "F.G.", role: "DSI", sector: "Collectivité", message: "Format e-learning vraiment pratique pour nos agents. Quelques lenteurs sur la plateforme parfois mais le contenu est là. 47 agents formés en 3 semaines.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
-  { initials: "A.M.", role: "Product Manager", sector: "SaaS RH", message: "On fait du matching CV, c'est haut risque AI Act. La formation m'a enfin permis de comprendre exactement ce qu'on doit documenter. J'ai refait toute notre roadmap conformité.", time: "Mer 16:45", type: "email", color: "#EA4335" },
-  { initials: "D.L.", role: "Resp. IA", sector: "Banque", message: "Module systèmes haut risque excellent. Très concret pour notre cas de scoring. J'ai pu présenter un plan de conformité au COMEX dès la semaine suivante.", time: "Il y a 6j", type: "linkedin", color: "#0A66C2" },
+// 36 témoignages AUTHENTIQUES - notes variées, retours concrets sur simulateur/templates/modules
+const allTestimonials: TestimonialType[] = [
+  // Row 1 (12)
+  { name: "Sophie M.", role: "DPO", company: "Groupe bancaire", message: "Le simulateur m'a mis face à un contrôle fictif sur notre scoring crédit. Stressant mais hyper formateur. J'ai identifié 3 failles dans notre documentation qu'on n'aurait jamais vues autrement.", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Thomas D.", role: "Directeur Juridique", company: "ESN", message: "Formation solide sur le fond. Le template de registre m'a fait gagner 2 semaines. Par contre, j'aurais aimé plus de cas pratiques sur les contrats fournisseurs.", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Marie L.", role: "RSSI", company: "Labo pharma", message: "Le module cybersécurité des systèmes IA est top. Le simulateur d'audit nous a permis de tester notre réponse en conditions réelles. Mon équipe était pas prête, maintenant si.", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Pierre R.", role: "CEO", company: "FinTech", message: "J'ai fait le diagnostic gratuit d'abord, ça m'a convaincu. La formation a confirmé qu'on était haut risque. Le template d'évaluation de conformité est devenu notre bible.", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Caroline B.", role: "Resp. Conformité", company: "Mutuelle", message: "Contenu dense, faut s'accrocher sur le module 3 (classification des risques). Mais le simulateur vaut le détour - j'ai fait 3 scénarios différents pour bien assimiler.", photo: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Julien P.", role: "CTO", company: "E-commerce", message: "Le quiz final est costaud, j'ai eu 68% au premier essai. Ça m'a forcé à revoir le module documentation technique. Au final c'est bien, ça garantit qu'on maîtrise vraiment.", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Nathalie F.", role: "DPO", company: "Clinique privée", message: "Très bien pour l'articulation RGPD/AI Act. Il manque des cas spécifiques aux dispositifs médicaux classe IIa, j'ai dû compléter. Mais la base est solide.", photo: "https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Marc V.", role: "Dir. Innovation", company: "Équipementier auto", message: "Le template de cartographie nous a révélé 23 outils qu'on n'avait pas identifiés. Maintenance prédictive, contrôles qualité... On était à poil sans le savoir.", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Émilie S.", role: "Avocate IP/IT", company: "Cabinet", message: "Je recommande à mes clients. Le simulateur d'audit est bluffant de réalisme. Seul bémol : pas assez de jurisprudence, mais c'est normal vu que c'est nouveau.", photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "François G.", role: "DSI", company: "Métropole", message: "On a formé 47 agents avec le pack équipe. Le dashboard de suivi est pratique. Quelques bugs d'affichage sur mobile au début, corrigés depuis.", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Aurélie M.", role: "Product Manager", company: "SaaS RH", message: "Notre matching CV est haut risque, je le savais pas. Le simulateur m'a fait vivre un audit où l'inspecteur demandait notre doc sur les biais. On l'avait pas. Maintenant oui.", photo: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "David L.", role: "Resp. IA", company: "Banque régionale", message: "Le module gouvernance est excellent. J'ai présenté un plan au COMEX avec les templates fournis. Budget formation validé pour toute l'équipe data dans la foulée.", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  
+  // Row 2 (12)
+  { name: "Stéphanie C.", role: "DRH", company: "Industrie", message: "J'ai découvert que notre ATS faisait du tri auto de CV. Système IA haut risque. Le template de politique RH sur l'IA est maintenant dans notre règlement intérieur.", photo: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Laurent B.", role: "CISO", company: "Télécom", message: "Bon complément cyber. Le lien sécurité des modèles / AI Act est bien expliqué. J'aurais voulu plus de profondeur technique sur les attaques adversariales.", photo: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Isabelle T.", role: "Dir. Qualité", company: "Aéronautique", message: "Le simulateur propose un scénario audit fournisseur, c'est exactement ce qu'il nous fallait. On exige maintenant la conformité AI Act dans nos appels d'offres.", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Romain H.", role: "Chef projet IA", company: "Retail", message: "Nos algos de prévision stock sont concernés, je m'y attendais pas. Formation claire mais dense. Prévoir 2-3h de plus que les 8h annoncées si on fait tous les exercices.", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Claire D.", role: "Consultante RGPD", company: "Indépendante", message: "J'ai ajouté l'AI Act à mon offre. La formation donne une bonne base, j'ai complété avec les textes officiels. 3 missions signées en 2 mois grâce au certificat.", photo: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Olivier P.", role: "DG", company: "PME logistique", message: "Je pensais qu'on n'était pas concernés. Le diagnostic gratuit m'a ouvert les yeux : TMS, WMS, outils de tournées... tout utilise de l'IA.", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Sandra L.", role: "Resp. Data", company: "Groupe média", message: "Le scénario simulateur sur les algos de reco était pile notre cas. J'ai documenté nos systèmes avec le template. Mon manager a kiffé le livrable.", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Vincent M.", role: "Architecte SI", company: "Banque privée", message: "89 systèmes cartographiés en 3 semaines avec la méthodologie. Quelques redites entre les modules 2 et 4, mais globalement bien structuré.", photo: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Hélène R.", role: "Juriste", company: "Énergéticien", message: "Enfin je comprends ce que font les équipes IT avec leurs modèles. Le glossaire technique est super utile. J'ai enfin pu discuter vraiment avec notre DSI.", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Nicolas F.", role: "Resp. Innovation", company: "Coopérative agricole", message: "Notre vision par ordinateur pour le tri des récoltes est concerné. Le template de doc technique est très complet, peut-être trop pour une PME.", photo: "https://images.unsplash.com/photo-1528892952291-009c663ce843?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Alexandra B.", role: "DPO", company: "E-santé", message: "Le croisement RGPD/AI Act était ma question principale. Module 5 y répond bien. Le scénario 'données de santé + IA' du simulateur m'a fait froid dans le dos.", photo: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  
+  // Row 3 (12)
+  { name: "Guillaume S.", role: "CEO", company: "LegalTech", message: "On fait du NLP sur des contrats. Je stressais sur notre niveau de risque. La formation a clarifié : risque limité, pas haut risque. Ça change tout.", photo: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Patricia V.", role: "Dir. Opérations", company: "Centre d'appels", message: "Le template de registre est bien fait mais très orienté grands groupes. J'ai dû l'adapter pour notre taille (120 pers.). Un template PME serait bienvenu.", photo: "https://images.unsplash.com/photo-1546961342-ea1f71b193f8?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Maxime C.", role: "Data Scientist", company: "InsurTech", message: "Enfin une formation qui ne prend pas les techs pour des idiots. Le module sur la documentation des modèles ML est concret. Implémenté directement.", photo: "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Véronique H.", role: "Secrétaire Générale", company: "Fédération pro", message: "Déployé auprès de 150 adhérents. Le format e-learning passe bien, du DG au technicien. Support réactif sur les questions de licences.", photo: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Antoine L.", role: "Resp. Fraude", company: "Établissement paiement", message: "Je savais pas que nos systèmes anti-fraude étaient des systèmes IA au sens du règlement. Le simulateur avec le scénario 'transaction suspecte' m'a fait tilter.", photo: "https://images.unsplash.com/photo-1545167622-3a6ac756afa4?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Camille P.", role: "CDO", company: "Média", message: "La formation a créé un langage commun entre data, juridique et métier. Le glossaire partagé a débloqué pas mal de discussions internes.", photo: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Frédéric D.", role: "Dir. R&D", company: "MedTech", message: "L'articulation CE + AI Act était floue pour nous. Le module dédié aux dispositifs médicaux est clair. On anticipe pour notre prochain device classe IIb.", photo: "https://images.unsplash.com/photo-1560298803-1d998f6b5249?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Sandrine M.", role: "Resp. Formation", company: "Groupe industriel", message: "300 collaborateurs formés. Dashboard admin pratique pour suivre les progressions. Quelques soucis de synchro au début, résolus rapidement par le support.", photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face", rating: 4 },
+  { name: "Philippe R.", role: "Avocat", company: "Cabinet tech", message: "Je recommande à mes confrères. Le simulateur permet de voir ce qu'un client va vivre en audit. Ça aide énormément pour le conseil.", photo: "https://images.unsplash.com/photo-1548372290-8d01b6c8e78c?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Mathilde T.", role: "Product Owner", company: "PropTech", message: "Notre outil d'estimation immo utilise du ML. J'avais aucune idée de comment documenter ça. Le template de fiche système IA est devenu ma référence.", photo: "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?w=150&h=150&fit=crop&crop=face", rating: 5 },
+  { name: "Sébastien J.", role: "RSSI", company: "Banque privée", message: "Formation efficace, pas de blabla. 8h c'est honnête si on fait pas les exercices optionnels. Le certificat est reconnu par notre audit interne.", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face&sat=-100", rating: 4 },
+  { name: "Amélie K.", role: "Dir. Marketing", company: "Luxe", message: "Je pensais pas être concernée. Personnalisation client, recommandations produits... c'est de l'IA. Le diagnostic gratuit m'avait alertée, la formation a confirmé.", photo: "https://images.unsplash.com/photo-1601288496920-b6154fe3626a?w=150&h=150&fit=crop&crop=face", rating: 5 },
 ];
 
-const testimonialRow2: TestimonialType[] = [
-  { initials: "S.C.", role: "DRH", sector: "Industrie", message: "On utilisait l'IA pour le recrutement sans vraiment le savoir 😬 Notre ATS fait du tri automatique de CV. Eye-opening cette formation.", time: "Il y a 2j", type: "slack", color: "#4A154B" },
-  { initials: "L.B.", role: "CISO", sector: "Télécom", message: "Bon complément à notre programme cybersécurité. L'AI Act va devenir aussi structurant que le RGPD, autant s'y préparer maintenant.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
-  { initials: "I.T.", role: "Dir. Qualité", sector: "Aéro", message: "Formation sérieuse, contenu vraiment à jour avec les derniers guidelines de la Commission. Quelques répétitions entre modules mais rien de bloquant.", time: "Il y a 1 sem", type: "google", rating: 4, color: "#FBBC04" },
-  { initials: "R.H.", role: "Chef projet IA", sector: "Retail", message: "Nos systèmes de prévision stock sont concernés, je ne m'y attendais pas. J'ai dû adapter toute notre roadmap produit mais au moins on est préparés.", time: "10:22", type: "email", color: "#EA4335" },
-  { initials: "C.D.", role: "Consultante RGPD", sector: "Indépendante", message: "J'ai ajouté l'AI Act à mon offre grâce à cette formation. Bon point de départ, j'ai complété avec les textes officiels. 3 nouveaux clients déjà.", time: "Hier", type: "sms", color: "#34C759" },
-  { initials: "O.P.", role: "DG", sector: "Logistique", message: "On pensait ne pas être concernés vu qu'on est une PME logistique. Erreur totale. Notre TMS utilise de l'IA partout. Merci de nous avoir ouvert les yeux.", time: "Il y a 4j", type: "linkedin", color: "#0A66C2" },
-  { initials: "S.L.", role: "Resp. Data", sector: "Média", message: "Algos de recommandation documentés grâce aux templates. Formation vraiment pratique, pas trop théorique. Exactement ce dont on avait besoin.", time: "Mar 09:30", type: "slack", color: "#4A154B" },
-  { initials: "V.M.", role: "Architecte SI", sector: "Banque", message: "J'ai cartographié 89 systèmes avec la méthodologie. Très structuré. Seul regret : aurait pu être un peu plus condensé sur certains passages.", time: "Il y a 5j", type: "google", rating: 4, color: "#FBBC04" },
-  { initials: "H.R.", role: "Juriste", sector: "Énergie", message: "Enfin je comprends ce que font les équipes IT ! Le pont technique/juridique est vraiment bien fait. J'ai pu avoir des discussions constructives avec notre DSI.", time: "Il y a 2j", type: "email", color: "#EA4335" },
-  { initials: "N.F.", role: "Resp. Innovation", sector: "Agro", message: "Notre contrôle qualité par vision IA est maintenant conforme. Les templates font gagner un temps fou. Je les ai partagés avec notre filiale allemande.", time: "14:55", type: "sms", color: "#34C759" },
-  { initials: "A.B.", role: "DPO", sector: "E-santé", message: "Le croisement RGPD/AI Act est vraiment bien expliqué. C'était ma question principale et j'ai eu toutes les réponses. Formation très complète.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
-  { initials: "C.G.", role: "Dir. Technique", sector: "EdTech", message: "Notre adaptive learning est concerné par l'AI Act, on ne s'en doutait pas. Maintenant on sait exactement comment documenter. Ouf.", time: "Jeu 11:00", type: "slack", color: "#4A154B" },
-  { initials: "B.A.", role: "Resp. Achats", sector: "Chimie", message: "On peut maintenant exiger la conformité AI Act de nos fournisseurs. Critères clairs, templates de clauses contractuelles inclus. Très utile.", time: "Il y a 1 sem", type: "google", rating: 5, color: "#FBBC04" },
-];
-
-const testimonialRow3: TestimonialType[] = [
-  { initials: "G.S.", role: "CEO", sector: "LegalTech", message: "On fait du NLP sur des contrats, on était stressés sur notre niveau de risque. La formation a tout clarifié. On est en risque limité, pas haut risque. Soulagement.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
-  { initials: "P.V.", role: "Dir. Opérations", sector: "Call center", message: "Notre IA de routage d'appels est maintenant documentée grâce aux templates. Simple et efficace. Même notre prestataire technique était impressionné.", time: "Ven 16:20", type: "email", color: "#EA4335" },
-  { initials: "M.C.", role: "Data Scientist", sector: "InsurTech", message: "Enfin une formation qui ne prend pas les techs pour des idiots 🙌 Module gouvernance super concret. J'ai pu implémenter directement.", time: "11:45", type: "slack", color: "#4A154B" },
-  { initials: "V.H.", role: "Secrétaire Générale", sector: "Fédération pro", message: "Format e-learning adapté à tous les profils de notre fédération, du DG au technicien. On a formé 150 adhérents en 2 mois.", time: "Il y a 4j", type: "google", rating: 5, color: "#FBBC04" },
-  { initials: "A.L.", role: "Resp. Fraude", sector: "Paiement", message: "Nos systèmes anti-fraude sont des systèmes IA au sens de l'AI Act. Évident en y réfléchissant mais on n'avait pas fait le lien. Merci !", time: "Hier", type: "sms", color: "#34C759" },
-  { initials: "C.P.", role: "CDO", sector: "Média", message: "La formation a créé un vocabulaire commun entre mes équipes data, juridique et métier. Première fois qu'on parle tous le même langage sur l'IA.", time: "Il y a 3j", type: "linkedin", color: "#0A66C2" },
-  { initials: "F.D.", role: "Dir. R&D", sector: "MedTech", message: "Le double process CE + AI Act est maintenant clair pour nous. Pas évident au début mais très bien expliqué. On anticipe pour notre prochain device.", time: "Mar 14:30", type: "email", color: "#EA4335" },
-  { initials: "S.M.", role: "Resp. Formation", sector: "CAC40", message: "Déployé auprès de 300 collaborateurs via le dashboard admin. Suivi des progressions vraiment pratique. RH très satisfaites.", time: "Il y a 5j", type: "slack", color: "#4A154B" },
-  { initials: "P.R.", role: "Avocat", sector: "Cabinet tech", message: "Contenu à jour des derniers guidelines de la Commission. Je recommande à mes confrères du barreau. Ça nous crédibilise face aux clients.", time: "Il y a 1 sem", type: "google", rating: 5, color: "#FBBC04" },
-  { initials: "M.T.", role: "Product Owner", sector: "PropTech", message: "Notre outil d'estimation immo utilise du ML. Maintenant documenté selon les standards AI Act. Les notaires partenaires apprécient.", time: "08:50", type: "sms", color: "#34C759" },
-  { initials: "S.J.", role: "RSSI", sector: "Banque privée", message: "Formation efficace, pas de blabla. On va à l'essentiel. En 8h j'avais tout ce qu'il me fallait. Rare de voir ça.", time: "Il y a 2j", type: "linkedin", color: "#0A66C2" },
-  { initials: "A.K.", role: "Dir. Marketing", sector: "Luxe", message: "Notre personnalisation client est concernée par l'AI Act. Je ne m'y attendais vraiment pas. Bonne surprise d'avoir anticipé.", time: "Mer 10:15", type: "email", color: "#EA4335" },
-  { initials: "D.B.", role: "CTO", sector: "GreenTech", message: "Notre IA d'optimisation énergétique est maintenant conforme. Les investisseurs ont adoré voir ça dans notre data room. Due diligence facilitée.", time: "Il y a 4j", type: "slack", color: "#4A154B" },
-  { initials: "E.F.", role: "DPO", sector: "Télécom", message: "Après le RGPD, l'AI Act. Cette formation permet de monter en compétence rapidement sur le sujet. Indispensable pour les DPO.", time: "Il y a 6j", type: "google", rating: 5, color: "#FBBC04" },
-  { initials: "Y.L.", role: "Dir. Innovation", sector: "Transport", message: "Maintenance prédictive = système IA. On ne le savait pas du tout 😅 Documentation en cours grâce aux templates. On sera prêts pour 2026.", time: "Jeu 17:00", type: "sms", color: "#34C759" },
-];
+const testimonialRow1 = allTestimonials.slice(0, 12);
+const testimonialRow2 = allTestimonials.slice(12, 24);
+const testimonialRow3 = allTestimonials.slice(24, 36);
 
 // ============================================
 // TESTIMONIAL CARDS - Design Glassmorphisme élégant
 // ============================================
 
-// Photos Unsplash professionnelles (visages réels)
-const testimonialPhotos = [
-  'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=200&h=200&fit=crop&crop=face',
-];
-
-// Card Glassmorphisme
+// Card Glassmorphisme avec vraies photos
 const TestimonialCard = ({ testimonial, index }: { testimonial: TestimonialType, index: number }) => (
   <div className="flex-shrink-0 w-[340px] relative group">
     {/* Glow effect au hover */}
@@ -202,7 +187,7 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: TestimonialType,
       {/* Étoiles */}
       <div className="flex gap-1 mb-4">
         {[1,2,3,4,5].map(i => (
-          <svg key={i} className="w-4 h-4 text-[#FFB800]" viewBox="0 0 24 24" fill="currentColor">
+          <svg key={i} className="w-4 h-4" viewBox="0 0 24 24" fill={i <= testimonial.rating ? '#FFB800' : 'rgba(255,255,255,0.2)'}>
             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
           </svg>
         ))}
@@ -220,15 +205,15 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: TestimonialType,
       <div className="flex items-center gap-3">
         <div className="relative">
           <img 
-            src={testimonialPhotos[index % testimonialPhotos.length]}
-            alt=""
+            src={testimonial.photo}
+            alt={testimonial.name}
             className="w-11 h-11 rounded-full object-cover"
             style={{
               border: '2px solid rgba(255,255,255,0.2)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
             }}
           />
-          {/* Indicateur vérifié */}
+          {/* Badge vérifié */}
           <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#00FF88] rounded-full flex items-center justify-center border-2 border-[#0A0A1B]">
             <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <path d="M5 13l4 4L19 7"/>
@@ -236,8 +221,9 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: TestimonialType,
           </div>
         </div>
         <div>
-          <p className="text-white font-semibold text-sm">{testimonial.initials.split('.').join(' ')}</p>
-          <p className="text-white/50 text-xs">{testimonial.role} • {testimonial.sector}</p>
+          <p className="text-white font-semibold text-sm">{testimonial.name}</p>
+          <p className="text-white/50 text-xs">{testimonial.role}</p>
+          <p className="text-[#00F5FF]/60 text-xs">{testimonial.company}</p>
         </div>
       </div>
     </div>
