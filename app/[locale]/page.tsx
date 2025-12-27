@@ -554,8 +554,8 @@ const MultiStepLeadForm = () => {
   }
 
   return (
-    <HoloCard glow="#00F5FF">
-      <div className="p-6 sm:p-8">
+    <HoloCard glow="#00F5FF" className="ring-1 ring-[#00F5FF]/30">
+      <div className="p-6 sm:p-8 bg-gradient-to-br from-[#00F5FF]/5 via-transparent to-[#00FF88]/5">
         {/* Header avec urgence */}
         <div className="text-center mb-6">
           <motion.div 
@@ -4403,7 +4403,14 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, x: 0 }} 
               viewport={{ once: true }}
             >
-              <div className="sticky top-24">
+              <div 
+                className="sticky top-24 rounded-2xl"
+                style={{
+                  boxShadow: '0 0 60px rgba(0, 245, 255, 0.3), 0 0 100px rgba(0, 245, 255, 0.15), inset 0 0 60px rgba(0, 245, 255, 0.05)',
+                  border: '2px solid rgba(0, 245, 255, 0.4)',
+                  background: 'linear-gradient(135deg, rgba(0, 245, 255, 0.08) 0%, rgba(10, 10, 27, 0.95) 50%, rgba(0, 255, 136, 0.05) 100%)'
+                }}
+              >
                 <MultiStepLeadForm />
               </div>
             </motion.div>
