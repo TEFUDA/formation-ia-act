@@ -164,215 +164,85 @@ const testimonialRow3: TestimonialType[] = [
 ];
 
 // ============================================
-// TESTIMONIAL CARDS - Designs PIXEL-PERFECT authentiques
+// TESTIMONIAL CARDS - Design Glassmorphisme élégant
 // ============================================
 
-// Google Review - EXACT comme le vrai (fond blanc, photo ronde, étoiles jaunes)
-const GoogleCard = ({ t }: { t: TestimonialType }) => (
-  <div className="flex-shrink-0 w-[300px] bg-white rounded-xl shadow-sm p-4">
-    {/* Header avec photo et infos */}
-    <div className="flex items-start gap-3">
-      {/* Photo de profil ronde */}
-      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0 shadow-sm">
-        {t.initials.split('.')[0]}
-      </div>
-      <div className="flex-1 min-w-0">
-        {/* Nom */}
-        <p className="text-[#1a1a1a] font-medium text-[15px] leading-tight">{t.initials.split('.').join(' ')}</p>
-        {/* Google logo + date */}
-        <div className="flex items-center gap-1.5 mt-1">
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+// Photos Unsplash professionnelles (visages réels)
+const testimonialPhotos = [
+  'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1598550874175-4d0ef436c909?w=200&h=200&fit=crop&crop=face',
+];
+
+// Card Glassmorphisme
+const TestimonialCard = ({ testimonial, index }: { testimonial: TestimonialType, index: number }) => (
+  <div className="flex-shrink-0 w-[340px] relative group">
+    {/* Glow effect au hover */}
+    <div className="absolute -inset-1 bg-gradient-to-r from-[#00F5FF]/20 via-[#8B5CF6]/20 to-[#00FF88]/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    
+    {/* Card principale glassmorphisme */}
+    <div 
+      className="relative p-6 rounded-2xl overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
+      }}
+    >
+      {/* Reflet subtil en haut */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      
+      {/* Étoiles */}
+      <div className="flex gap-1 mb-4">
+        {[1,2,3,4,5].map(i => (
+          <svg key={i} className="w-4 h-4 text-[#FFB800]" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
           </svg>
-          <span className="text-[#70757a] text-xs">{t.time}</span>
-        </div>
-        {/* Étoiles */}
-        <div className="flex gap-0.5 mt-2">
-          {[1,2,3,4,5].map(i => (
-            <svg key={i} className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill={i <= (t.rating || 5) ? '#FBBC04' : '#dadce0'}>
-              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-            </svg>
-          ))}
-        </div>
+        ))}
       </div>
-    </div>
-    {/* Texte de l'avis */}
-    <p className="text-[#3c4043] text-sm leading-[1.58] mt-3">{t.message}</p>
-  </div>
-);
-
-// WhatsApp - EXACT avec fond beige et bulles vertes
-const WhatsAppCard = ({ t }: { t: TestimonialType }) => (
-  <div className="flex-shrink-0 w-[320px] rounded-xl overflow-hidden shadow-lg">
-    {/* Header WhatsApp vert foncé */}
-    <div className="flex items-center gap-3 px-4 py-2.5" style={{ background: '#075E54' }}>
-      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold text-sm flex-shrink-0">
-        {t.initials.split('.')[0]}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-white text-[15px] font-medium truncate">{t.initials.split('.').join(' ')}</p>
-        <p className="text-white/70 text-xs">{t.role}</p>
-      </div>
-      <div className="flex items-center gap-4 text-white/90">
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
-      </div>
-    </div>
-    {/* Zone de messages fond beige */}
-    <div className="p-3 min-h-[100px]" style={{ background: '#ECE5DD' }}>
-      {/* Bulle de message verte (envoyé) */}
-      <div className="flex justify-end">
-        <div className="max-w-[85%] rounded-lg rounded-tr-none p-2 relative" style={{ background: '#DCF8C6' }}>
-          <p className="text-[#303030] text-[14.2px] leading-[19px] pr-14">{t.message}</p>
-          {/* Timestamp et checks */}
-          <div className="absolute bottom-1 right-2 flex items-center gap-1">
-            <span className="text-[#667781] text-[11px]">{t.time}</span>
-            <svg className="w-[18px] h-[13px]" viewBox="0 0 18 13" fill="#53BDEB">
-              <path d="M17.394 2.092l-.478-.372a.365.365 0 0 0-.51.063l-5.356 6.873a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.508zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L6.95 8.656a.32.32 0 0 1-.484.032L4.276 6.6a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.06-.564z"/>
+      
+      {/* Message */}
+      <p className="text-white/90 text-[15px] leading-relaxed mb-6">
+        "{testimonial.message}"
+      </p>
+      
+      {/* Séparateur */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
+      
+      {/* Auteur */}
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <img 
+            src={testimonialPhotos[index % testimonialPhotos.length]}
+            alt=""
+            className="w-11 h-11 rounded-full object-cover"
+            style={{
+              border: '2px solid rgba(255,255,255,0.2)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+            }}
+          />
+          {/* Indicateur vérifié */}
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#00FF88] rounded-full flex items-center justify-center border-2 border-[#0A0A1B]">
+            <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M5 13l4 4L19 7"/>
             </svg>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-);
-
-// LinkedIn - Style publication/commentaire fond blanc
-const LinkedInCard = ({ t }: { t: TestimonialType }) => (
-  <div className="flex-shrink-0 w-[340px] bg-white rounded-lg border border-[#e0e0e0] shadow-sm overflow-hidden">
-    {/* Header du post */}
-    <div className="p-3 flex items-start gap-2">
-      {/* Photo de profil */}
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0A66C2] to-[#004182] flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
-        {t.initials.split('.')[0]}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[#000000E6] font-semibold text-sm hover:text-[#0A66C2] hover:underline cursor-pointer">{t.initials.split('.').join(' ')}</p>
-        <p className="text-[#00000099] text-xs leading-tight">{t.role} • {t.sector}</p>
-        <div className="flex items-center gap-1 text-[#00000099] text-xs mt-0.5">
-          <span>{t.time}</span>
-          <span>•</span>
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 1a7 7 0 107 7 7 7 0 00-7-7zM3 8a5 5 0 1110 0A5 5 0 013 8z"/>
-          </svg>
-        </div>
-      </div>
-      {/* Menu 3 points */}
-      <button className="text-[#00000099] hover:bg-black/5 p-1.5 rounded-full">
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-      </button>
-    </div>
-    {/* Contenu */}
-    <div className="px-3 pb-3">
-      <p className="text-[#000000E6] text-sm leading-[1.43]">{t.message}</p>
-    </div>
-    {/* Séparateur + réactions */}
-    <div className="border-t border-[#e0e0e0]">
-      <div className="px-3 py-1.5 flex items-center gap-1">
-        <div className="flex -space-x-1">
-          <div className="w-[18px] h-[18px] rounded-full bg-[#0A66C2] flex items-center justify-center border-2 border-white">
-            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/></svg>
-          </div>
-          <div className="w-[18px] h-[18px] rounded-full bg-[#DF704D] flex items-center justify-center border-2 border-white">
-            <span className="text-[8px]">❤️</span>
-          </div>
-        </div>
-        <span className="text-[#00000099] text-xs ml-1">12</span>
-      </div>
-    </div>
-  </div>
-);
-
-// Slack - Style EXACT avec fond blanc et réactions
-const SlackCard = ({ t }: { t: TestimonialType }) => (
-  <div className="flex-shrink-0 w-[380px] bg-white rounded-lg border border-[#e1e1e1] shadow-sm overflow-hidden">
-    {/* Channel header */}
-    <div className="px-4 py-2 border-b border-[#e1e1e1] bg-white">
-      <div className="flex items-center gap-1">
-        <span className="text-[#1d1c1d] font-bold text-lg">#</span>
-        <span className="text-[#1d1c1d] font-bold text-[15px]">conformité-ia</span>
-      </div>
-    </div>
-    {/* Message */}
-    <div className="p-4 hover:bg-[#f8f8f8] transition-colors">
-      <div className="flex items-start gap-2">
-        {/* Avatar carré arrondi style Slack */}
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#36C5F0] to-[#2EB67D] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-          {t.initials.split('.')[0]}
-        </div>
-        <div className="flex-1 min-w-0">
-          {/* Nom et timestamp */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-[#1d1c1d] font-bold text-[15px]">{t.initials.split('.').join(' ')}</span>
-            <span className="text-[#616061] text-xs">{t.time}</span>
-          </div>
-          {/* Message */}
-          <p className="text-[#1d1c1d] text-[15px] leading-[1.46] mt-0.5">{t.message}</p>
-          {/* Réactions */}
-          <div className="flex items-center gap-1.5 mt-2">
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-[#f0f0f0] hover:bg-[#e8e8e8] rounded-full cursor-pointer border border-transparent hover:border-[#1264a3]">
-              <span className="text-[13px]">👍</span>
-              <span className="text-[#1d1c1d] text-xs font-medium">3</span>
-            </div>
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-[#f0f0f0] hover:bg-[#e8e8e8] rounded-full cursor-pointer">
-              <span className="text-[13px]">🎉</span>
-              <span className="text-[#1d1c1d] text-xs font-medium">1</span>
-            </div>
-          </div>
+        <div>
+          <p className="text-white font-semibold text-sm">{testimonial.initials.split('.').join(' ')}</p>
+          <p className="text-white/50 text-xs">{testimonial.role} • {testimonial.sector}</p>
         </div>
       </div>
     </div>
   </div>
 );
-
-// Email Gmail - Style inbox
-const EmailCard = ({ t }: { t: TestimonialType }) => (
-  <div className="flex-shrink-0 w-[360px] bg-white rounded-lg border border-[#e0e0e0] shadow-sm overflow-hidden">
-    {/* Header email */}
-    <div className="px-4 py-3 flex items-start gap-3 border-b border-[#e0e0e0]">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EA4335] to-[#FBBC04] flex items-center justify-center text-white font-semibold text-base flex-shrink-0">
-        {t.initials.split('.')[0]}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <span className="text-[#202124] font-medium text-sm">{t.initials.split('.').join(' ')}</span>
-          <span className="text-[#5f6368] text-xs">{t.time}</span>
-        </div>
-        <p className="text-[#5f6368] text-xs">à moi</p>
-      </div>
-    </div>
-    {/* Objet */}
-    <div className="px-4 py-2 border-b border-[#f1f3f4]">
-      <p className="text-[#202124] font-medium text-sm">Re: Formation AI Act - Retour</p>
-    </div>
-    {/* Corps */}
-    <div className="px-4 py-3">
-      <p className="text-[#202124] text-sm leading-[1.58]">{t.message}</p>
-      <div className="mt-4 pt-3 border-t border-[#f1f3f4]">
-        <p className="text-[#5f6368] text-xs">—</p>
-        <p className="text-[#5f6368] text-xs">{t.initials.split('.').join(' ')}</p>
-        <p className="text-[#5f6368] text-xs">{t.role}, {t.sector}</p>
-      </div>
-    </div>
-  </div>
-);
-
-// Main Testimonial Card Selector
-const TestimonialCard = ({ testimonial }: { testimonial: TestimonialType }) => {
-  switch (testimonial.type) {
-    case 'linkedin': return <LinkedInCard t={testimonial} />;
-    case 'email': return <EmailCard t={testimonial} />;
-    case 'slack': return <SlackCard t={testimonial} />;
-    case 'sms': return <WhatsAppCard t={testimonial} />;
-    case 'google': return <GoogleCard t={testimonial} />;
-    default: return <GoogleCard t={testimonial} />;
-  }
-};
 
 // Neural Background
 const NeuralBackground = () => {
@@ -3926,7 +3796,7 @@ export default function LandingPage() {
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
             >
               {[...testimonialRow1, ...testimonialRow1].map((t, i) => (
-                <TestimonialCard key={i} testimonial={t} />
+                <TestimonialCard key={i} testimonial={t} index={i} />
               ))}
             </motion.div>
           </div>
@@ -3939,7 +3809,7 @@ export default function LandingPage() {
               transition={{ duration: 70, repeat: Infinity, ease: "linear" }}
             >
               {[...testimonialRow2, ...testimonialRow2].map((t, i) => (
-                <TestimonialCard key={i} testimonial={t} />
+                <TestimonialCard key={i} testimonial={t} index={i + 10} />
               ))}
             </motion.div>
           </div>
@@ -3952,7 +3822,7 @@ export default function LandingPage() {
               transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
             >
               {[...testimonialRow3, ...testimonialRow3].map((t, i) => (
-                <TestimonialCard key={i} testimonial={t} />
+                <TestimonialCard key={i} testimonial={t} index={i + 20} />
               ))}
             </motion.div>
           </div>
@@ -4291,21 +4161,6 @@ export default function LandingPage() {
               <span className="text-[#FF4444]">CERTAIN</span>
               <span className="text-white"> d'être en conformité ?</span>
             </motion.h2>
-            
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-block"
-            >
-              <Link 
-                href="#audit-gratuit"
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold text-lg px-8 py-4 rounded-full"
-              >
-                🎁 Diagnostic GRATUIT en 2 min
-                <span className="text-black/60">→</span>
-              </Link>
-            </motion.div>
-            <p className="text-white/40 text-sm mt-3">Sans engagement • Valeur 2 500€</p>
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8 items-start">
@@ -4389,8 +4244,21 @@ export default function LandingPage() {
               {/* Social proof */}
               <div className="mt-6 flex items-center justify-center gap-4 text-white/40 text-sm">
                 <div className="flex -space-x-2">
-                  {[1,2,3,4,5,6,7].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00F5FF] to-[#8B5CF6] border-2 border-[#0A0A1B]" />
+                  {[
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face',
+                  ].map((src, i) => (
+                    <img 
+                      key={i} 
+                      src={src}
+                      alt=""
+                      className="w-8 h-8 rounded-full border-2 border-[#0A0A1B] object-cover"
+                    />
                   ))}
                 </div>
                 <span><strong className="text-white">1 247 dirigeants</strong> ont fait leur audit ce mois</span>
@@ -4633,28 +4501,75 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="mt-12"
           >
-            <div className="bg-[#00FF88]/5 border-2 border-[#00FF88]/30 rounded-2xl p-6">
-              <div className="flex flex-col sm:flex-row items-start gap-6">
-                <motion.div 
-                  className="w-20 h-20 rounded-full bg-[#00FF88]/10 flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                >
-                  <div className="w-10 h-10 text-[#00FF88]"><Icons.ShieldCheck /></div>
-                </motion.div>
-                <div>
-                  <h4 className="text-[#00FF88] font-bold text-xl mb-2">
-                    Garantie "Conformité ou Remboursé" — 30 jours
-                  </h4>
-                  <p className="text-white/60 mb-4">
-                    Suivez la formation, appliquez les templates, et si vous n'êtes pas{' '}
-                    <span className="text-white font-semibold">100% confiant</span> dans votre capacité 
-                    à mettre votre entreprise en conformité, nous vous remboursons intégralement.
-                  </p>
-                  <p className="text-white/40 text-sm">
-                    <span className="text-[#00FF88] font-semibold">Bonus :</span> Gardez tous les templates même si vous demandez un remboursement.
-                    On prend le risque pour vous.
-                  </p>
+            <div className="relative overflow-hidden rounded-2xl">
+              {/* Fond avec effet premium */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#00FF88]/10 via-[#00FF88]/5 to-[#00FF88]/10" />
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMEZGODgiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+              
+              {/* Bordure animée */}
+              <div className="absolute inset-0 rounded-2xl border-2 border-[#00FF88]/40" />
+              <motion.div 
+                className="absolute inset-0 rounded-2xl border-2 border-[#00FF88]"
+                style={{ clipPath: 'inset(0 100% 0 0)' }}
+                animate={{ clipPath: ['inset(0 100% 0 0)', 'inset(0 0% 0 0)', 'inset(0 0% 0 0)'] }}
+                transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+              />
+              
+              <div className="relative p-8 sm:p-10">
+                <div className="flex flex-col lg:flex-row items-center gap-8">
+                  {/* Icône avec badge */}
+                  <div className="relative flex-shrink-0">
+                    <motion.div 
+                      className="w-28 h-28 rounded-full bg-gradient-to-br from-[#00FF88]/20 to-[#00FF88]/5 flex items-center justify-center"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    >
+                      <div className="w-16 h-16 rounded-full bg-[#00FF88]/20 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-[#00FF88]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                          <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                      </div>
+                    </motion.div>
+                    {/* Badge 30 jours */}
+                    <div className="absolute -top-2 -right-2 bg-[#FFB800] text-black text-xs font-black px-3 py-1 rounded-full shadow-lg">
+                      30 JOURS
+                    </div>
+                  </div>
+                  
+                  {/* Contenu */}
+                  <div className="flex-1 text-center lg:text-left">
+                    <h4 className="text-2xl sm:text-3xl font-black mb-4">
+                      <span className="text-[#00FF88]">Garantie</span>
+                      <span className="text-white"> "Conformité ou Remboursé"</span>
+                    </h4>
+                    
+                    <p className="text-white/70 text-lg mb-6 leading-relaxed">
+                      Suivez la formation, appliquez les templates. Si vous n'êtes pas{' '}
+                      <span className="text-white font-bold">100% confiant</span> dans votre capacité 
+                      à passer un audit sereinement → <span className="text-[#00FF88] font-bold">remboursement intégral</span>.
+                    </p>
+                    
+                    {/* Points clés */}
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                      {[
+                        { icon: "✓", text: "Sans condition" },
+                        { icon: "🎁", text: "Gardez les templates" },
+                        { icon: "⚡", text: "Remboursé sous 48h" },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full">
+                          <span className="text-[#00FF88]">{item.icon}</span>
+                          <span className="text-white/80 text-sm font-medium">{item.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Signature confiance */}
+                  <div className="flex-shrink-0 text-center">
+                    <p className="text-white/40 text-sm mb-2">On prend le risque</p>
+                    <p className="text-[#00FF88] font-bold text-lg">pas vous.</p>
+                  </div>
                 </div>
               </div>
             </div>
