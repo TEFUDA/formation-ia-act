@@ -21,32 +21,15 @@ const calculatePrice = (users: number) => {
   if (users <= 0) return { unitPrice: 0, total: 0, savings: 0, tier: '' };
   
   if (users === 1) {
-    return { unitPrice: 4900, total: 4900, savings: 0, tier: 'Solo' };
-  } else if (users >= 2 && users <= 4) {
-    const unitPrice = 4500;
-    const total = users * unitPrice;
-    const savings = users * 4900 - total;
-    return { unitPrice, total, savings, tier: 'Duo-Quartet' };
-  } else if (users >= 5 && users <= 9) {
-    const unitPrice = 3900;
-    const total = users * unitPrice;
-    const savings = users * 4900 - total;
+    return { unitPrice: 4990, total: 4990, savings: 0, tier: 'Solo' };
+  } else if (users >= 2 && users <= 5) {
+    const total = 9990;
+    const unitPrice = Math.round(total / users);
+    const savings = users * 4990 - total;
     return { unitPrice, total, savings, tier: 'Équipe' };
-  } else if (users >= 10 && users <= 24) {
-    const unitPrice = 3500;
-    const total = users * unitPrice;
-    const savings = users * 4900 - total;
-    return { unitPrice, total, savings, tier: 'Business' };
-  } else if (users >= 25 && users <= 49) {
-    const unitPrice = 3000;
-    const total = users * unitPrice;
-    const savings = users * 4900 - total;
-    return { unitPrice, total, savings, tier: 'Corporate' };
   } else {
-    const unitPrice = 2500;
-    const total = users * unitPrice;
-    const savings = users * 4900 - total;
-    return { unitPrice, total, savings, tier: 'Enterprise' };
+    // Plus de 5 personnes = sur devis
+    return { unitPrice: 0, total: 0, savings: 0, tier: 'Devis personnalisé' };
   }
 };
 
@@ -333,7 +316,7 @@ export default function DevisPage() {
         ${pricing.savings > 0 ? `
         <tr>
           <td colspan="4" style="text-align: right;" class="savings">
-            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 4900)) * 100)}% de réduction)
+            ✓ Économie réalisée : ${pricing.savings.toLocaleString('fr-FR')} € (${Math.round((pricing.savings / (formData.users * 4990)) * 100)}% de réduction)
           </td>
         </tr>
         ` : ''}
@@ -657,9 +640,9 @@ export default function DevisPage() {
 
                       {/* Pricing tiers info */}
                       <div className="text-xs text-white/40 space-y-1">
-                        <p>💡 Tarifs dégressifs :</p>
-                        <p>• 1 pers: 4 900€ | 2-4 pers: 4 500€/pers | 5-9 pers: 3 900€/pers</p>
-                        <p>• 10-24 pers: 3 500€/pers | 25-49 pers: 3 000€/pers | 50+ pers: 2 500€/pers</p>
+                        <p>💡 Tarifs :</p>
+                        <p>• 1 pers: 4 990€ | 2-5 pers: 9 990€ (pack équipe)</p>
+                        <p>• +5 pers: Devis personnalisé</p>
                       </div>
                     </div>
                   </div>
