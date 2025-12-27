@@ -1386,7 +1386,7 @@ const DIALOGUE_SCENARIO: DialogNode[] = [
     speaker: 'player',
     text: "",
     tip: "Derniers instants de préparation. Que faites-vous ?",
-    triggerMiniGame: 'priority_sort_1',
+    // triggerMiniGame déplacé pour éviter blocage
     choices: [
       {
         id: 'a',
@@ -3098,16 +3098,9 @@ export default function AuditSimulationMassive({ moduleColor = '#F97316', onComp
       setCurrentTip('');
     }
 
-    // Check for mini-game trigger
-    if (node.triggerMiniGame && Math.random() < 0.4) {
-      const miniGame = MINI_GAMES.find(m => m.id === node.triggerMiniGame);
-      if (miniGame) {
-        setTimeout(() => {
-          setCurrentMiniGame(miniGame);
-          setGamePhase('minigame');
-        }, 1500);
-      }
-    }
+    // Mini-game logic désactivée pour éviter les blocages
+    // Les mini-games sont maintenant déclenchés via des événements spécifiques
+    // if (node.triggerMiniGame) { ... }
 
     // Process based on speaker type
     const speakerTypes = ['auditor', 'dg', 'dsi', 'drh', 'rh', 'colleague', 'legal', 'vendor', 'intern', 'phone'];
@@ -3146,9 +3139,11 @@ export default function AuditSimulationMassive({ moduleColor = '#F97316', onComp
       }]);
       
       if (node.autoNext) {
+        const nextDelay = node.delay || 2000;
+        console.log('AutoNext vers:', node.autoNext, 'dans', nextDelay, 'ms');
         setTimeout(() => {
           processNode(node.autoNext!);
-        }, node.delay || 2000);
+        }, nextDelay);
       } else if (node.choices && node.choices.length > 0) {
         setTimeout(() => {
           setCurrentChoices(node.choices!);
@@ -3173,9 +3168,12 @@ export default function AuditSimulationMassive({ moduleColor = '#F97316', onComp
         }, 500);
       }
     } else if (node.speaker === 'player') {
+      // Force l'affichage des choix avec un petit délai pour s'assurer du rendu
       if (node.choices && node.choices.length > 0) {
-        setCurrentChoices(node.choices);
-        setShowChoices(true);
+        setTimeout(() => {
+          setCurrentChoices(node.choices!);
+          setShowChoices(true);
+        }, 100);
       }
     }
 
@@ -3941,8 +3939,13 @@ Formation Conformité IA
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="flex-shrink-0 border-t border-white/10 p-2 space-y-1.5 max-h-[220px] overflow-y-auto"
+              className="flex-shrink-0 border-t border-white/10 p-4 space-y-2.5 min-h-[100px]"
+              style={{ maxHeight: '35vh', overflowY: 'auto' }}
             >
+              {/* Indication du nombre de choix */}
+              <div className="text-[10px] text-white/40 mb-2">
+                {currentChoices.length} option{currentChoices.length > 1 ? 's' : ''} disponible{currentChoices.length > 1 ? 's' : ''}
+              </div>
               {/* Tip button */}
               {currentTip && (
                 <button
@@ -3976,7 +3979,7 @@ Formation Conformité IA
                 return (
                   <motion.button
                     key={choice.id}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.1 }}
                     onClick={() => handleChoice(choice)}
