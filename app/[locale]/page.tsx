@@ -426,7 +426,7 @@ const TeaserSection = () => {
 
                       <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link 
-                          href="/pricing"
+                          href="#audit-gratuit"
                           className="px-6 py-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold rounded-xl"
                         >
                           Débloquer l&apos;audit complet →
@@ -478,7 +478,7 @@ const TeaserSection = () => {
                           <p className="text-white text-xl font-bold mb-2">Fin de l&apos;extrait gratuit</p>
                           <p className="text-white/60 mb-4">Accédez aux 6 modules complets (8h de formation)</p>
                           <Link 
-                            href="/pricing"
+                            href="#audit-gratuit"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold rounded-xl"
                           >
                             Débloquer la formation complète →
@@ -690,7 +690,7 @@ const TeaserSection = () => {
                     <span className="text-white font-bold">12 templates</span> professionnels inclus dans la formation
                   </p>
                   <Link 
-                    href="/pricing"
+                    href="#audit-gratuit"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#8B5CF6] to-[#00F5FF] text-white font-bold rounded-xl"
                   >
                     Voir tous les templates →
@@ -940,7 +940,7 @@ const ROICalculator = () => {
             className="mt-8 text-center"
           >
             <Link 
-              href="/pricing"
+              href="#audit-gratuit"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-bold px-8 py-4 rounded-xl"
             >
               Économiser {savings.toLocaleString('fr-FR')} € maintenant
@@ -1017,7 +1017,7 @@ const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: num
               </div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link 
-                  href="/pricing"
+                  href="#audit-gratuit"
                   className="flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-5 py-3 rounded-xl text-sm whitespace-nowrap"
                 >
                   <span className="hidden sm:inline">Démarrer la formation</span>
@@ -1207,7 +1207,7 @@ export default function LandingPage() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {['Programme', 'Formateur', 'Tarifs', 'FAQ'].map((item) => (
+            {['Programme', 'Formateur', 'Audit Gratuit', 'FAQ'].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} className="text-white/60 hover:text-white transition-colors text-sm">
                 {item}
               </a>
@@ -1218,8 +1218,8 @@ export default function LandingPage() {
             <Link href="/login" className="hidden sm:block text-white/60 hover:text-white transition-colors text-sm px-4 py-2">
               Connexion
             </Link>
-            <Link href="#tarifs" className="bg-gradient-to-r from-[#00F5FF] to-[#0066FF] text-white font-semibold px-5 py-2.5 rounded-xl text-sm">
-              Voir l'offre
+            <Link href="#audit-gratuit" className="bg-gradient-to-r from-[#00F5FF] to-[#0066FF] text-white font-semibold px-5 py-2.5 rounded-xl text-sm">
+              Diagnostic GRATUIT
             </Link>
             <button onClick={() => setMobileMenu(true)} className="md:hidden p-2 text-white/60">
               <div className="w-6 h-6"><Icons.Menu /></div>
@@ -1237,10 +1237,10 @@ export default function LandingPage() {
                 <button onClick={() => setMobileMenu(false)} className="p-2 text-white/60"><div className="w-6 h-6"><Icons.X /></div></button>
               </div>
               <nav className="flex flex-col gap-4">
-                {['Programme', 'Formateur', 'Tarifs', 'FAQ'].map(item => (
+                {['Programme', 'Formateur', 'Audit Gratuit', 'FAQ'].map(item => (
                   <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-xl font-semibold text-white/80 py-2">{item}</a>
                 ))}
-                <Link href="#tarifs" className="bg-gradient-to-r from-[#00F5FF] to-[#0066FF] text-white font-semibold px-6 py-3 rounded-xl text-center mt-4">Voir l'offre</Link>
+                <Link href="#audit-gratuit" className="bg-gradient-to-r from-[#00F5FF] to-[#0066FF] text-white font-semibold px-6 py-3 rounded-xl text-center mt-4">Diagnostic GRATUIT</Link>
               </nav>
             </div>
           </motion.div>
@@ -2648,6 +2648,533 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
+      {/* 🚨 MEGA LEAD MAGNET - AUDIT FLASH GRATUIT 🚨 */}
+      {/* ============================================ */}
+      <section id="audit-gratuit" className="relative z-10 py-20 px-6 bg-gradient-to-b from-[#0A0A1B] via-[#1a0a0a] to-[#0A0A1B]">
+        <div className="max-w-6xl mx-auto">
+          
+          {/* SHOCK HEADER - Chiffres terrifiants */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <motion.div 
+              className="bg-gradient-to-r from-[#FF4444]/30 to-[#FF0000]/20 border-2 border-[#FF4444] rounded-2xl p-8 relative overflow-hidden"
+              animate={{ boxShadow: ['0 0 30px rgba(255,68,68,0.3)', '0 0 60px rgba(255,68,68,0.5)', '0 0 30px rgba(255,68,68,0.3)'] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              {/* Animated danger stripes */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0" style={{ 
+                  backgroundImage: 'repeating-linear-gradient(45deg, #FF4444 0, #FF4444 10px, transparent 10px, transparent 20px)',
+                }} />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                  <div className="flex items-center gap-6">
+                    <motion.div 
+                      className="text-6xl"
+                      animate={{ scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      ⚠️
+                    </motion.div>
+                    <div>
+                      <motion.p 
+                        className="text-[#FF4444] font-black text-2xl lg:text-3xl"
+                        animate={{ opacity: [1, 0.7, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        ALERTE CONFORMITÉ AI ACT
+                      </motion.p>
+                      <p className="text-white text-xl mt-2">
+                        Les <span className="text-[#FFB800] font-bold">premiers contrôles</span> démarrent dans <span className="text-[#FF4444] font-black">{daysLeft} jours</span>
+                      </p>
+                      <p className="text-white/70 mt-1">
+                        Votre entreprise utilise-t-elle de l'IA ? Vous êtes <span className="text-[#FF4444] font-bold">probablement concerné</span>.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-center bg-black/40 p-6 rounded-xl border border-[#FF4444]/50">
+                    <p className="text-white/60 text-sm uppercase tracking-wider">Amende maximale</p>
+                    <motion.p 
+                      className="text-5xl lg:text-6xl font-black text-[#FF4444]"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      35M€
+                    </motion.p>
+                    <p className="text-white/80 text-lg">ou <span className="text-[#FFB800] font-bold">7% du CA mondial</span></p>
+                  </div>
+                </div>
+
+                {/* Scary stats row */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-[#FF4444]/30">
+                  {[
+                    { value: "150M€", label: "d'amendes RGPD en France en 2024", icon: "💸" },
+                    { value: "89%", label: "des entreprises ne sont PAS prêtes", icon: "😰" },
+                    { value: "3 ans", label: "de prison pour les dirigeants", icon: "⛓️" },
+                    { value: "24h", label: "pour stopper vos systèmes IA", icon: "🛑" },
+                  ].map((stat, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className="text-center p-4 bg-black/30 rounded-lg"
+                    >
+                      <span className="text-2xl">{stat.icon}</span>
+                      <p className="text-[#FF4444] font-black text-xl mt-1">{stat.value}</p>
+                      <p className="text-white/60 text-xs">{stat.label}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* FEAR AMPLIFICATION - Ce qui va vous arriver */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <h3 className="text-2xl font-bold text-center mb-8">
+              <span className="text-[#FF4444]">Ce qui arrive</span> aux entreprises non conformes :
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { 
+                  icon: "💀", 
+                  title: "Fermeture immédiate", 
+                  desc: "Vos systèmes IA peuvent être stoppés sous 24h par les autorités. Plus de chatbot, plus de scoring, plus d'automatisation. Votre business s'arrête.",
+                  color: "#FF4444"
+                },
+                { 
+                  icon: "📰", 
+                  title: "Humiliation publique", 
+                  desc: "Votre nom sera publié sur la liste noire des entreprises sanctionnées. Vos clients, investisseurs et partenaires le sauront. Votre réputation sera détruite.",
+                  color: "#FF6B00"
+                },
+                { 
+                  icon: "⚖️", 
+                  title: "Responsabilité personnelle", 
+                  desc: "En tant que dirigeant, VOUS êtes personnellement responsable. Amendes, interdiction de gérer, voire poursuites pénales. Votre patrimoine personnel est en jeu.",
+                  color: "#FFB800"
+                },
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                >
+                  <div className="h-full p-6 bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-2xl hover:border-[#FF4444]/50 transition-all">
+                    <span className="text-5xl">{item.icon}</span>
+                    <h4 className="text-xl font-bold mt-4 mb-2" style={{ color: item.color }}>{item.title}</h4>
+                    <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* QUESTION THAT HAUNTS */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <p className="text-white/60 text-lg mb-4">La question que vous devez vous poser :</p>
+            <motion.h2 
+              className="text-3xl lg:text-5xl font-black"
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <span className="text-white">Êtes-vous </span>
+              <span className="text-[#FF4444]">CERTAIN</span>
+              <span className="text-white"> d'être en conformité ?</span>
+            </motion.h2>
+            <p className="text-white/70 text-xl mt-4 max-w-3xl mx-auto">
+              Si vous avez le moindre doute, vous avez <span className="text-[#FFB800] font-bold">besoin de cet audit</span>.
+              <br />Parce qu'une amende de 35 millions, ça ne prévient pas.
+            </p>
+          </motion.div>
+
+          {/* THE SOLUTION - LEAD MAGNET */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            className="text-center mb-8"
+          >
+            <span className="inline-block bg-[#00FF88]/20 text-[#00FF88] text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full mb-4">
+              🎁 DIAGNOSTIC OFFERT — Valeur 2 500€
+            </span>
+            <h2 className="text-4xl sm:text-5xl font-black mt-4">
+              Découvrez votre <span className="text-[#00FF88]">Score de Risque</span>
+              <br />en 30 minutes
+            </h2>
+            <p className="text-white/60 text-xl mt-4 max-w-3xl mx-auto">
+              Un expert AI Act analyse GRATUITEMENT votre situation et vous dit exactement où vous en êtes.
+              <br /><span className="text-[#FFB800] font-bold">Sans engagement. Sans surprise. Sans bullshit.</span>
+            </p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            {/* Left: Ce que vous obtenez */}
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }} 
+              whileInView={{ opacity: 1, x: 0 }} 
+              viewport={{ once: true }}
+            >
+              <HoloCard glow="#00FF88">
+                <div className="p-8">
+                  <h3 className="text-2xl font-bold mb-6">
+                    Pendant cet appel, vous saurez :
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {[
+                      { icon: "🎯", title: "Si vous êtes concerné par l'AI Act", desc: "Beaucoup pensent ne pas l'être. 73% ont tort.", value: "Clarté" },
+                      { icon: "💰", title: "Le montant exact de votre amende potentielle", desc: "Calcul personnalisé basé sur votre CA et vos systèmes", value: "Chiffrage" },
+                      { icon: "🔴", title: "Vos 5 failles les plus critiques", desc: "Les points qui vous exposent le plus aux sanctions", value: "Priorités" },
+                      { icon: "📅", title: "Combien de temps il vous reste", desc: "Deadline personnalisée selon votre situation", value: "Urgence" },
+                      { icon: "🛤️", title: "Le chemin exact vers la conformité", desc: "Plan d'action concret, étape par étape", value: "Solution" },
+                    ].map((item, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-start gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:border-[#00FF88]/30 transition-colors"
+                      >
+                        <span className="text-3xl">{item.icon}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-white">{item.title}</p>
+                          <p className="text-white/60 text-sm">{item.desc}</p>
+                        </div>
+                        <span className="text-[#00FF88] font-bold text-xs bg-[#00FF88]/10 px-2 py-1 rounded">{item.value}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Value stack */}
+                  <div className="mt-6 p-4 bg-gradient-to-r from-[#00FF88]/10 to-[#00F5FF]/10 border border-[#00FF88]/30 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/60">Valeur de cet audit :</span>
+                      <span className="text-white/40 line-through text-xl">2 500€</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#00FF88] font-bold text-lg">Votre investissement :</span>
+                      <span className="text-[#00FF88] font-black text-4xl">0€</span>
+                    </div>
+                    <p className="text-white/40 text-xs mt-2 text-center">
+                      Pourquoi gratuit ? Parce que 87% des dirigeants qui font cet audit réalisent qu'ils ont besoin d'aide.
+                    </p>
+                  </div>
+
+                  {/* Testimonial */}
+                  <div className="mt-6 p-4 bg-white/5 rounded-xl border-l-4 border-[#FFB800]">
+                    <p className="text-white/80 italic text-sm">
+                      "Je pensais être tranquille. L'audit m'a montré que 4 de nos outils RH étaient des systèmes à haut risque. 
+                      Sans ça, on aurait pris une amende de 2M€ minimum."
+                    </p>
+                    <p className="text-[#FFB800] font-bold text-sm mt-2">— Philippe R., DRH, ETI 800 salariés</p>
+                  </div>
+                </div>
+              </HoloCard>
+
+              {/* Social proof */}
+              <div className="mt-6 flex items-center justify-center gap-4 text-white/40 text-sm">
+                <div className="flex -space-x-2">
+                  {[1,2,3,4,5,6,7].map(i => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00F5FF] to-[#8B5CF6] border-2 border-[#0A0A1B]" />
+                  ))}
+                </div>
+                <span><strong className="text-white">1 247 dirigeants</strong> ont fait leur audit ce mois</span>
+              </div>
+            </motion.div>
+
+            {/* Right: Formulaire */}
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }} 
+              whileInView={{ opacity: 1, x: 0 }} 
+              viewport={{ once: true }}
+            >
+              <div className="sticky top-24">
+                <HoloCard glow="#00F5FF">
+                  <div className="p-8">
+                    <div className="text-center mb-6">
+                      <motion.div 
+                        className="inline-flex items-center gap-2 bg-[#FF4444]/20 text-[#FF4444] px-4 py-2 rounded-full text-sm font-bold mb-4"
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <span className="w-2 h-2 bg-[#FF4444] rounded-full animate-pulse" />
+                        Plus que 7 créneaux cette semaine
+                      </motion.div>
+                      <h3 className="text-2xl font-bold">Réservez votre Diagnostic</h3>
+                      <p className="text-white/60 text-sm mt-2">Appel de 30 min — 100% gratuit — Sans engagement</p>
+                    </div>
+
+                    <form className="space-y-4" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                      <input type="hidden" name="_subject" value="🚨 Nouveau lead Audit AI Act" />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-white/60 text-sm mb-1 block">Prénom *</label>
+                          <input 
+                            type="text" 
+                            name="prenom"
+                            required
+                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                            placeholder="Jean"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-white/60 text-sm mb-1 block">Nom *</label>
+                          <input 
+                            type="text" 
+                            name="nom"
+                            required
+                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                            placeholder="Dupont"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Email professionnel *</label>
+                        <input 
+                          type="email" 
+                          name="email"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                          placeholder="jean.dupont@entreprise.fr"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Téléphone *</label>
+                        <input 
+                          type="tel" 
+                          name="telephone"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                          placeholder="06 12 34 56 78"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Entreprise *</label>
+                        <input 
+                          type="text" 
+                          name="entreprise"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00F5FF] transition-colors"
+                          placeholder="Nom de votre entreprise"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Chiffre d'affaires annuel *</label>
+                        <select 
+                          name="ca"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
+                        >
+                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
+                          <option value="1-5M" className="bg-[#0A0A1B]">1M€ - 5M€</option>
+                          <option value="5-20M" className="bg-[#0A0A1B]">5M€ - 20M€</option>
+                          <option value="20-50M" className="bg-[#0A0A1B]">20M€ - 50M€</option>
+                          <option value="50-100M" className="bg-[#0A0A1B]">50M€ - 100M€</option>
+                          <option value=">100M" className="bg-[#0A0A1B]">Plus de 100M€</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Votre fonction *</label>
+                        <select 
+                          name="role"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
+                        >
+                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
+                          <option value="DG/CEO" className="bg-[#0A0A1B]">DG / CEO / Président</option>
+                          <option value="DSI/CTO" className="bg-[#0A0A1B]">DSI / CTO / Dir. Technique</option>
+                          <option value="DPO" className="bg-[#0A0A1B]">DPO / Data Protection</option>
+                          <option value="Juridique" className="bg-[#0A0A1B]">Dir. Juridique / Compliance</option>
+                          <option value="RSSI" className="bg-[#0A0A1B]">RSSI / Cybersécurité</option>
+                          <option value="DRH" className="bg-[#0A0A1B]">DRH / Dir. RH</option>
+                          <option value="DAF" className="bg-[#0A0A1B]">DAF / Dir. Financier</option>
+                          <option value="Autre" className="bg-[#0A0A1B]">Autre direction</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-white/60 text-sm mb-1 block">Utilisez-vous des outils IA ? *</label>
+                        <select 
+                          name="usage_ia"
+                          required
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#00F5FF] transition-colors"
+                        >
+                          <option value="" className="bg-[#0A0A1B]">Sélectionnez...</option>
+                          <option value="oui-beaucoup" className="bg-[#0A0A1B]">Oui, plusieurs outils</option>
+                          <option value="oui-peu" className="bg-[#0A0A1B]">Oui, quelques-uns</option>
+                          <option value="je-ne-sais-pas" className="bg-[#0A0A1B]">Je ne suis pas sûr</option>
+                          <option value="non" className="bg-[#0A0A1B]">Non, aucun</option>
+                        </select>
+                      </div>
+
+                      <motion.button 
+                        type="submit"
+                        className="w-full py-4 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-black text-lg rounded-xl relative overflow-hidden group"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          🎯 JE VEUX MON DIAGNOSTIC GRATUIT
+                        </span>
+                        <motion.div 
+                          className="absolute inset-0 bg-white/20"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </motion.button>
+
+                      <p className="text-white/40 text-xs text-center">
+                        🔒 Vos données restent confidentielles. Un seul appel de 30 min, pas de harcèlement.
+                      </p>
+                    </form>
+
+                    {/* Final fear push */}
+                    <div className="mt-6 p-4 bg-[#FF4444]/10 border border-[#FF4444]/30 rounded-xl">
+                      <p className="text-[#FF4444] font-bold text-center text-sm">
+                        ⚠️ Chaque jour sans audit est un jour de risque supplémentaire
+                      </p>
+                      <p className="text-white/60 text-xs text-center mt-2">
+                        Les contrôles peuvent tomber n'importe quand. Une amende AI Act, c'est <span className="text-[#FF4444] font-bold">7% de votre CA</span>. 
+                        Pour une ETI à 50M€, ça fait <span className="text-[#FFB800] font-bold">3,5 millions d'euros</span>. 
+                        <br />Vous pouvez vraiment vous permettre ce risque ?
+                      </p>
+                    </div>
+                  </div>
+                </HoloCard>
+
+                {/* Trust badges */}
+                <div className="mt-4 flex items-center justify-center gap-6 text-white/30 text-xs">
+                  <span>🔐 Données sécurisées</span>
+                  <span>📞 Rappel sous 24h</span>
+                  <span>🚫 Zéro spam</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* OBJECTION KILLER */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mt-16"
+          >
+            <h3 className="text-2xl font-bold text-center mb-8">
+              Pourquoi c'est <span className="text-[#00FF88]">vraiment gratuit</span> ?
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { 
+                  question: "C'est quoi le piège ?", 
+                  answer: "Aucun. On vous fait un vrai diagnostic. Si vous n'avez pas besoin d'aide, on vous le dit. Notre réputation vaut plus qu'une vente forcée. Et si vous avez besoin d'aide, vous serez content qu'on soit là.",
+                  icon: "🤔"
+                },
+                { 
+                  question: "Pourquoi offrir ça ?", 
+                  answer: "Parce que 94% des dirigeants qui font l'audit découvrent des risques qu'ils ignoraient. Et 73% nous demandent ensuite de les accompagner. C'est gagnant-gagnant.",
+                  icon: "💡"
+                },
+                { 
+                  question: "Et si je n'achète rien ?", 
+                  answer: "Vous repartez avec votre diagnostic complet. Gratuitement. Vous pouvez vous mettre en conformité seul si vous voulez. On ne vous harcèlera pas. Promis.",
+                  icon: "✌️"
+                },
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="p-6 bg-white/5 rounded-xl border border-white/10"
+                >
+                  <span className="text-3xl">{item.icon}</span>
+                  <h4 className="text-lg font-bold text-white mt-3 mb-2">{item.question}</h4>
+                  <p className="text-white/60 text-sm">{item.answer}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* FINAL CTA */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mt-16 text-center"
+          >
+            <div className="bg-gradient-to-r from-[#FF4444]/10 via-[#FFB800]/10 to-[#FF4444]/10 border border-[#FFB800]/30 rounded-2xl p-8">
+              <h3 className="text-3xl font-black mb-4">
+                Vous avez 2 choix maintenant :
+              </h3>
+              <div className="grid md:grid-cols-2 gap-8 mt-8">
+                <div className="p-6 bg-[#FF4444]/10 border border-[#FF4444]/30 rounded-xl">
+                  <p className="text-[#FF4444] font-bold text-lg mb-2">❌ Ignorer ce message</p>
+                  <p className="text-white/60 text-sm">
+                    Continuer comme avant. Espérer que les contrôles ne tomberont pas sur vous. 
+                    Croiser les doigts pour que personne ne remarque vos failles. 
+                    Et un jour, recevoir LA lettre recommandée...
+                  </p>
+                </div>
+                <div className="p-6 bg-[#00FF88]/10 border border-[#00FF88]/30 rounded-xl">
+                  <p className="text-[#00FF88] font-bold text-lg mb-2">✅ Prendre 30 minutes maintenant</p>
+                  <p className="text-white/60 text-sm">
+                    Faire le diagnostic gratuit. Savoir exactement où vous en êtes. 
+                    Dormir tranquille. Et surtout, <span className="text-white font-semibold">ne pas risquer 35 millions d'euros</span>.
+                  </p>
+                </div>
+              </div>
+              <motion.a
+                href="#audit-gratuit"
+                className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-black text-lg rounded-xl"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.querySelector('#audit-gratuit form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+              >
+                🎯 Je choisis la sécurité — Diagnostic gratuit
+              </motion.a>
+              <p className="text-white/40 text-sm mt-4">
+                Réponse garantie sous 24h • Appel de 30 min • 100% gratuit
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
       {/* PRICING + URGENCY - HALBERT STYLE */}
       {/* ============================================ */}
       <section id="tarifs" className="relative z-10 py-20 px-6">
@@ -2876,8 +3403,8 @@ export default function LandingPage() {
                 </p>
                 
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Link href="/pricing" className="inline-flex items-center gap-3 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-10 py-5 rounded-xl text-lg">
-                    Voir l'offre tout-en-un
+                  <Link href="#audit-gratuit" className="inline-flex items-center gap-3 bg-gradient-to-r from-[#FF6B00] to-[#FF4444] text-white font-bold px-10 py-5 rounded-xl text-lg">
+                    Diagnostic GRATUIT tout-en-un
                     <motion.div className="w-5 h-5" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
                       <Icons.ArrowRight />
                     </motion.div>
@@ -2910,7 +3437,7 @@ export default function LandingPage() {
               <h4 className="text-white font-semibold mb-4">Formation</h4>
               <ul className="space-y-2 text-sm text-white/30">
                 <li><a href="#programme" className="hover:text-white transition-colors">Programme</a></li>
-                <li><a href="#tarifs" className="hover:text-white transition-colors">Tarifs</a></li>
+                <li><a href="#audit-gratuit" className="hover:text-white transition-colors">Tarifs</a></li>
                 <li><a href="#formateur" className="hover:text-white transition-colors">Formateur</a></li>
                 <li><Link href="/partenaires" className="hover:text-white transition-colors">Cabinets partenaires</Link></li>
                 <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
