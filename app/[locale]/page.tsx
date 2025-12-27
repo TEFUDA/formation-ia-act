@@ -2084,46 +2084,360 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================ */}
-      {/* MODULES - Quick Overview */}
+      {/* ARSENAL COMPLET - Ce que vous allez obtenir */}
       {/* ============================================ */}
-      <section id="programme" className="relative z-10 py-20 px-6">
-        <div className="max-w-6xl mx-auto">
+      <section id="programme" className="relative z-10 py-20 px-6 overflow-hidden">
+        {/* Background effect */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00FF88]/5 to-transparent" />
+        
+        <div className="max-w-6xl mx-auto relative">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             whileInView={{ opacity: 1, y: 0 }} 
             viewport={{ once: true }} 
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
-            <span className="text-[#00FF88] text-sm font-medium uppercase tracking-widest">Programme complet</span>
-            <h2 className="text-3xl sm:text-4xl font-bold mt-2 mb-4">6 modules pour maîtriser l'AI Act</h2>
-            <p className="text-white/40 max-w-xl mx-auto">8 heures de formation intensive, à suivre à votre rythme sur 12 mois</p>
+            <motion.span 
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00FF88]/20 to-[#00F5FF]/20 border border-[#00FF88]/30 text-[#00FF88] text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full mb-6"
+              animate={{ boxShadow: ['0 0 20px rgba(0,255,136,0.2)', '0 0 40px rgba(0,255,136,0.4)', '0 0 20px rgba(0,255,136,0.2)'] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              🎁 Votre arsenal complet
+            </motion.span>
+            <h2 className="text-3xl sm:text-5xl font-black mt-4 mb-6">
+              Repartez avec <span className="text-[#00FF88]">TOUT</span> ce qu'il faut
+              <br />pour <span className="text-[#FFB800]">blinder</span> votre entreprise
+            </h2>
+            <p className="text-white/60 text-xl max-w-3xl mx-auto">
+              Pas de théorie creuse. Des <span className="text-white font-bold">outils prêts à l'emploi</span>, 
+              des <span className="text-white font-bold">stratégies testées</span>, et la <span className="text-white font-bold">confiance</span> d'être prêt pour n'importe quel contrôle.
+            </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules.map((module, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 20 }} 
-                whileInView={{ opacity: 1, y: 0 }} 
-                viewport={{ once: true }} 
-                transition={{ delay: i * 0.05 }}
-              >
-                <HoloCard glow={module.color}>
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-3xl">{module.icon}</span>
-                      <span className="text-white/20 text-sm">Module {module.num}</span>
+          {/* TRANSFORMATION AVANT/APRÈS */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* AVANT */}
+              <div className="relative">
+                <div className="absolute -top-4 left-4 bg-[#FF4444] text-white text-sm font-bold px-4 py-1 rounded-full z-10">
+                  😰 AVANT la formation
+                </div>
+                <div className="p-6 bg-gradient-to-br from-[#FF4444]/10 to-transparent border border-[#FF4444]/30 rounded-2xl h-full">
+                  <ul className="space-y-4 mt-4">
+                    {[
+                      "Vous ne savez pas si l'AI Act vous concerne",
+                      "Aucune visibilité sur vos systèmes IA",
+                      "Documentation inexistante ou obsolète",
+                      "Peur panique à l'idée d'un contrôle",
+                      "Nuits blanches à penser aux amendes",
+                      "Équipe dans le flou total"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-white/70">
+                        <span className="text-[#FF4444] mt-1">✗</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* APRÈS */}
+              <div className="relative">
+                <div className="absolute -top-4 left-4 bg-[#00FF88] text-black text-sm font-bold px-4 py-1 rounded-full z-10">
+                  🚀 APRÈS la formation
+                </div>
+                <div className="p-6 bg-gradient-to-br from-[#00FF88]/10 to-transparent border border-[#00FF88]/30 rounded-2xl h-full">
+                  <ul className="space-y-4 mt-4">
+                    {[
+                      "Clarté totale sur vos obligations",
+                      "Registre IA complet et à jour",
+                      "Documentation prête pour l'audit",
+                      "Confiance absolue face aux contrôles",
+                      "Tranquillité d'esprit retrouvée",
+                      "Équipe formée et autonome"
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-white">
+                        <span className="text-[#00FF88] mt-1">✓</span>
+                        <span className="font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CE QUE VOUS ALLEZ MAÎTRISER */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <h3 className="text-2xl font-bold text-center mb-8">
+              <span className="text-[#00F5FF]">6 modules</span> pour devenir <span className="text-[#FFB800]">imbattable</span>
+            </h3>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  num: "01",
+                  title: "Décryptage AI Act",
+                  subtitle: "Comprendre pour agir",
+                  points: ["Les 4 niveaux de risque expliqués", "Ce qui est interdit (et pourquoi)", "Les délais à ne pas rater"],
+                  result: "→ Vous saurez exactement ce qui s'applique à vous",
+                  color: "#00F5FF",
+                  icon: "🎯"
+                },
+                {
+                  num: "02",
+                  title: "Classification Maîtrisée",
+                  subtitle: "Cartographier vos risques",
+                  points: ["Identifier TOUS vos systèmes IA", "Les classifier correctement", "Prioriser vos actions"],
+                  result: "→ Zéro angle mort dans votre parc IA",
+                  color: "#00FF88",
+                  icon: "📊"
+                },
+                {
+                  num: "03",
+                  title: "Registre & Inventaire",
+                  subtitle: "Documentation parfaite",
+                  points: ["Template de registre prêt à l'emploi", "Fiche d'identité pour chaque IA", "Traçabilité irréprochable"],
+                  result: "→ Dossier béton pour les contrôleurs",
+                  color: "#FFB800",
+                  icon: "📋"
+                },
+                {
+                  num: "04",
+                  title: "Gouvernance IA",
+                  subtitle: "Structurer votre organisation",
+                  points: ["Politique IA clé en main", "Rôles et responsabilités", "Processus de validation"],
+                  result: "→ Organisation solide et défendable",
+                  color: "#8B5CF6",
+                  icon: "🏛️"
+                },
+                {
+                  num: "05",
+                  title: "Systèmes Haut Risque",
+                  subtitle: "Le niveau expert",
+                  points: ["Exigences spécifiques détaillées", "Documentation technique avancée", "Supervision humaine"],
+                  result: "→ Même vos IA critiques sont conformes",
+                  color: "#FF6B00",
+                  icon: "⚠️"
+                },
+                {
+                  num: "06",
+                  title: "Audit & Contrôle",
+                  subtitle: "Prêt pour le jour J",
+                  points: ["Simulation d'audit complète", "Check-list du contrôleur", "Stratégie de défense"],
+                  result: "→ Vous passez le contrôle les doigts dans le nez",
+                  color: "#FF4444",
+                  icon: "✅"
+                }
+              ].map((module, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="group"
+                >
+                  <div 
+                    className="h-full p-6 rounded-2xl border transition-all duration-300"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${module.color}10, transparent)`,
+                      borderColor: `${module.color}30`
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-4xl">{module.icon}</span>
+                      <span className="text-white/20 font-mono text-sm">{module.num}</span>
                     </div>
-                    <h3 className="text-white font-semibold mb-2">{module.title}</h3>
-                    <div className="flex items-center gap-2 text-white/40 text-sm">
-                      <div className="w-4 h-4" style={{ color: module.color }}><Icons.Clock /></div>
-                      {module.duration}
+                    <h4 className="text-xl font-bold text-white mb-1">{module.title}</h4>
+                    <p className="text-white/50 text-sm mb-4">{module.subtitle}</p>
+                    <ul className="space-y-2 mb-4">
+                      {module.points.map((point, j) => (
+                        <li key={j} className="text-white/70 text-sm flex items-start gap-2">
+                          <span style={{ color: module.color }}>•</span>
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-sm font-semibold" style={{ color: module.color }}>
+                      {module.result}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* VOTRE VALISE - Les outils concrets */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold">
+                🧳 Votre <span className="text-[#FFB800]">valise de survie</span> AI Act
+              </h3>
+              <p className="text-white/50 mt-2">12 outils prêts à l'emploi que vous gardez à vie</p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { name: "Registre IA Complet", type: "Excel", icon: "📊", desc: "12 onglets pré-remplis" },
+                { name: "Politique IA Entreprise", type: "Word", icon: "📜", desc: "18 pages personnalisables" },
+                { name: "Check-list Conformité", type: "PDF", icon: "✅", desc: "127 points de contrôle" },
+                { name: "Matrice des Risques", type: "Excel", icon: "⚠️", desc: "Scoring automatique" },
+                { name: "Modèle FRIA", type: "Word", icon: "⚖️", desc: "Évaluation d'impact" },
+                { name: "Template Audit Interne", type: "Excel", icon: "🔍", desc: "Simulation complète" },
+                { name: "Emails Fournisseurs", type: "Word", icon: "📧", desc: "5 modèles prêts" },
+                { name: "Plan d'Action 90 Jours", type: "Excel", icon: "📅", desc: "Roadmap détaillée" },
+                { name: "Guide Documentation", type: "PDF", icon: "📚", desc: "Tout ce qu'il faut documenter" },
+                { name: "FAQ Juridique", type: "PDF", icon: "❓", desc: "50 questions/réponses" },
+                { name: "Certificat Officiel", type: "PDF", icon: "🏆", desc: "Valeur probante" },
+                { name: "Fiches Mémo", type: "PDF", icon: "📝", desc: "Résumés visuels" }
+              ].map((tool, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ scale: 1.05, y: -3 }}
+                  className="p-4 bg-white/5 border border-white/10 rounded-xl hover:border-[#00FF88]/30 transition-all cursor-default"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{tool.icon}</span>
+                    <div>
+                      <p className="font-semibold text-white text-sm">{tool.name}</p>
+                      <p className="text-white/40 text-xs">{tool.desc}</p>
+                      <span className="inline-block mt-1 text-[10px] px-2 py-0.5 bg-white/10 text-white/50 rounded">{tool.type}</span>
                     </div>
                   </div>
-                </HoloCard>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.p 
+              className="text-center mt-6 text-white/60"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-[#00FF88] font-bold">Valeur totale : 2 500€</span> de templates — 
+              <span className="text-white"> inclus dans la formation</span>
+            </motion.p>
+          </motion.div>
+
+          {/* VIDÉOS EXTRAORDINAIRES */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="mb-16"
+          >
+            <HoloCard glow="#8B5CF6">
+              <div className="p-8">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <span className="text-5xl block mb-4">🎬</span>
+                    <h3 className="text-2xl font-bold mb-4">
+                      <span className="text-[#8B5CF6]">12 vidéos</span> tournées par des experts
+                    </h3>
+                    <p className="text-white/60 mb-6">
+                      Pas de PowerPoint soporifiques. Des vidéos <span className="text-white font-semibold">courtes, percutantes, 
+                      et applicables immédiatement</span>. Regardez, appliquez, passez à la suite.
+                    </p>
+                    <ul className="space-y-3">
+                      {[
+                        "Format court (10-20 min) = pas de perte de temps",
+                        "Exemples concrets de votre secteur",
+                        "Exercices pratiques après chaque vidéo",
+                        "Sous-titres + transcriptions incluses",
+                        "Accès mobile = formez-vous partout"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-2 text-white/80">
+                          <span className="text-[#8B5CF6]">▶</span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="relative">
+                    <div className="aspect-video bg-gradient-to-br from-[#8B5CF6]/20 to-[#00F5FF]/20 rounded-xl border border-white/10 flex items-center justify-center">
+                      <motion.div
+                        className="w-20 h-20 bg-[#8B5CF6] rounded-full flex items-center justify-center cursor-pointer"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        animate={{ boxShadow: ['0 0 0 0 rgba(139,92,246,0.4)', '0 0 0 20px rgba(139,92,246,0)', '0 0 0 0 rgba(139,92,246,0.4)'] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <span className="text-3xl ml-1">▶</span>
+                      </motion.div>
+                    </div>
+                    <div className="absolute -bottom-3 -right-3 bg-[#FFB800] text-black text-xs font-bold px-3 py-1 rounded-full">
+                      8h de contenu premium
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </HoloCard>
+          </motion.div>
+
+          {/* LA PROMESSE FINALE */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+          >
+            <div className="text-center p-8 bg-gradient-to-r from-[#00FF88]/10 via-[#00F5FF]/10 to-[#8B5CF6]/10 border border-[#00FF88]/30 rounded-2xl">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-4">
+                🎯 La promesse : vous repartez <span className="text-[#00FF88]">100% armé</span>
+              </h3>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto mb-6">
+                Après cette formation, vous aurez <span className="text-white font-bold">tout ce qu'il faut</span> pour :
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                {[
+                  "Éviter les amendes jusqu'à 35M€",
+                  "Passer n'importe quel contrôle",
+                  "Former vos équipes",
+                  "Rassurer vos clients",
+                  "Dormir sur vos deux oreilles"
+                ].map((item, i) => (
+                  <span 
+                    key={i}
+                    className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-white/80 text-sm"
+                  >
+                    ✓ {item}
+                  </span>
+                ))}
+              </div>
+              <motion.div 
+                className="mt-8"
+                whileHover={{ scale: 1.02 }}
+              >
+                <Link 
+                  href="#audit-gratuit"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00FF88] to-[#00F5FF] text-black font-black px-8 py-4 rounded-xl text-lg"
+                >
+                  Je veux cette formation
+                  <div className="w-5 h-5"><Icons.ArrowRight /></div>
+                </Link>
               </motion.div>
-            ))}
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
