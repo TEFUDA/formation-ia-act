@@ -24,13 +24,14 @@ const tabs = [
   { id: 'audit', label: 'Audit', icon: '🔍' },
 ];
 
-const modules = [
-  { id: 1, title: "Fondamentaux de l'AI Act", duration: "45 min", lessons: 5, completed: true, progress: 100, color: '#00F5FF' },
-  { id: 2, title: "Classification des Risques", duration: "1h", lessons: 6, completed: true, progress: 100, color: '#00FF88' },
-  { id: 3, title: "Obligations Fournisseurs", duration: "1h30", lessons: 7, completed: false, progress: 60, color: '#8B5CF6' },
-  { id: 4, title: "Obligations Déployeurs", duration: "1h", lessons: 5, completed: false, progress: 0, color: '#FFB800' },
-  { id: 5, title: "Gouvernance IA", duration: "1h30", lessons: 8, completed: false, progress: 0, color: '#FF6B00' },
-  { id: 6, title: "Mise en Conformité Pratique", duration: "2h", lessons: 10, completed: false, progress: 0, color: '#FF4444' },
+// Modules de base (statiques)
+const baseModules = [
+  { id: 1, title: "Fondamentaux de l'AI Act", duration: "45 min", lessons: 5, color: '#00F5FF' },
+  { id: 2, title: "Classification des Risques", duration: "1h", lessons: 6, color: '#00FF88' },
+  { id: 3, title: "Obligations Fournisseurs", duration: "1h30", lessons: 7, color: '#8B5CF6' },
+  { id: 4, title: "Obligations Déployeurs", duration: "1h", lessons: 5, color: '#FFB800' },
+  { id: 5, title: "Gouvernance IA", duration: "1h30", lessons: 8, color: '#FF6B00' },
+  { id: 6, title: "Mise en Conformité Pratique", duration: "2h", lessons: 10, color: '#FF4444' },
 ];
 
 const templates = [
@@ -71,6 +72,8 @@ export default function DashboardPage() {
   const [auditScore, setAuditScore] = useState<number | null>(null);
   const [userPlan, setUserPlan] = useState<string>('solo');
   const [showDevPanel, setShowDevPanel] = useState(false);
+  const [modules, setModules] = useState(baseModules.map(m => ({ ...m, progress: 0, completed: false })));
+  const [nextLesson, setNextLesson] = useState({ module: 1, lesson: 1 });
 
   useEffect(() => {
     const savedScore = localStorage.getItem('auditScore');
@@ -80,6 +83,47 @@ export default function DashboardPage() {
     if (savedPlan) setUserPlan(savedPlan);
     else {
       localStorage.setItem('userPlan', 'solo');
+    }
+    
+    // Charger la progression depuis localStorage
+    const savedProgress = localStorage.getItem('courseProgress');
+    if (savedProgress) {
+      const completedLessons = JSON.parse(savedProgress);
+      
+      // Calculer la progression de chaque module
+      const updatedModules = baseModules.map(mod => {
+        const lessonsInModule = mod.lessons;
+        let completedCount = 0;
+        
+        for (let i = 1; i <= lessonsInModule; i++) {
+          if (completedLessons[`${mod.id}-${i}`]) {
+            completedCount++;
+          }
+        }
+        
+        const progress = Math.round((completedCount / lessonsInModule) * 100);
+        return {
+          ...mod,
+          progress,
+          completed: progress === 100
+        };
+      });
+      
+      setModules(updatedModules);
+      
+      // Trouver la prochaine leçon à faire
+      for (const mod of updatedModules) {
+        if (mod.progress < 100) {
+          // Trouver la première leçon non complétée dans ce module
+          for (let i = 1; i <= mod.lessons; i++) {
+            if (!completedLessons[`${mod.id}-${i}`]) {
+              setNextLesson({ module: mod.id, lesson: i });
+              break;
+            }
+          }
+          break;
+        }
+      }
     }
   }, []);
 
@@ -225,10 +269,10 @@ export default function DashboardPage() {
                 {/* Quick Actions */}
                 <h3 className="text-lg font-semibold mb-4">Actions rapides</h3>
                 <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                  <Link href="/formation" className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors block">
+                  <Link href={`/dashboard/cours?module=${nextLesson.module}&lesson=${nextLesson.lesson}`} className="p-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl text-left hover:bg-[#8B5CF6]/20 transition-colors block">
                     <span className="text-2xl mb-2 block">▶️</span>
                     <p className="font-medium">Continuer la formation</p>
-                    <p className="text-white/50 text-sm">Module 3 - Leçon 4</p>
+                    <p className="text-white/50 text-sm">Module {nextLesson.module} - Leçon {nextLesson.lesson}</p>
                   </Link>
                   <button onClick={() => setActiveTab('templates')} className="p-4 bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-xl text-left hover:bg-[#00F5FF]/20 transition-colors">
                     <span className="text-2xl mb-2 block">📥</span>
@@ -317,7 +361,7 @@ export default function DashboardPage() {
                             </div>
                             <button
                               disabled={isLocked}
-                              onClick={() => !isLocked && router.push(`/formation?module=${module.id}`)}
+                              onClick={() => !isLocked && router.push(`/dashboard/cours?module=${module.id}&lesson=1`)}
                               className="px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-shrink-0"
                               style={{
                                 background: isLocked ? 'rgba(255,255,255,0.05)' : `${module.color}20`,
