@@ -35,6 +35,31 @@ const calculateDaysUntil = () => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
+// Calcul dynamique des jours restants pour l'offre de lancement
+const calculateOfferDaysLeft = () => {
+  const endDate = new Date('2025-01-31T23:59:59');
+  const now = new Date();
+  const diffTime = endDate.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+// Message d'urgence dynamique selon les jours restants
+const getUrgencyMessage = (daysLeft: number) => {
+  if (daysLeft <= 0) {
+    return { emoji: "⚠️", text: "Dernières heures pour le tarif de lancement !", color: "text-[#FF4444]", intensity: "high" };
+  } else if (daysLeft === 1) {
+    return { emoji: "⏰", text: "Dernier jour — L'offre expire demain !", color: "text-[#FF4444]", intensity: "high" };
+  } else if (daysLeft <= 3) {
+    return { emoji: "🔥", text: `Plus que ${daysLeft} jours — Tarif de lancement`, color: "text-[#FF4444]", intensity: "high" };
+  } else if (daysLeft <= 7) {
+    return { emoji: "⚡", text: `J-${daysLeft} — Offre de lancement limitée`, color: "text-[#FF6B00]", intensity: "medium" };
+  } else if (daysLeft <= 14) {
+    return { emoji: "🎯", text: `Offre de lancement — Encore ${daysLeft} jours`, color: "text-[#FFB800]", intensity: "medium" };
+  } else {
+    return { emoji: "🚀", text: `Tarif préférentiel — ${daysLeft} jours restants`, color: "text-[#FFB800]", intensity: "low" };
+  }
+};
+
 // ============================================
 // MINI CTA COMPONENT - Réutilisable entre sections
 // ============================================
@@ -1474,7 +1499,11 @@ const ROICalculator = () => {
 };
 
 // Sticky CTA Bar Component
-const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: number, spotsLeft: number }) => (
+const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: number, spotsLeft: number }) => {
+  const offerDaysLeft = calculateOfferDaysLeft();
+  const urgency = getUrgencyMessage(offerDaysLeft);
+  
+  return (
   <AnimatePresence>
     {show && (
       <motion.div
@@ -1491,14 +1520,16 @@ const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: num
               <div className="flex items-center gap-2">
                 <motion.span 
                   className="text-2xl"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ duration: offerDaysLeft <= 3 ? 0.6 : 1, repeat: Infinity }}
                 >
-                  ⏰
+                  {urgency.emoji}
                 </motion.span>
                 <div>
-                  <p className="text-white font-semibold text-sm">Plus que {daysLeft} jours</p>
-                  <p className="text-white/40 text-xs">avant les contrôles AI Act</p>
+                  <p className={`${urgency.color} font-semibold text-sm`}>
+                    {offerDaysLeft <= 0 ? "Dernières heures !" : offerDaysLeft === 1 ? "Dernier jour !" : `Plus que ${offerDaysLeft} jours`}
+                  </p>
+                  <p className="text-white/40 text-xs">avant hausse des prix</p>
                 </div>
               </div>
               <div className="h-8 w-px bg-white/10" />
@@ -1517,14 +1548,16 @@ const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: num
             {/* Mobile: Compact info */}
             <div className="flex sm:hidden items-center gap-2">
               <motion.span 
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
+                animate={{ scale: [1, 1.15, 1] }}
+                transition={{ duration: offerDaysLeft <= 3 ? 0.6 : 1, repeat: Infinity }}
               >
-                🔥
+                {urgency.emoji}
               </motion.span>
               <div>
-                <p className="text-white font-semibold text-sm">{spotsLeft} places restantes</p>
-                <p className="text-white/40 text-xs">{daysLeft}j avant deadline</p>
+                <p className={`${urgency.color} font-semibold text-sm`}>
+                  {offerDaysLeft <= 0 ? "Dernières heures" : offerDaysLeft === 1 ? "Dernier jour" : `J-${offerDaysLeft}`} • {spotsLeft} places
+                </p>
+                <p className="text-white/40 text-xs">Tarif de lancement</p>
               </div>
             </div>
 
@@ -1557,6 +1590,7 @@ const StickyCTA = ({ show, daysLeft, spotsLeft }: { show: boolean, daysLeft: num
     )}
   </AnimatePresence>
 );
+};
 
 // Exit Intent Popup (Peep Laja)
 const ExitIntentPopup = () => {
@@ -4462,43 +4496,61 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-bold mt-2">Choisissez votre formule</h2>
           </motion.div>
 
-          {/* URGENCY BANNER - Gary Halbert */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
-            viewport={{ once: true }}
-            className="mb-8"
-          >
-            <motion.div 
-              className="bg-gradient-to-r from-[#FF4444]/10 to-[#FF6B00]/10 border border-[#FF4444]/30 rounded-2xl p-5"
-              animate={{ boxShadow: ['0 0 20px rgba(255,68,68,0.1)', '0 0 40px rgba(255,68,68,0.2)', '0 0 20px rgba(255,68,68,0.1)'] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <motion.span 
-                    className="text-4xl"
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    🔥
-                  </motion.span>
-                  <div>
-                    <p className="text-[#FF4444] font-bold">
-                      Offre de lancement — Fin le 31 janvier
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      Plus que <span className="text-[#FFB800] font-bold">{spotsLeft} places</span> au tarif actuel
-                    </p>
+          {/* URGENCY BANNER - Dynamique selon les jours restants */}
+          {(() => {
+            const offerDaysLeft = calculateOfferDaysLeft();
+            const urgency = getUrgencyMessage(offerDaysLeft);
+            const isHighUrgency = urgency.intensity === 'high';
+            const isMediumUrgency = urgency.intensity === 'medium';
+            
+            return (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }}
+                className="mb-8"
+              >
+                <motion.div 
+                  className={`bg-gradient-to-r ${isHighUrgency ? 'from-[#FF4444]/15 to-[#FF4444]/10 border-[#FF4444]/40' : isMediumUrgency ? 'from-[#FF6B00]/10 to-[#FFB800]/10 border-[#FF6B00]/30' : 'from-[#FFB800]/10 to-[#00FF88]/5 border-[#FFB800]/30'} border rounded-2xl p-5`}
+                  animate={isHighUrgency ? { boxShadow: ['0 0 20px rgba(255,68,68,0.1)', '0 0 40px rgba(255,68,68,0.25)', '0 0 20px rgba(255,68,68,0.1)'] } : {}}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <motion.span 
+                        className="text-4xl"
+                        animate={isHighUrgency ? { scale: [1, 1.2, 1] } : { scale: [1, 1.05, 1] }}
+                        transition={{ duration: isHighUrgency ? 0.8 : 2, repeat: Infinity }}
+                      >
+                        {urgency.emoji}
+                      </motion.span>
+                      <div>
+                        <p className={`${urgency.color} font-bold`}>
+                          {urgency.text}
+                        </p>
+                        <p className="text-white/60 text-sm">
+                          {offerDaysLeft <= 3 ? (
+                            <>Économisez <span className="text-[#00FF88] font-bold">2 510€</span> avant la hausse des prix</>
+                          ) : (
+                            <>Plus que <span className="text-[#FFB800] font-bold">{spotsLeft} places</span> au tarif actuel</>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-center sm:text-right">
+                      <p className="text-white/30 text-sm line-through">7 500€</p>
+                      <p className="text-3xl font-black text-white">4 990€</p>
+                      {offerDaysLeft <= 7 && (
+                        <p className="text-[#FF4444] text-xs font-medium mt-1">
+                          {offerDaysLeft <= 0 ? "Dernières heures !" : offerDaysLeft === 1 ? "Expire demain !" : `Plus que ${offerDaysLeft}j`}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="text-center sm:text-right">
-                  <p className="text-white/30 text-sm line-through">7 500€</p>
-                  <p className="text-3xl font-black text-white">4 990€</p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+                </motion.div>
+              </motion.div>
+            );
+          })()}
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-3 gap-6 items-start">
