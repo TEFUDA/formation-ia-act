@@ -84,12 +84,12 @@ export const checkPrerequisites = (workshopId: string): { met: boolean; missing:
   if (!workshopName) return { met: true, missing: [] };
   
   const flow = WORKSHOP_DATA_FLOW[workshopName as keyof typeof WORKSHOP_DATA_FLOW];
-  if (!flow || !flow.inputs) return { met: true, missing: [] };
+  if (!flow || !('inputs' in flow)) return { met: true, missing: [] };
   
   const missing: string[] = [];
   
   if (typeof window !== 'undefined') {
-    flow.inputs.forEach(key => {
+    (flow.inputs as string[]).forEach(key => {
       const data = localStorage.getItem(key);
       if (!data) {
         missing.push(key);
