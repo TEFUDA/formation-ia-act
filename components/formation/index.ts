@@ -10,3 +10,4 @@ export { default as CertificateGenerator } from './CertificateGenerator';
 export { default as ActionPlanBuilder } from './ActionPlanBuilder';
 export { default as DiagnosticChecklist } from './DiagnosticChecklist';
 export { default as FormationReportPDF } from './FormationReportPDF';
+export { default as ComplianceDossier } from './ComplianceDossier';
