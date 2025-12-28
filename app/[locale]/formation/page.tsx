@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { MODULES, Module, Video } from '@/lib/formation/modules';
-import { QUIZZES, getQuizByModuleId, calculateQuizScore, Quiz, QuizQuestion } from '@/lib/formation/quizzes';
+import { getQuizByModuleId, calculateQuizScore } from '@/lib/formation/quizzes';
 
 // Import interactive components
 import ClassificationWizard from '@/components/formation/ClassificationWizard';
 import AuditSimulation from '@/components/formation/AuditSimulation';
 import SmartEmailEditor from '@/components/formation/SmartEmailEditor';
 import BrainstormingGrid from '@/components/formation/BrainstormingGrid';
+import LegalMentionsGenerator from '@/components/formation/LegalMentionsGenerator';
 import CertificateGenerator from '@/components/formation/CertificateGenerator';
 import ActionPlanBuilder from '@/components/formation/ActionPlanBuilder';
 
@@ -194,9 +195,9 @@ const StreakBadge = ({ streak }: { streak: number }) => (
 // Daily Goals Progress
 const DailyGoals = ({ progress }: { progress: UserProgress }) => {
   const goals = [
-    { ...DAILY_GOALS[0], current: progress.lessonsToday },
-    { ...DAILY_GOALS[1], current: progress.minutesToday },
-    { ...DAILY_GOALS[2], current: progress.quizzesToday },
+    { ...DAILY_GOALS[0], current: progress.lessonsToday || 0 },
+    { ...DAILY_GOALS[1], current: progress.minutesToday || 0 },
+    { ...DAILY_GOALS[2], current: progress.quizzesToday || 0 },
   ];
 
   return (
@@ -429,26 +430,27 @@ const VideoPlayer = ({
 
         {/* Completed Overlay */}
         {isCompleted && (
-          <div className="absolute top-4 right-4 flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1.5 rounded-full text-sm">
-            <div className="w-4 h-4"><Icons.Check /></div>
-            Terminé
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-1 sm:gap-2 bg-green-500/20 text-green-400 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm">
+            <div className="w-3 h-3 sm:w-4 sm:h-4"><Icons.Check /></div>
+            <span className="hidden sm:inline">Terminé</span>
+            <span className="sm:hidden">✓</span>
           </div>
         )}
 
         {/* Module Badge */}
         <div 
-          className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-sm font-medium"
+          className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium"
           style={{ backgroundColor: `${module.color}20`, color: module.color }}
         >
-          {module.icon} {module.code}
+          {module.icon} <span className="hidden sm:inline">{module.code}</span>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Controls - Always visible on mobile, hover on desktop */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         {/* Progress Bar */}
-        <div className="mb-3">
-          <div className="h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer">
+        <div className="mb-2 sm:mb-3">
+          <div className="h-1.5 sm:h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer">
             <motion.div 
               className="h-full rounded-full"
               style={{ backgroundColor: module.color, width: `${progress}%` }}
@@ -458,19 +460,19 @@ const VideoPlayer = ({
 
         {/* Controls Row */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Play/Pause */}
             <button 
               onClick={onPlayPause}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
             >
-              <div className="w-5 h-5 text-white">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 text-white">
                 {isPlaying ? <Icons.Pause /> : <Icons.Play />}
               </div>
             </button>
 
-            {/* Volume */}
-            <div className="flex items-center gap-2">
+            {/* Volume - Hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2">
               <div className="w-5 h-5 text-white/60"><Icons.Volume /></div>
               <input 
                 type="range" 
@@ -483,17 +485,17 @@ const VideoPlayer = ({
             </div>
 
             {/* Time */}
-            <span className="text-white/60 text-sm">
+            <span className="text-white/60 text-xs sm:text-sm">
               {video.duration || '10:00'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Speed */}
             <div className="relative">
               <button 
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                className="px-3 py-1 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors"
+                className="px-2 sm:px-3 py-1 bg-white/10 rounded-lg text-xs sm:text-sm hover:bg-white/20 transition-colors"
               >
                 {playbackSpeed}x
               </button>
@@ -515,8 +517,8 @@ const VideoPlayer = ({
             </div>
 
             {/* Fullscreen */}
-            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-              <div className="w-5 h-5 text-white"><Icons.Maximize /></div>
+            <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 text-white"><Icons.Maximize /></div>
             </button>
           </div>
         </div>
@@ -528,11 +530,12 @@ const VideoPlayer = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={onComplete}
-          className="absolute bottom-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full font-bold text-black flex items-center gap-2"
+          className="absolute bottom-16 sm:bottom-20 left-1/2 transform -translate-x-1/2 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-black flex items-center gap-2 text-sm sm:text-base"
           style={{ backgroundColor: module.color }}
         >
-          <div className="w-5 h-5"><Icons.Check /></div>
-          Marquer comme terminé (+10 XP)
+          <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.Check /></div>
+          <span className="hidden sm:inline">Marquer comme terminé (+10 XP)</span>
+          <span className="sm:hidden">Terminé +10 XP</span>
         </motion.button>
       )}
     </div>
@@ -545,24 +548,24 @@ const LevelHeader = ({ xp, streak }: { xp: number; streak: number }) => {
   const { progress, remaining } = getXPToNextLevel(xp);
 
   return (
-    <div className="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/10">
+    <div className="flex items-center gap-2 sm:gap-4 bg-white/5 rounded-xl p-2 sm:p-3 border border-white/10">
       {/* Level Badge */}
       <div 
-        className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+        className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-lg sm:text-2xl flex-shrink-0"
         style={{ background: `linear-gradient(135deg, ${level.color}40, ${level.color}10)` }}
       >
         {level.badge}
       </div>
 
       {/* Level Info */}
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-bold" style={{ color: level.color }}>Niveau {level.level}</span>
-          <span className="text-white/60 text-sm">•</span>
-          <span className="text-white/80 text-sm">{level.name}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1 sm:gap-2 mb-1">
+          <span className="font-bold text-sm sm:text-base" style={{ color: level.color }}>Niv. {level.level}</span>
+          <span className="hidden sm:inline text-white/60 text-sm">•</span>
+          <span className="hidden sm:inline text-white/80 text-sm">{level.name}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 sm:h-2 bg-white/10 rounded-full overflow-hidden">
             <motion.div 
               className="h-full rounded-full"
               style={{ backgroundColor: level.color, width: `${progress}%` }}
@@ -570,21 +573,23 @@ const LevelHeader = ({ xp, streak }: { xp: number; streak: number }) => {
               animate={{ width: `${progress}%` }}
             />
           </div>
-          <span className="text-xs text-white/40">{remaining} XP</span>
+          <span className="text-[10px] text-white/40 flex-shrink-0">{remaining} XP</span>
         </div>
       </div>
 
-      {/* XP & Streak */}
-      <div className="flex items-center gap-3">
+      {/* XP & Streak - Simplified on mobile */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <div className="text-center">
           <div className="flex items-center gap-1 text-yellow-400">
-            <div className="w-5 h-5"><Icons.Zap /></div>
-            <span className="font-bold text-lg">{xp}</span>
+            <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.Zap /></div>
+            <span className="font-bold text-sm sm:text-lg">{xp}</span>
           </div>
-          <span className="text-[10px] text-white/40">XP TOTAL</span>
+          <span className="hidden sm:block text-[10px] text-white/40">XP TOTAL</span>
         </div>
-        <div className="w-px h-8 bg-white/10" />
-        <StreakBadge streak={streak} />
+        <div className="hidden sm:block w-px h-8 bg-white/10" />
+        <div className="hidden sm:block">
+          <StreakBadge streak={streak} />
+        </div>
       </div>
     </div>
   );
@@ -636,7 +641,7 @@ const NavigationButtons = ({
 // ============================================
 // MAIN COMPONENT
 // ============================================
-export default function FormationPage() {
+function FormationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -686,21 +691,31 @@ export default function FormationPage() {
         const parsed = JSON.parse(saved);
         // Update streak
         const today = new Date().toISOString().split('T')[0];
-        const lastActive = parsed.lastActiveDate;
+        const lastActive = parsed.lastActiveDate || today;
         
         if (lastActive !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
           const yesterdayStr = yesterday.toISOString().split('T')[0];
           
-          parsed.streak = lastActive === yesterdayStr ? parsed.streak + 1 : 1;
+          parsed.streak = lastActive === yesterdayStr ? (parsed.streak || 0) + 1 : 1;
           parsed.lastActiveDate = today;
           parsed.lessonsToday = 0;
           parsed.minutesToday = 0;
           parsed.quizzesToday = 0;
         }
         
-        setProgress(parsed);
+        // Merge with defaults to ensure all fields exist
+        setProgress(prev => ({
+          ...prev,
+          ...parsed,
+          // Ensure arrays exist
+          completedVideos: parsed.completedVideos || [],
+          unlockedBadges: parsed.unlockedBadges || [],
+          notes: parsed.notes || {},
+          bookmarks: parsed.bookmarks || [],
+          quizScores: parsed.quizScores || {},
+        }));
       } catch (e) {
         console.error('Error loading progress:', e);
       }
@@ -762,35 +777,183 @@ export default function FormationPage() {
   // Current module and video
   const currentModule = MODULES[selectedModule] || MODULES[0];
   const currentVideo = currentModule?.videos[selectedVideoIdx];
+  const currentQuiz = getQuizByModuleId(selectedModule);
+  const currentQuestion = currentQuiz?.questions[currentQuestionIdx];
+
+  // Current quiz
+  const currentQuiz = getQuizByModuleId(selectedModule);
+  const currentQuestion = currentQuiz?.questions[currentQuestionIdx];
+
+  // Handle quiz answer selection
+  const handleQuizAnswer = (questionId: string, answerId: string) => {
+    setSelectedAnswer(answerId);
+    setQuizAnswers(prev => ({ ...prev, [questionId]: answerId }));
+    setShowFeedback(true);
+  };
+
+  // Go to next question or show results
+  const nextQuestion = () => {
+    if (!currentQuiz) return;
+    
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+    
+    if (currentQuestionIdx < currentQuiz.questions.length - 1) {
+      setCurrentQuestionIdx(prev => prev + 1);
+    } else {
+      // Calculate final score
+      const result = calculateQuizScore(currentQuiz, quizAnswers);
+      
+      // Update progress
+      if (result.passed) {
+        const quizVideoId = `${selectedModule}-${currentModule.videos.find(v => v.type === 'quiz')?.id}`;
+        addXP(50); // Bonus XP for passing quiz
+        
+        setProgress(p => ({
+          ...p,
+          completedVideos: (p.completedVideos || []).includes(quizVideoId)
+            ? p.completedVideos
+            : [...(p.completedVideos || []), quizVideoId],
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+          quizzesToday: (p.quizzesToday || 0) + 1,
+        }));
+      } else {
+        setProgress(p => ({
+          ...p,
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+        }));
+      }
+      
+      setShowQuizResult(true);
+    }
+  };
+
+  // Retry quiz
+  const retryQuiz = () => {
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowQuizResult(false);
+    setViewMode('lesson');
+    // Force re-enter quiz
+    setTimeout(() => setViewMode('quiz'), 100);
+  };
+
+  // Go to next module after passing quiz
+  const goToNextModule = () => {
+    if (selectedModule < MODULES.length - 1) {
+      setSelectedModule(selectedModule + 1);
+      setSelectedVideoIdx(0);
+      setViewMode('lesson');
+      setCurrentQuestionIdx(0);
+      setQuizAnswers({});
+      setShowQuizResult(false);
+    }
+  };
+
+  // Start quiz (when clicking on quiz video)
+  const startQuiz = () => {
+    setViewMode('quiz');
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowQuizResult(false);
+  };
+
+  // Handle quiz answer
+  const handleQuizAnswer = (questionId: string, answerId: string) => {
+    if (showFeedback) return;
+    
+    setSelectedAnswer(answerId);
+    setQuizAnswers({ ...quizAnswers, [questionId]: answerId });
+    setShowFeedback(true);
+  };
+
+  // Go to next question
+  const nextQuestion = () => {
+    if (!currentQuiz) return;
+
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+
+    if (currentQuestionIdx < currentQuiz.questions.length - 1) {
+      setCurrentQuestionIdx(currentQuestionIdx + 1);
+    } else {
+      const result = calculateQuizScore(currentQuiz, quizAnswers);
+      
+      if (result.passed) {
+        const quizVideoId = `${selectedModule}-${currentModule.videos.find(v => v.type === 'quiz')?.id}`;
+        const xpGain = currentModule.xp;
+        
+        setProgress(p => ({
+          ...p,
+          completedVideos: (p.completedVideos || []).includes(quizVideoId) 
+            ? p.completedVideos 
+            : [...(p.completedVideos || []), quizVideoId],
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+          totalXP: (p.totalXP || 0) + xpGain,
+          quizzesToday: (p.quizzesToday || 0) + 1,
+        }));
+        
+        addXP(xpGain);
+      }
+      
+      setShowQuizResult(true);
+    }
+  };
+
+  // Retry quiz
+  const retryQuiz = () => {
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setShowQuizResult(false);
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+  };
+
+  // Go to next module
+  const goToNextModule = () => {
+    if (selectedModule < MODULES.length - 1) {
+      const nextModuleId = selectedModule + 1;
+      setSelectedModule(nextModuleId);
+      setSelectedVideoIdx(0);
+      setViewMode('lesson');
+    } else {
+      router.push('/formation/complete');
+    }
+  };
 
   // Progress calculations
   const overallProgress = useMemo(() => {
     const totalVideos = MODULES.reduce((acc, m) => acc + m.videos.length, 0);
-    return Math.round((progress.completedVideos.length / totalVideos) * 100);
+    const completedCount = (progress.completedVideos || []).length;
+    return Math.round((completedCount / totalVideos) * 100);
   }, [progress.completedVideos]);
 
   const getModuleProgress = (moduleId: number) => {
     const module = MODULES.find(m => m.id === moduleId);
     if (!module) return 0;
     const moduleVideoIds = module.videos.map(v => `${moduleId}-${v.id}`);
-    const completed = moduleVideoIds.filter(id => progress.completedVideos.includes(id)).length;
+    const completed = moduleVideoIds.filter(id => (progress.completedVideos || []).includes(id)).length;
     return module.videos.length > 0 ? Math.round((completed / module.videos.length) * 100) : 0;
   };
 
   const isModuleUnlocked = (moduleId: number) => {
     if (moduleId === 0) return true;
-    const prevQuizScore = progress.quizScores[moduleId - 1];
+    const prevQuizScore = (progress.quizScores || {})[moduleId - 1];
     return prevQuizScore !== undefined && prevQuizScore >= 70;
   };
 
   const isVideoCompleted = (moduleId: number, videoId: string) => {
-    return progress.completedVideos.includes(`${moduleId}-${videoId}`);
+    return (progress.completedVideos || []).includes(`${moduleId}-${videoId}`);
   };
 
   // Add XP with animation
   const addXP = (amount: number) => {
-    const prevLevel = getCurrentLevel(progress.totalXP);
-    const newXP = progress.totalXP + amount;
+    const prevLevel = getCurrentLevel(progress.totalXP || 0);
+    const newXP = (progress.totalXP || 0) + amount;
     const newLevel = getCurrentLevel(newXP);
 
     setXpAnimation(amount);
@@ -804,16 +967,17 @@ export default function FormationPage() {
 
   // Complete video
   const completeVideo = () => {
+    if (!currentVideo) return;
     const videoId = `${selectedModule}-${currentVideo.id}`;
-    if (progress.completedVideos.includes(videoId)) return;
+    if ((progress.completedVideos || []).includes(videoId)) return;
 
     const xpGain = 10;
     addXP(xpGain);
 
     setProgress(p => ({
       ...p,
-      completedVideos: [...p.completedVideos, videoId],
-      lessonsToday: p.lessonsToday + 1,
+      completedVideos: [...(p.completedVideos || []), videoId],
+      lessonsToday: (p.lessonsToday || 0) + 1,
     }));
   };
 
@@ -842,9 +1006,9 @@ export default function FormationPage() {
     const videoId = `${selectedModule}-${currentVideo?.id}`;
     setProgress(p => ({
       ...p,
-      bookmarks: p.bookmarks.includes(videoId)
-        ? p.bookmarks.filter(b => b !== videoId)
-        : [...p.bookmarks, videoId]
+      bookmarks: (p.bookmarks || []).includes(videoId)
+        ? (p.bookmarks || []).filter(b => b !== videoId)
+        : [...(p.bookmarks || []), videoId]
     }));
   };
 
@@ -852,15 +1016,15 @@ export default function FormationPage() {
   const saveNote = (videoId: string, note: string) => {
     setProgress(p => ({
       ...p,
-      notes: { ...p.notes, [videoId]: note }
+      notes: { ...(p.notes || {}), [videoId]: note }
     }));
     // Bonus XP for first note
-    if (!progress.notes[videoId] && note.trim()) {
+    if (!(progress.notes || {})[videoId] && note.trim()) {
       addXP(5);
     }
   };
 
-  const isBookmarked = progress.bookmarks.includes(`${selectedModule}-${currentVideo?.id}`);
+  const isBookmarked = (progress.bookmarks || []).includes(`${selectedModule}-${currentVideo?.id}`);
   const hasPrev = selectedVideoIdx > 0 || selectedModule > 0;
   const hasNext = selectedVideoIdx < currentModule.videos.length - 1 || 
     (selectedModule < MODULES.length - 1 && isModuleUnlocked(selectedModule + 1));
@@ -895,17 +1059,29 @@ export default function FormationPage() {
 
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0A0A1B]/95 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-3 py-2 gap-2">
+          {/* Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(true)}
-            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center"
+            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"
           >
             <div className="w-5 h-5 text-white"><Icons.Menu /></div>
           </button>
           
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 text-yellow-400"><Icons.Zap /></div>
-            <span className="text-yellow-400 font-bold">{progress.totalXP}</span>
+          {/* Current Lesson Info */}
+          <div className="flex-1 min-w-0 text-center">
+            <p className="text-[10px] text-white/40 truncate">
+              {currentModule?.title}
+            </p>
+            <p className="text-xs font-medium text-white truncate">
+              {currentVideo?.title}
+            </p>
+          </div>
+
+          {/* XP Badge */}
+          <div className="flex items-center gap-1 bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-lg flex-shrink-0">
+            <div className="w-4 h-4"><Icons.Zap /></div>
+            <span className="text-sm font-bold">{progress.totalXP || 0}</span>
           </div>
         </div>
       </header>
@@ -922,8 +1098,16 @@ export default function FormationPage() {
             ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             flex flex-col
           `}>
-            {/* Sidebar content - Same as FormationSidebar */}
+            {/* Sidebar content */}
             <div className="p-4 border-b border-white/5">
+              {/* Close button - Mobile only */}
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="lg:hidden absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white/60 hover:text-white"
+              >
+                <div className="w-5 h-5"><Icons.X /></div>
+              </button>
+
               <Link href="/dashboard" className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00F5FF] via-[#8B5CF6] to-[#FF6B6B] p-0.5">
                   <div className="w-full h-full rounded-[10px] bg-[#0A0A1B] flex items-center justify-center">
@@ -937,7 +1121,7 @@ export default function FormationPage() {
               </Link>
 
               {/* Level Header */}
-              <LevelHeader xp={progress.totalXP} streak={progress.streak} />
+              <LevelHeader xp={progress.totalXP || 0} streak={progress.streak || 0} />
             </div>
 
             {/* Modules List */}
@@ -949,49 +1133,104 @@ export default function FormationPage() {
                 const isCompleted = moduleProgress === 100;
 
                 return (
-                  <button
-                    key={module.id}
-                    onClick={() => {
-                      if (isUnlocked) {
-                        setSelectedModule(module.id);
-                        setSelectedVideoIdx(0);
-                        setMobileMenuOpen(false);
-                      }
-                    }}
-                    disabled={!isUnlocked}
-                    className={`
-                      w-full p-3 rounded-xl text-left transition-all
-                      ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
-                      ${!isUnlocked && 'opacity-50 cursor-not-allowed'}
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${module.color}20` }}
-                      >
-                        {isCompleted ? (
-                          <div className="w-5 h-5" style={{ color: module.color }}><Icons.Check /></div>
-                        ) : !isUnlocked ? (
-                          <div className="w-5 h-5 text-white/30"><Icons.Lock /></div>
-                        ) : (
-                          <span className="text-lg">{module.icon}</span>
+                  <div key={module.id} className="rounded-xl overflow-hidden">
+                    {/* Module Header */}
+                    <button
+                      onClick={() => {
+                        if (isUnlocked) {
+                          if (isSelected) {
+                            // Toggle collapse
+                          } else {
+                            setSelectedModule(module.id);
+                            setSelectedVideoIdx(0);
+                          }
+                          setMobileMenuOpen(false);
+                        }
+                      }}
+                      disabled={!isUnlocked}
+                      className={`
+                        w-full p-3 text-left transition-all
+                        ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
+                        ${!isUnlocked && 'opacity-50 cursor-not-allowed'}
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: `${module.color}20` }}
+                        >
+                          {isCompleted ? (
+                            <div className="w-5 h-5" style={{ color: module.color }}><Icons.Check /></div>
+                          ) : !isUnlocked ? (
+                            <div className="w-5 h-5 text-white/30"><Icons.Lock /></div>
+                          ) : (
+                            <span className="text-lg">{module.icon}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{module.title}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{ width: `${moduleProgress}%`, backgroundColor: module.color }}
+                              />
+                            </div>
+                            <span className="text-xs text-white/40">{moduleProgress}%</span>
+                          </div>
+                        </div>
+                        {isUnlocked && (
+                          <div className={`w-4 h-4 text-white/40 transition-transform ${isSelected ? 'rotate-180' : ''}`}>
+                            <Icons.ChevronDown />
+                          </div>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{module.title}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full rounded-full transition-all"
-                              style={{ width: `${moduleProgress}%`, backgroundColor: module.color }}
-                            />
-                          </div>
-                          <span className="text-xs text-white/40">{moduleProgress}%</span>
-                        </div>
+                    </button>
+
+                    {/* Videos List - Show when selected */}
+                    {isSelected && isUnlocked && (
+                      <div className="bg-white/5 px-3 pb-2 space-y-1">
+                        {module.videos.map((video, idx) => {
+                          const isActive = selectedVideoIdx === idx;
+                          const isComplete = isVideoCompleted(module.id, video.id);
+                          const isQuiz = video.type === 'quiz';
+                          
+                          return (
+                            <button
+                              key={video.id}
+                              onClick={() => {
+                                setSelectedVideoIdx(idx);
+                                setMobileMenuOpen(false);
+                              }}
+                              className={`
+                                w-full p-2 rounded-lg flex items-center gap-2 text-left transition-all
+                                ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}
+                              `}
+                            >
+                              <div className={`
+                                w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0
+                                ${isComplete ? 'bg-green-500/20' : 'bg-white/5'}
+                              `}>
+                                {isComplete ? (
+                                  <div className="w-3 h-3 text-green-400"><Icons.Check /></div>
+                                ) : isQuiz ? (
+                                  <span className="text-[10px]">📝</span>
+                                ) : (
+                                  <span className="text-[10px] text-white/40">{idx + 1}</span>
+                                )}
+                              </div>
+                              <span className={`text-xs truncate ${isActive ? 'text-white' : 'text-white/60'}`}>
+                                {video.title}
+                              </span>
+                              {isActive && (
+                                <div className="w-1.5 h-1.5 rounded-full ml-auto" style={{ backgroundColor: module.color }} />
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
-                    </div>
-                  </button>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -1012,10 +1251,35 @@ export default function FormationPage() {
         </AnimatePresence>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col pt-16 lg:pt-0 h-screen overflow-hidden">
+        <main className="flex-1 flex flex-col pt-14 lg:pt-0 pb-16 sm:pb-20 h-screen overflow-hidden">
           {/* Top Bar */}
           <div className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A1B]/50 backdrop-blur-xl">
             <div className="flex items-center gap-4">
+              {/* Navigation Arrows */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={goToPrev}
+                  disabled={!hasPrev}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    hasPrev ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/20 cursor-not-allowed'
+                  }`}
+                  title="Précédent (P)"
+                >
+                  <div className="w-4 h-4"><Icons.ChevronLeft /></div>
+                </button>
+                <button
+                  onClick={goToNext}
+                  disabled={!hasNext}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    hasNext ? 'text-black' : 'bg-white/5 text-white/20 cursor-not-allowed'
+                  }`}
+                  style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
+                  title="Suivant (N)"
+                >
+                  <div className="w-4 h-4"><Icons.ChevronRight /></div>
+                </button>
+              </div>
+
               <span 
                 className="px-3 py-1.5 rounded-full text-sm font-medium"
                 style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
@@ -1061,17 +1325,17 @@ export default function FormationPage() {
               {/* XP Badge */}
               <div className="flex items-center gap-2 bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-lg">
                 <div className="w-4 h-4"><Icons.Zap /></div>
-                <span className="font-bold">{progress.totalXP}</span>
+                <span className="font-bold">{progress.totalXP || 0}</span>
               </div>
 
-              <StreakBadge streak={progress.streak} />
+              <StreakBadge streak={progress.streak || 0} />
             </div>
           </div>
 
           {/* Content Area */}
-          <div className={`flex-1 flex overflow-hidden ${focusMode ? 'p-0' : 'p-4 lg:p-6'}`}>
+          <div className={`flex-1 flex overflow-hidden ${focusMode ? 'p-0' : 'p-3 sm:p-4 lg:p-6'}`}>
             {/* Video/Content Section */}
-            <div className={`flex-1 flex flex-col ${showRightPanel && !focusMode ? 'lg:pr-80' : ''}`}>
+            <div className={`flex-1 flex flex-col overflow-y-auto ${showRightPanel && !focusMode ? 'lg:pr-80' : ''}`}>
               {currentVideo?.type === 'video' && (
                 <VideoPlayer
                   video={currentVideo}
@@ -1084,48 +1348,184 @@ export default function FormationPage() {
               )}
 
               {currentVideo?.type === 'exercise' && (
-                <div className="flex-1 bg-white/5 rounded-2xl p-6 overflow-auto">
+                <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
+                  {/* M1 - Diagnostic Initial */}
+                  {currentVideo.id === '1.2' && (
+                    <div className="text-center py-8">
+                      <div className="text-5xl mb-4">🔍</div>
+                      <h3 className="text-xl font-bold mb-2">Diagnostic Initial AI Act</h3>
+                      <p className="text-white/60 mb-6 max-w-md mx-auto">
+                        Téléchargez la checklist pour évaluer votre niveau de conformité actuel.
+                      </p>
+                      {currentVideo.exerciseFile && (
+                        <a
+                          href={`/resources/${currentVideo.exerciseFile}`}
+                          download
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black"
+                          style={{ backgroundColor: currentModule.color }}
+                        >
+                          <div className="w-5 h-5"><Icons.Download /></div>
+                          Télécharger la checklist
+                        </a>
+                      )}
+                      <button
+                        onClick={completeVideo}
+                        className="block mx-auto mt-4 text-sm text-white/40 hover:text-white/60"
+                      >
+                        Marquer comme terminé →
+                      </button>
+                    </div>
+                  )}
+
+                  {/* M2 - Brainstorming & Registre IA */}
                   {currentVideo.id === '2.2' && (
                     <BrainstormingGrid 
                       moduleColor={currentModule.color}
                       onComplete={completeVideo}
                     />
                   )}
+                  {currentVideo.id === '2.4' && (
+                    <div className="text-center py-8">
+                      <div className="text-5xl mb-4">📋</div>
+                      <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
+                      <p className="text-white/60 mb-6 max-w-md mx-auto">
+                        Téléchargez le template Excel pour créer votre registre des systèmes IA.
+                      </p>
+                      {currentVideo.exerciseFile && (
+                        <a
+                          href={`/resources/${currentVideo.exerciseFile}`}
+                          download
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black"
+                          style={{ backgroundColor: currentModule.color }}
+                        >
+                          <div className="w-5 h-5"><Icons.Download /></div>
+                          Télécharger le registre
+                        </a>
+                      )}
+                      <button
+                        onClick={completeVideo}
+                        className="block mx-auto mt-4 text-sm text-white/40 hover:text-white/60"
+                      >
+                        Marquer comme terminé →
+                      </button>
+                    </div>
+                  )}
+
+                  {/* M3 - Classification Wizard */}
                   {currentVideo.id === '3.2' && (
                     <ClassificationWizard 
                       moduleColor={currentModule.color}
                       onComplete={completeVideo}
                     />
                   )}
+
+                  {/* M4 - Smart Email Editor */}
                   {currentVideo.id === '4.2' && (
                     <SmartEmailEditor 
                       moduleColor={currentModule.color}
                       onComplete={completeVideo}
                     />
                   )}
+
+                  {/* M5 - Legal Mentions Generator */}
+                  {currentVideo.id === '5.4' && (
+                    <LegalMentionsGenerator 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+
+                  {/* M6 - Audit Simulation */}
                   {currentVideo.id === '6.2' && (
                     <AuditSimulation 
                       moduleColor={currentModule.color}
                       onComplete={completeVideo}
                     />
                   )}
+
+                  {/* M7 - Action Plan Builder */}
                   {currentVideo.id === '7.2' && (
                     <ActionPlanBuilder 
                       moduleColor={currentModule.color}
                       onComplete={completeVideo}
                     />
                   )}
+
+                  {/* Fallback pour autres exercices avec fichier */}
+                  {!['1.2', '2.2', '2.4', '3.2', '4.2', '5.4', '6.2', '7.2'].includes(currentVideo.id) && 
+                   currentVideo.exerciseFile && (
+                    <div className="text-center py-8">
+                      <div className="text-5xl mb-4">📝</div>
+                      <h3 className="text-xl font-bold mb-2">Exercice Pratique</h3>
+                      <p className="text-white/60 mb-6">
+                        Téléchargez les ressources pour cet exercice.
+                      </p>
+                      <a
+                        href={`/resources/${currentVideo.exerciseFile}`}
+                        download
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black"
+                        style={{ backgroundColor: currentModule.color }}
+                      >
+                        <div className="w-5 h-5"><Icons.Download /></div>
+                        Télécharger
+                      </a>
+                      <button
+                        onClick={completeVideo}
+                        className="block mx-auto mt-4 text-sm text-white/40 hover:text-white/60"
+                      >
+                        Marquer comme terminé →
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {currentVideo?.type === 'quiz' && (
+              {/* Scenario type */}
+              {currentVideo?.type === 'scenario' && (
+                <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
+                  {currentModule.id === 6 ? (
+                    <AuditSimulation 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-5xl mb-4">🎭</div>
+                      <h3 className="text-xl font-bold mb-2">Scénario Interactif</h3>
+                      <p className="text-white/60 mb-6">
+                        Mettez-vous en situation réelle pour pratiquer.
+                      </p>
+                      {currentVideo.exerciseFile && (
+                        <a
+                          href={`/resources/${currentVideo.exerciseFile}`}
+                          download
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black mb-4"
+                          style={{ backgroundColor: currentModule.color }}
+                        >
+                          <div className="w-5 h-5"><Icons.Download /></div>
+                          Télécharger le scénario
+                        </a>
+                      )}
+                      <button
+                        onClick={completeVideo}
+                        className="block mx-auto mt-4 px-6 py-3 rounded-xl font-bold text-black"
+                        style={{ backgroundColor: currentModule.color }}
+                      >
+                        Lancer le scénario
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentVideo?.type === 'quiz' && viewMode === 'lesson' && (
                 <div className="flex-1 bg-white/5 rounded-2xl p-6 overflow-auto">
                   <div className="text-center py-8">
                     <div className="text-5xl mb-4">📝</div>
                     <h3 className="text-xl font-bold mb-2">Quiz - {currentModule.title}</h3>
                     <p className="text-white/60 mb-6">Testez vos connaissances pour débloquer le module suivant</p>
                     <button
-                      onClick={() => setViewMode('quiz')}
+                      onClick={startQuiz}
                       className="px-6 py-3 rounded-xl font-bold text-black"
                       style={{ backgroundColor: currentModule.color }}
                     >
@@ -1135,26 +1535,233 @@ export default function FormationPage() {
                 </div>
               )}
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between mt-4">
-                <NavigationButtons
-                  onPrev={goToPrev}
-                  onNext={goToNext}
-                  hasPrev={hasPrev}
-                  hasNext={hasNext}
-                  moduleColor={currentModule.color}
-                />
+              {/* QUIZ VIEW */}
+              {viewMode === 'quiz' && currentQuiz && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {!showQuizResult ? (
+                    <>
+                      {/* Quiz Header */}
+                      <div className="flex-shrink-0 mb-3 bg-[#0A0A1B]/80 px-3 py-2 rounded-xl border border-white/10">
+                        <div className="flex items-center justify-between mb-1">
+                          <span 
+                            className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
+                          >
+                            {currentModule.icon} Quiz
+                          </span>
+                          <span className="text-white/60 text-xs">
+                            {currentQuestionIdx + 1} / {currentQuiz.questions.length}
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: currentModule.color }}
+                            animate={{ width: `${((currentQuestionIdx + 1) / currentQuiz.questions.length) * 100}%` }}
+                          />
+                        </div>
+                      </div>
 
-                {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                      {/* Question */}
+                      {currentQuestion && (
+                        <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
+                          <h2 className="text-sm sm:text-base font-semibold mb-4">{currentQuestion.question}</h2>
+                          
+                          <div className="space-y-2">
+                            {currentQuestion.options.map((option, idx) => {
+                              const isSelected = selectedAnswer === option.id;
+                              const isCorrect = option.isCorrect;
+                              const showResult = showFeedback;
+
+                              return (
+                                <button
+                                  key={option.id}
+                                  onClick={() => handleQuizAnswer(currentQuestion.id, option.id)}
+                                  disabled={showFeedback}
+                                  className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 text-xs sm:text-sm ${
+                                    showResult
+                                      ? isCorrect
+                                        ? 'bg-green-500/20 border-2 border-green-500'
+                                        : isSelected
+                                          ? 'bg-red-500/20 border-2 border-red-500'
+                                          : 'bg-white/5 border-2 border-transparent'
+                                      : isSelected
+                                        ? 'bg-white/10 border-2'
+                                        : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
+                                  }`}
+                                  style={isSelected && !showResult ? { borderColor: currentModule.color } : {}}
+                                >
+                                  <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                                    showResult
+                                      ? isCorrect
+                                        ? 'bg-green-500 text-white'
+                                        : isSelected
+                                          ? 'bg-red-500 text-white'
+                                          : 'bg-white/10 text-white/60'
+                                      : isSelected
+                                        ? 'text-black'
+                                        : 'bg-white/10 text-white/60'
+                                  }`} style={isSelected && !showResult ? { backgroundColor: currentModule.color } : {}}>
+                                    {String.fromCharCode(65 + idx)}
+                                  </span>
+                                  <span className="flex-1">{option.text}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Feedback */}
+                          {showFeedback && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="mt-4"
+                            >
+                              <div 
+                                className="p-3 rounded-xl text-xs sm:text-sm"
+                                style={{ 
+                                  backgroundColor: currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
+                                    ? 'rgba(34, 197, 94, 0.1)' 
+                                    : 'rgba(239, 68, 68, 0.1)'
+                                }}
+                              >
+                                <p className="font-medium">
+                                  {currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
+                                    ? '✅ Bonne réponse !' 
+                                    : '❌ Mauvaise réponse'}
+                                </p>
+                              </div>
+
+                              <button
+                                onClick={nextQuestion}
+                                className="w-full mt-3 py-3 rounded-xl font-bold text-black text-sm"
+                                style={{ backgroundColor: currentModule.color }}
+                              >
+                                {currentQuestionIdx < currentQuiz.questions.length - 1 
+                                  ? 'Question suivante' 
+                                  : 'Voir les résultats'}
+                              </button>
+                            </motion.div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* Quiz Results */
+                    <div 
+                      className="flex-1 rounded-2xl p-4 sm:p-6 text-center overflow-auto border-2"
+                      style={{ 
+                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        borderColor: calculateQuizScore(currentQuiz, quizAnswers).passed ? '#00FF88' : '#FF4444'
+                      }}
+                    >
+                      {(() => {
+                        const result = calculateQuizScore(currentQuiz, quizAnswers);
+                        const passed = result.passed;
+
+                        return (
+                          <>
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                                passed ? 'bg-green-500' : 'bg-red-500'
+                              }`}
+                            >
+                              {passed ? (
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 text-white"><Icons.Trophy /></div>
+                              ) : (
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 text-white"><Icons.X /></div>
+                              )}
+                            </motion.div>
+
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                              {passed ? 'Bravo ! 🎉' : 'Pas encore...'}
+                            </h2>
+                            
+                            <p className="text-white/60 text-sm mb-4">
+                              {passed 
+                                ? `Vous avez débloqué le module suivant ! +${currentModule.xp} XP` 
+                                : 'Réessayez pour débloquer le module suivant'}
+                            </p>
+                            
+                            <div className="flex justify-center gap-6 my-4">
+                              <div className="text-center">
+                                <div className={`text-3xl sm:text-4xl font-bold ${passed ? 'text-green-400' : 'text-red-400'}`}>
+                                  {result.score}%
+                                </div>
+                                <p className="text-white/40 text-xs">Votre score</p>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-3xl sm:text-4xl font-bold text-white/40">
+                                  {currentQuiz.passingScore}%
+                                </div>
+                                <p className="text-white/40 text-xs">Requis</p>
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2 mt-4">
+                              {!passed && (
+                                <button
+                                  onClick={retryQuiz}
+                                  className="flex-1 py-3 rounded-xl bg-white/10 font-semibold text-sm hover:bg-white/20 transition-colors"
+                                >
+                                  Réessayer
+                                </button>
+                              )}
+                              {passed && (
+                                <button
+                                  onClick={goToNextModule}
+                                  className="flex-1 py-3 rounded-xl font-bold text-black text-sm"
+                                  style={{ backgroundColor: currentModule.color }}
+                                >
+                                  {selectedModule < MODULES.length - 1 ? 'Module suivant →' : 'Terminer la formation 🎓'}
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Navigation - Hide in quiz mode */}
+              {viewMode !== 'quiz' && (
+                <div className="flex items-center justify-between mt-4">
+                  <NavigationButtons
+                    onPrev={goToPrev}
+                    onNext={goToNext}
+                    hasPrev={hasPrev}
+                    hasNext={hasNext}
+                    moduleColor={currentModule.color}
+                  />
+
+                  {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                    <button
+                      onClick={completeVideo}
+                      className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors flex items-center gap-2"
+                    >
+                      <div className="w-4 h-4"><Icons.Check /></div>
+                      Marquer terminé
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Quiz Back Button */}
+              {viewMode === 'quiz' && (
+                <div className="mt-4">
                   <button
-                    onClick={completeVideo}
-                    className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors flex items-center gap-2"
+                    onClick={() => setViewMode('lesson')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
                   >
-                    <div className="w-4 h-4"><Icons.Check /></div>
-                    Marquer terminé
+                    <div className="w-4 h-4"><Icons.ChevronLeft /></div>
+                    Retour à la leçon
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Right Panel - Notes & Daily Goals */}
@@ -1167,7 +1774,7 @@ export default function FormationPage() {
                   {/* Notes */}
                   <NotesPanel
                     videoId={`${selectedModule}-${currentVideo?.id}`}
-                    notes={progress.notes}
+                    notes={progress.notes || {}}
                     onSave={saveNote}
                   />
 
@@ -1203,7 +1810,97 @@ export default function FormationPage() {
             )}
           </div>
         </main>
+
+        {/* Fixed Bottom Navigation Bar - Hide during quiz */}
+        {viewMode !== 'quiz' && (
+          <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-3 py-2 sm:px-4 sm:py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
+            <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+              {/* Previous */}
+              <button
+                onClick={goToPrev}
+                disabled={!hasPrev}
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
+                  hasPrev 
+                    ? 'bg-white/10 hover:bg-white/20 text-white' 
+                    : 'bg-white/5 text-white/30 cursor-not-allowed'
+                }`}
+              >
+                <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronLeft /></div>
+                <span className="hidden sm:inline">Précédent</span>
+              </button>
+
+              {/* Center - Mark Complete Button (simplified on mobile) */}
+              <div className="flex-1 flex items-center justify-center">
+                {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' ? (
+                  <button
+                    onClick={completeVideo}
+                    className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors text-sm"
+                  >
+                    <div className="w-4 h-4"><Icons.Check /></div>
+                    <span>Terminé</span>
+                    <span className="hidden sm:inline text-green-400/60">+10 XP</span>
+                  </button>
+                ) : isVideoCompleted(selectedModule, currentVideo?.id || '') ? (
+                  <div className="flex items-center gap-2 text-green-400 text-sm">
+                    <div className="w-5 h-5"><Icons.Check /></div>
+                    <span className="hidden sm:inline">Leçon terminée</span>
+                    <span className="sm:hidden">✓</span>
+                  </div>
+                ) : currentVideo?.type === 'quiz' ? (
+                  <button
+                    onClick={startQuiz}
+                    className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium text-black text-sm"
+                    style={{ backgroundColor: currentModule.color }}
+                  >
+                    <span>📝</span>
+                    <span>Commencer le quiz</span>
+                  </button>
+                ) : (
+                  <span className="text-xs text-white/40 text-center">
+                    {selectedVideoIdx + 1} / {currentModule?.videos?.length || 0}
+                  </span>
+                )}
+              </div>
+
+              {/* Next */}
+              <button
+                onClick={goToNext}
+                disabled={!hasNext}
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
+                  hasNext 
+                    ? 'text-black' 
+                    : 'bg-white/5 text-white/30 cursor-not-allowed'
+                }`}
+                style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
+              >
+                <span className="hidden sm:inline">Suivant</span>
+                <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronRight /></div>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+// Loading fallback
+function FormationLoading() {
+  return (
+    <div className="min-h-screen bg-[#030014] flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-white/60">Chargement de la formation...</p>
+      </div>
+    </div>
+  );
+}
+
+// Export with Suspense wrapper
+export default function FormationPageWrapper() {
+  return (
+    <Suspense fallback={<FormationLoading />}>
+      <FormationPage />
+    </Suspense>
   );
 }
