@@ -421,8 +421,8 @@ export default function DiagnosticWorkshop({ moduleColor, onComplete }: Diagnost
       maxScore,
       percentage,
       level,
-      recommendations: [...new Set(recommendations)],
-      concernedBy: [...new Set(concernedBy)],
+      recommendations: Array.from(new Set(recommendations)),
+      concernedBy: Array.from(new Set(concernedBy)),
       completedAt: new Date().toISOString(),
     };
 
