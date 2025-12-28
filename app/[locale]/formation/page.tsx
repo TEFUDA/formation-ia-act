@@ -18,12 +18,12 @@ import ActionPlanBuilder from '@/components/formation/ActionPlanBuilder';
 // Import new workshops
 import {
   DiagnosticWorkshop,
-  InventoryWorkshop,
-  RegistryBuilder,
+  InventorySpreadsheet,
+  RegistrySpreadsheet,
   ClassificationWorkshop,
   EmailGeneratorWorkshop,
   PolicyGeneratorWorkshop,
-  ActionPlanWorkshop,
+  ActionPlanSpreadsheet,
 } from '@/components/formation/workshops';
 
 // ============================================
@@ -593,6 +593,19 @@ function FormationContent() {
               />
             </div>
           </div>
+
+          {/* Compliance Dossier Button */}
+          <Link 
+            href="/dossier" 
+            className="mt-3 flex items-center gap-2 p-2 bg-gradient-to-r from-[#00F5FF]/20 to-[#8B5CF6]/20 rounded-lg border border-[#00F5FF]/30 hover:border-[#00F5FF]/50 transition-all group"
+          >
+            <span className="text-xl">📁</span>
+            <div className="flex-1">
+              <p className="text-xs font-medium group-hover:text-[#00F5FF] transition-colors">Mon Dossier Conformité</p>
+              <p className="text-[10px] text-white/50">Télécharger tous mes documents</p>
+            </div>
+            <span className="text-white/40 group-hover:text-[#00F5FF] transition-colors">→</span>
+          </Link>
         </div>
 
         {/* Modules List */}
@@ -776,17 +789,17 @@ function FormationContent() {
                   />
                 )}
 
-                {/* M2 - Inventory Workshop */}
+                {/* M2 - Inventory Spreadsheet */}
                 {currentVideo.id === '2.2' && (
-                  <InventoryWorkshop 
+                  <InventorySpreadsheet 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
                 )}
 
-                {/* M2 - Registry Builder */}
+                {/* M2 - Registry Spreadsheet */}
                 {currentVideo.id === '2.4' && (
-                  <RegistryBuilder 
+                  <RegistrySpreadsheet 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
@@ -824,9 +837,9 @@ function FormationContent() {
                   />
                 )}
 
-                {/* M7 - Action Plan Workshop */}
+                {/* M7 - Action Plan Spreadsheet */}
                 {currentVideo.id === '7.2' && (
-                  <ActionPlanWorkshop 
+                  <ActionPlanSpreadsheet 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
