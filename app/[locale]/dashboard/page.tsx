@@ -429,26 +429,27 @@ const VideoPlayer = ({
 
         {/* Completed Overlay */}
         {isCompleted && (
-          <div className="absolute top-4 right-4 flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1.5 rounded-full text-sm">
-            <div className="w-4 h-4"><Icons.Check /></div>
-            Terminé
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-1 sm:gap-2 bg-green-500/20 text-green-400 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm">
+            <div className="w-3 h-3 sm:w-4 sm:h-4"><Icons.Check /></div>
+            <span className="hidden sm:inline">Terminé</span>
+            <span className="sm:hidden">✓</span>
           </div>
         )}
 
         {/* Module Badge */}
         <div 
-          className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-sm font-medium"
+          className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium"
           style={{ backgroundColor: `${module.color}20`, color: module.color }}
         >
-          {module.icon} {module.code}
+          {module.icon} <span className="hidden sm:inline">{module.code}</span>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Controls - Always visible on mobile, hover on desktop */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         {/* Progress Bar */}
-        <div className="mb-3">
-          <div className="h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer">
+        <div className="mb-2 sm:mb-3">
+          <div className="h-1.5 sm:h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer">
             <motion.div 
               className="h-full rounded-full"
               style={{ backgroundColor: module.color, width: `${progress}%` }}
@@ -458,19 +459,19 @@ const VideoPlayer = ({
 
         {/* Controls Row */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Play/Pause */}
             <button 
               onClick={onPlayPause}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
             >
-              <div className="w-5 h-5 text-white">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 text-white">
                 {isPlaying ? <Icons.Pause /> : <Icons.Play />}
               </div>
             </button>
 
-            {/* Volume */}
-            <div className="flex items-center gap-2">
+            {/* Volume - Hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2">
               <div className="w-5 h-5 text-white/60"><Icons.Volume /></div>
               <input 
                 type="range" 
@@ -483,17 +484,17 @@ const VideoPlayer = ({
             </div>
 
             {/* Time */}
-            <span className="text-white/60 text-sm">
+            <span className="text-white/60 text-xs sm:text-sm">
               {video.duration || '10:00'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Speed */}
             <div className="relative">
               <button 
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                className="px-3 py-1 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors"
+                className="px-2 sm:px-3 py-1 bg-white/10 rounded-lg text-xs sm:text-sm hover:bg-white/20 transition-colors"
               >
                 {playbackSpeed}x
               </button>
@@ -515,8 +516,8 @@ const VideoPlayer = ({
             </div>
 
             {/* Fullscreen */}
-            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-              <div className="w-5 h-5 text-white"><Icons.Maximize /></div>
+            <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 text-white"><Icons.Maximize /></div>
             </button>
           </div>
         </div>
@@ -528,11 +529,12 @@ const VideoPlayer = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={onComplete}
-          className="absolute bottom-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full font-bold text-black flex items-center gap-2"
+          className="absolute bottom-16 sm:bottom-20 left-1/2 transform -translate-x-1/2 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-black flex items-center gap-2 text-sm sm:text-base"
           style={{ backgroundColor: module.color }}
         >
-          <div className="w-5 h-5"><Icons.Check /></div>
-          Marquer comme terminé (+10 XP)
+          <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.Check /></div>
+          <span className="hidden sm:inline">Marquer comme terminé (+10 XP)</span>
+          <span className="sm:hidden">Terminé +10 XP</span>
         </motion.button>
       )}
     </div>
@@ -545,24 +547,24 @@ const LevelHeader = ({ xp, streak }: { xp: number; streak: number }) => {
   const { progress, remaining } = getXPToNextLevel(xp);
 
   return (
-    <div className="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/10">
+    <div className="flex items-center gap-2 sm:gap-4 bg-white/5 rounded-xl p-2 sm:p-3 border border-white/10">
       {/* Level Badge */}
       <div 
-        className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+        className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-lg sm:text-2xl flex-shrink-0"
         style={{ background: `linear-gradient(135deg, ${level.color}40, ${level.color}10)` }}
       >
         {level.badge}
       </div>
 
       {/* Level Info */}
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-bold" style={{ color: level.color }}>Niveau {level.level}</span>
-          <span className="text-white/60 text-sm">•</span>
-          <span className="text-white/80 text-sm">{level.name}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1 sm:gap-2 mb-1">
+          <span className="font-bold text-sm sm:text-base" style={{ color: level.color }}>Niv. {level.level}</span>
+          <span className="hidden sm:inline text-white/60 text-sm">•</span>
+          <span className="hidden sm:inline text-white/80 text-sm">{level.name}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 sm:h-2 bg-white/10 rounded-full overflow-hidden">
             <motion.div 
               className="h-full rounded-full"
               style={{ backgroundColor: level.color, width: `${progress}%` }}
@@ -570,21 +572,23 @@ const LevelHeader = ({ xp, streak }: { xp: number; streak: number }) => {
               animate={{ width: `${progress}%` }}
             />
           </div>
-          <span className="text-xs text-white/40">{remaining} XP</span>
+          <span className="text-[10px] text-white/40 flex-shrink-0">{remaining} XP</span>
         </div>
       </div>
 
-      {/* XP & Streak */}
-      <div className="flex items-center gap-3">
+      {/* XP & Streak - Simplified on mobile */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <div className="text-center">
           <div className="flex items-center gap-1 text-yellow-400">
-            <div className="w-5 h-5"><Icons.Zap /></div>
-            <span className="font-bold text-lg">{xp}</span>
+            <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.Zap /></div>
+            <span className="font-bold text-sm sm:text-lg">{xp}</span>
           </div>
-          <span className="text-[10px] text-white/40">XP TOTAL</span>
+          <span className="hidden sm:block text-[10px] text-white/40">XP TOTAL</span>
         </div>
-        <div className="w-px h-8 bg-white/10" />
-        <StreakBadge streak={streak} />
+        <div className="hidden sm:block w-px h-8 bg-white/10" />
+        <div className="hidden sm:block">
+          <StreakBadge streak={streak} />
+        </div>
       </div>
     </div>
   );
@@ -907,17 +911,29 @@ function FormationPage() {
 
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0A0A1B]/95 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-3 py-2 gap-2">
+          {/* Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(true)}
-            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center"
+            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0"
           >
             <div className="w-5 h-5 text-white"><Icons.Menu /></div>
           </button>
           
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 text-yellow-400"><Icons.Zap /></div>
-            <span className="text-yellow-400 font-bold">{progress.totalXP || 0}</span>
+          {/* Current Lesson Info */}
+          <div className="flex-1 min-w-0 text-center">
+            <p className="text-[10px] text-white/40 truncate">
+              {currentModule?.title}
+            </p>
+            <p className="text-xs font-medium text-white truncate">
+              {currentVideo?.title}
+            </p>
+          </div>
+
+          {/* XP Badge */}
+          <div className="flex items-center gap-1 bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-lg flex-shrink-0">
+            <div className="w-4 h-4"><Icons.Zap /></div>
+            <span className="text-sm font-bold">{progress.totalXP || 0}</span>
           </div>
         </div>
       </header>
@@ -934,8 +950,16 @@ function FormationPage() {
             ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             flex flex-col
           `}>
-            {/* Sidebar content - Same as FormationSidebar */}
+            {/* Sidebar content */}
             <div className="p-4 border-b border-white/5">
+              {/* Close button - Mobile only */}
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="lg:hidden absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white/60 hover:text-white"
+              >
+                <div className="w-5 h-5"><Icons.X /></div>
+              </button>
+
               <Link href="/dashboard" className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00F5FF] via-[#8B5CF6] to-[#FF6B6B] p-0.5">
                   <div className="w-full h-full rounded-[10px] bg-[#0A0A1B] flex items-center justify-center">
@@ -1079,7 +1103,7 @@ function FormationPage() {
         </AnimatePresence>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col pt-16 lg:pt-0 h-screen overflow-hidden">
+        <main className="flex-1 flex flex-col pt-14 lg:pt-0 pb-16 sm:pb-20 h-screen overflow-hidden">
           {/* Top Bar */}
           <div className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A1B]/50 backdrop-blur-xl">
             <div className="flex items-center gap-4">
@@ -1161,9 +1185,9 @@ function FormationPage() {
           </div>
 
           {/* Content Area */}
-          <div className={`flex-1 flex overflow-hidden ${focusMode ? 'p-0' : 'p-4 lg:p-6'}`}>
+          <div className={`flex-1 flex overflow-hidden ${focusMode ? 'p-0' : 'p-3 sm:p-4 lg:p-6'}`}>
             {/* Video/Content Section */}
-            <div className={`flex-1 flex flex-col ${showRightPanel && !focusMode ? 'lg:pr-80' : ''}`}>
+            <div className={`flex-1 flex flex-col overflow-y-auto ${showRightPanel && !focusMode ? 'lg:pr-80' : ''}`}>
               {currentVideo?.type === 'video' && (
                 <VideoPlayer
                   video={currentVideo}
@@ -1297,48 +1321,42 @@ function FormationPage() {
         </main>
 
         {/* Fixed Bottom Navigation Bar */}
-        <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+        <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-3 py-2 sm:px-4 sm:py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
             {/* Previous */}
             <button
               onClick={goToPrev}
               disabled={!hasPrev}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
                 hasPrev 
                   ? 'bg-white/10 hover:bg-white/20 text-white' 
                   : 'bg-white/5 text-white/30 cursor-not-allowed'
               }`}
             >
-              <div className="w-5 h-5"><Icons.ChevronLeft /></div>
+              <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronLeft /></div>
               <span className="hidden sm:inline">Précédent</span>
             </button>
 
-            {/* Center - Progress indicator */}
-            <div className="flex-1 flex items-center justify-center gap-3">
-              <div className="text-center">
-                <p className="text-xs text-white/40">
-                  Leçon {selectedVideoIdx + 1} / {currentModule.videos.length}
-                </p>
-                <p className="text-sm font-medium text-white/80 truncate max-w-[200px]">
-                  {currentVideo?.title}
-                </p>
-              </div>
-              
-              {/* Mark Complete Button */}
-              {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+            {/* Center - Mark Complete Button (simplified on mobile) */}
+            <div className="flex-1 flex items-center justify-center">
+              {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' ? (
                 <button
                   onClick={completeVideo}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                  className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors text-sm"
                 >
                   <div className="w-4 h-4"><Icons.Check /></div>
-                  <span className="hidden sm:inline">Terminé</span>
+                  <span>Terminé</span>
+                  <span className="hidden sm:inline text-green-400/60">+10 XP</span>
                 </button>
-              )}
-              
-              {isVideoCompleted(selectedModule, currentVideo?.id || '') && (
-                <span className="flex items-center gap-1 text-green-400 text-sm">
-                  <div className="w-4 h-4"><Icons.Check /></div>
-                  ✓
+              ) : isVideoCompleted(selectedModule, currentVideo?.id || '') ? (
+                <div className="flex items-center gap-2 text-green-400 text-sm">
+                  <div className="w-5 h-5"><Icons.Check /></div>
+                  <span className="hidden sm:inline">Leçon terminée</span>
+                  <span className="sm:hidden">✓</span>
+                </div>
+              ) : (
+                <span className="text-xs text-white/40 text-center">
+                  {selectedVideoIdx + 1} / {currentModule?.videos?.length || 0}
                 </span>
               )}
             </div>
@@ -1347,7 +1365,7 @@ function FormationPage() {
             <button
               onClick={goToNext}
               disabled={!hasNext}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
                 hasNext 
                   ? 'text-black' 
                   : 'bg-white/5 text-white/30 cursor-not-allowed'
@@ -1355,7 +1373,10 @@ function FormationPage() {
               style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
             >
               <span className="hidden sm:inline">Suivant</span>
-              <div className="w-5 h-5"><Icons.ChevronRight /></div>
+              <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronRight /></div>
+            </button>
+          </div>
+        </div>
             </button>
           </div>
         </div>
