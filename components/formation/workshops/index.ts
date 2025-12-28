@@ -3,11 +3,14 @@
 
 export { default as DiagnosticWorkshop } from './DiagnosticWorkshop';
 export { default as InventoryWorkshop } from './InventoryWorkshop';
+export { default as InventorySpreadsheet } from './InventorySpreadsheet';
 export { default as RegistryBuilder } from './RegistryBuilder';
+export { default as RegistrySpreadsheet } from './RegistrySpreadsheet';
 export { default as ClassificationWorkshop } from './ClassificationWorkshop';
 export { default as EmailGeneratorWorkshop } from './EmailGeneratorWorkshop';
 export { default as PolicyGeneratorWorkshop } from './PolicyGeneratorWorkshop';
 export { default as ActionPlanWorkshop } from './ActionPlanWorkshop';
+export { default as ActionPlanSpreadsheet } from './ActionPlanSpreadsheet';
 
 // Workshop mapping by exercise ID
 export const WORKSHOP_MAP: Record<string, string> = {
