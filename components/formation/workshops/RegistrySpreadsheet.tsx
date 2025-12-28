@@ -455,7 +455,7 @@ export default function RegistrySpreadsheet({ moduleColor, onComplete }: Registr
         className={`w-full h-full px-2 py-1 text-xs truncate cursor-cell ${
           isSelected ? 'ring-2 ring-inset' : ''
         } ${!value && col.required ? 'bg-red-500/10' : ''}`}
-        style={isSelected ? { ringColor: moduleColor } : {}}
+        style={isSelected ? { boxShadow: `inset 0 0 0 2px ${moduleColor}` } : {}}
         onClick={() => handleCellClick(rowIdx, colIdx)}
         onDoubleClick={() => handleCellDoubleClick(rowIdx, colIdx)}
         title={displayValue}
