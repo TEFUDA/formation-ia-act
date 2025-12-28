@@ -29,7 +29,7 @@ export interface Quiz {
 // MODULE 0 : QUIZ D'INTRODUCTION (10 questions)
 // ============================================
 const quizModule0: Quiz = {
-  moduleId: 0,
+  moduleId: 1,
   title: "Quiz - Introduction à l'AI Act",
   description: "Testez vos connaissances sur les fondamentaux du règlement",
   passingScore: 80,
@@ -158,12 +158,12 @@ const quizModule0: Quiz = {
 };
 
 // ============================================
-// MODULE 1 : QUIZ DIAGNOSTIC (10 questions)
+// MODULE 2 : QUIZ DIAGNOSTIC (10 questions)
 // ============================================
 const quizModule1: Quiz = {
-  moduleId: 1,
-  title: "Quiz - Diagnostic Initial",
-  description: "Vérifiez votre compréhension des critères d'application",
+  moduleId: 2,
+  title: "Quiz - Classification des Systèmes IA",
+  description: "Vérifiez votre compréhension de la classification des risques",
   passingScore: 80,
   maxAttempts: 2,
   questions: [
