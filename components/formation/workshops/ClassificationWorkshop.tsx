@@ -319,7 +319,7 @@ export default function ClassificationWorkshop({ moduleColor, onComplete }: Clas
       systemId: currentSystem.id,
       systemName: currentSystem.name,
       riskLevel,
-      reasons: [...new Set(reasons.filter(Boolean))],
+      reasons: Array.from(new Set(reasons.filter(Boolean))),
       obligations: OBLIGATIONS_BY_LEVEL[riskLevel],
       deadline: DEADLINES[riskLevel],
       classifiedAt: new Date().toISOString(),
