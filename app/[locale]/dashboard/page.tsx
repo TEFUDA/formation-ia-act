@@ -776,6 +776,153 @@ function FormationPage() {
   // Current module and video
   const currentModule = MODULES[selectedModule] || MODULES[0];
   const currentVideo = currentModule?.videos[selectedVideoIdx];
+  const currentQuiz = getQuizByModuleId(selectedModule);
+  const currentQuestion = currentQuiz?.questions[currentQuestionIdx];
+
+  // Current quiz
+  const currentQuiz = getQuizByModuleId(selectedModule);
+  const currentQuestion = currentQuiz?.questions[currentQuestionIdx];
+
+  // Handle quiz answer selection
+  const handleQuizAnswer = (questionId: string, answerId: string) => {
+    setSelectedAnswer(answerId);
+    setQuizAnswers(prev => ({ ...prev, [questionId]: answerId }));
+    setShowFeedback(true);
+  };
+
+  // Go to next question or show results
+  const nextQuestion = () => {
+    if (!currentQuiz) return;
+    
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+    
+    if (currentQuestionIdx < currentQuiz.questions.length - 1) {
+      setCurrentQuestionIdx(prev => prev + 1);
+    } else {
+      // Calculate final score
+      const result = calculateQuizScore(currentQuiz, quizAnswers);
+      
+      // Update progress
+      if (result.passed) {
+        const quizVideoId = `${selectedModule}-${currentModule.videos.find(v => v.type === 'quiz')?.id}`;
+        addXP(50); // Bonus XP for passing quiz
+        
+        setProgress(p => ({
+          ...p,
+          completedVideos: (p.completedVideos || []).includes(quizVideoId)
+            ? p.completedVideos
+            : [...(p.completedVideos || []), quizVideoId],
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+          quizzesToday: (p.quizzesToday || 0) + 1,
+        }));
+      } else {
+        setProgress(p => ({
+          ...p,
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+        }));
+      }
+      
+      setShowQuizResult(true);
+    }
+  };
+
+  // Retry quiz
+  const retryQuiz = () => {
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowQuizResult(false);
+    setViewMode('lesson');
+    // Force re-enter quiz
+    setTimeout(() => setViewMode('quiz'), 100);
+  };
+
+  // Go to next module after passing quiz
+  const goToNextModule = () => {
+    if (selectedModule < MODULES.length - 1) {
+      setSelectedModule(selectedModule + 1);
+      setSelectedVideoIdx(0);
+      setViewMode('lesson');
+      setCurrentQuestionIdx(0);
+      setQuizAnswers({});
+      setShowQuizResult(false);
+    }
+  };
+
+  // Start quiz (when clicking on quiz video)
+  const startQuiz = () => {
+    setViewMode('quiz');
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowQuizResult(false);
+  };
+
+  // Handle quiz answer
+  const handleQuizAnswer = (questionId: string, answerId: string) => {
+    if (showFeedback) return;
+    
+    setSelectedAnswer(answerId);
+    setQuizAnswers({ ...quizAnswers, [questionId]: answerId });
+    setShowFeedback(true);
+  };
+
+  // Go to next question
+  const nextQuestion = () => {
+    if (!currentQuiz) return;
+
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+
+    if (currentQuestionIdx < currentQuiz.questions.length - 1) {
+      setCurrentQuestionIdx(currentQuestionIdx + 1);
+    } else {
+      const result = calculateQuizScore(currentQuiz, quizAnswers);
+      
+      if (result.passed) {
+        const quizVideoId = `${selectedModule}-${currentModule.videos.find(v => v.type === 'quiz')?.id}`;
+        const xpGain = currentModule.xp;
+        
+        setProgress(p => ({
+          ...p,
+          completedVideos: (p.completedVideos || []).includes(quizVideoId) 
+            ? p.completedVideos 
+            : [...(p.completedVideos || []), quizVideoId],
+          quizScores: { ...(p.quizScores || {}), [selectedModule]: result.score },
+          totalXP: (p.totalXP || 0) + xpGain,
+          quizzesToday: (p.quizzesToday || 0) + 1,
+        }));
+        
+        addXP(xpGain);
+      }
+      
+      setShowQuizResult(true);
+    }
+  };
+
+  // Retry quiz
+  const retryQuiz = () => {
+    setCurrentQuestionIdx(0);
+    setQuizAnswers({});
+    setShowQuizResult(false);
+    setShowFeedback(false);
+    setSelectedAnswer(null);
+  };
+
+  // Go to next module
+  const goToNextModule = () => {
+    if (selectedModule < MODULES.length - 1) {
+      const nextModuleId = selectedModule + 1;
+      setSelectedModule(nextModuleId);
+      setSelectedVideoIdx(0);
+      setViewMode('lesson');
+    } else {
+      router.push('/formation/complete');
+    }
+  };
 
   // Progress calculations
   const overallProgress = useMemo(() => {
@@ -1234,14 +1381,14 @@ function FormationPage() {
                 </div>
               )}
 
-              {currentVideo?.type === 'quiz' && (
+              {currentVideo?.type === 'quiz' && viewMode === 'lesson' && (
                 <div className="flex-1 bg-white/5 rounded-2xl p-6 overflow-auto">
                   <div className="text-center py-8">
                     <div className="text-5xl mb-4">📝</div>
                     <h3 className="text-xl font-bold mb-2">Quiz - {currentModule.title}</h3>
                     <p className="text-white/60 mb-6">Testez vos connaissances pour débloquer le module suivant</p>
                     <button
-                      onClick={() => setViewMode('quiz')}
+                      onClick={startQuiz}
                       className="px-6 py-3 rounded-xl font-bold text-black"
                       style={{ backgroundColor: currentModule.color }}
                     >
@@ -1251,26 +1398,233 @@ function FormationPage() {
                 </div>
               )}
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between mt-4">
-                <NavigationButtons
-                  onPrev={goToPrev}
-                  onNext={goToNext}
-                  hasPrev={hasPrev}
-                  hasNext={hasNext}
-                  moduleColor={currentModule.color}
-                />
+              {/* QUIZ VIEW */}
+              {viewMode === 'quiz' && currentQuiz && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {!showQuizResult ? (
+                    <>
+                      {/* Quiz Header */}
+                      <div className="flex-shrink-0 mb-3 bg-[#0A0A1B]/80 px-3 py-2 rounded-xl border border-white/10">
+                        <div className="flex items-center justify-between mb-1">
+                          <span 
+                            className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
+                          >
+                            {currentModule.icon} Quiz
+                          </span>
+                          <span className="text-white/60 text-xs">
+                            {currentQuestionIdx + 1} / {currentQuiz.questions.length}
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: currentModule.color }}
+                            animate={{ width: `${((currentQuestionIdx + 1) / currentQuiz.questions.length) * 100}%` }}
+                          />
+                        </div>
+                      </div>
 
-                {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                      {/* Question */}
+                      {currentQuestion && (
+                        <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
+                          <h2 className="text-sm sm:text-base font-semibold mb-4">{currentQuestion.question}</h2>
+                          
+                          <div className="space-y-2">
+                            {currentQuestion.options.map((option, idx) => {
+                              const isSelected = selectedAnswer === option.id;
+                              const isCorrect = option.isCorrect;
+                              const showResult = showFeedback;
+
+                              return (
+                                <button
+                                  key={option.id}
+                                  onClick={() => handleQuizAnswer(currentQuestion.id, option.id)}
+                                  disabled={showFeedback}
+                                  className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 text-xs sm:text-sm ${
+                                    showResult
+                                      ? isCorrect
+                                        ? 'bg-green-500/20 border-2 border-green-500'
+                                        : isSelected
+                                          ? 'bg-red-500/20 border-2 border-red-500'
+                                          : 'bg-white/5 border-2 border-transparent'
+                                      : isSelected
+                                        ? 'bg-white/10 border-2'
+                                        : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
+                                  }`}
+                                  style={isSelected && !showResult ? { borderColor: currentModule.color } : {}}
+                                >
+                                  <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                                    showResult
+                                      ? isCorrect
+                                        ? 'bg-green-500 text-white'
+                                        : isSelected
+                                          ? 'bg-red-500 text-white'
+                                          : 'bg-white/10 text-white/60'
+                                      : isSelected
+                                        ? 'text-black'
+                                        : 'bg-white/10 text-white/60'
+                                  }`} style={isSelected && !showResult ? { backgroundColor: currentModule.color } : {}}>
+                                    {String.fromCharCode(65 + idx)}
+                                  </span>
+                                  <span className="flex-1">{option.text}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Feedback */}
+                          {showFeedback && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="mt-4"
+                            >
+                              <div 
+                                className="p-3 rounded-xl text-xs sm:text-sm"
+                                style={{ 
+                                  backgroundColor: currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
+                                    ? 'rgba(34, 197, 94, 0.1)' 
+                                    : 'rgba(239, 68, 68, 0.1)'
+                                }}
+                              >
+                                <p className="font-medium">
+                                  {currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
+                                    ? '✅ Bonne réponse !' 
+                                    : '❌ Mauvaise réponse'}
+                                </p>
+                              </div>
+
+                              <button
+                                onClick={nextQuestion}
+                                className="w-full mt-3 py-3 rounded-xl font-bold text-black text-sm"
+                                style={{ backgroundColor: currentModule.color }}
+                              >
+                                {currentQuestionIdx < currentQuiz.questions.length - 1 
+                                  ? 'Question suivante' 
+                                  : 'Voir les résultats'}
+                              </button>
+                            </motion.div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* Quiz Results */
+                    <div 
+                      className="flex-1 rounded-2xl p-4 sm:p-6 text-center overflow-auto border-2"
+                      style={{ 
+                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        borderColor: calculateQuizScore(currentQuiz, quizAnswers).passed ? '#00FF88' : '#FF4444'
+                      }}
+                    >
+                      {(() => {
+                        const result = calculateQuizScore(currentQuiz, quizAnswers);
+                        const passed = result.passed;
+
+                        return (
+                          <>
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                                passed ? 'bg-green-500' : 'bg-red-500'
+                              }`}
+                            >
+                              {passed ? (
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 text-white"><Icons.Trophy /></div>
+                              ) : (
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 text-white"><Icons.X /></div>
+                              )}
+                            </motion.div>
+
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                              {passed ? 'Bravo ! 🎉' : 'Pas encore...'}
+                            </h2>
+                            
+                            <p className="text-white/60 text-sm mb-4">
+                              {passed 
+                                ? `Vous avez débloqué le module suivant ! +${currentModule.xp} XP` 
+                                : 'Réessayez pour débloquer le module suivant'}
+                            </p>
+                            
+                            <div className="flex justify-center gap-6 my-4">
+                              <div className="text-center">
+                                <div className={`text-3xl sm:text-4xl font-bold ${passed ? 'text-green-400' : 'text-red-400'}`}>
+                                  {result.score}%
+                                </div>
+                                <p className="text-white/40 text-xs">Votre score</p>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-3xl sm:text-4xl font-bold text-white/40">
+                                  {currentQuiz.passingScore}%
+                                </div>
+                                <p className="text-white/40 text-xs">Requis</p>
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2 mt-4">
+                              {!passed && (
+                                <button
+                                  onClick={retryQuiz}
+                                  className="flex-1 py-3 rounded-xl bg-white/10 font-semibold text-sm hover:bg-white/20 transition-colors"
+                                >
+                                  Réessayer
+                                </button>
+                              )}
+                              {passed && (
+                                <button
+                                  onClick={goToNextModule}
+                                  className="flex-1 py-3 rounded-xl font-bold text-black text-sm"
+                                  style={{ backgroundColor: currentModule.color }}
+                                >
+                                  {selectedModule < MODULES.length - 1 ? 'Module suivant →' : 'Terminer la formation 🎓'}
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Navigation - Hide in quiz mode */}
+              {viewMode !== 'quiz' && (
+                <div className="flex items-center justify-between mt-4">
+                  <NavigationButtons
+                    onPrev={goToPrev}
+                    onNext={goToNext}
+                    hasPrev={hasPrev}
+                    hasNext={hasNext}
+                    moduleColor={currentModule.color}
+                  />
+
+                  {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                    <button
+                      onClick={completeVideo}
+                      className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors flex items-center gap-2"
+                    >
+                      <div className="w-4 h-4"><Icons.Check /></div>
+                      Marquer terminé
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Quiz Back Button */}
+              {viewMode === 'quiz' && (
+                <div className="mt-4">
                   <button
-                    onClick={completeVideo}
-                    className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors flex items-center gap-2"
+                    onClick={() => setViewMode('lesson')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
                   >
-                    <div className="w-4 h-4"><Icons.Check /></div>
-                    Marquer terminé
+                    <div className="w-4 h-4"><Icons.ChevronLeft /></div>
+                    Retour à la leçon
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Right Panel - Notes & Daily Goals */}
@@ -1320,66 +1674,74 @@ function FormationPage() {
           </div>
         </main>
 
-        {/* Fixed Bottom Navigation Bar */}
-        <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-3 py-2 sm:px-4 sm:py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-            {/* Previous */}
-            <button
-              onClick={goToPrev}
-              disabled={!hasPrev}
-              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
-                hasPrev 
-                  ? 'bg-white/10 hover:bg-white/20 text-white' 
-                  : 'bg-white/5 text-white/30 cursor-not-allowed'
-              }`}
-            >
-              <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronLeft /></div>
-              <span className="hidden sm:inline">Précédent</span>
-            </button>
+        {/* Fixed Bottom Navigation Bar - Hide during quiz */}
+        {viewMode !== 'quiz' && (
+          <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-3 py-2 sm:px-4 sm:py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
+            <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+              {/* Previous */}
+              <button
+                onClick={goToPrev}
+                disabled={!hasPrev}
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
+                  hasPrev 
+                    ? 'bg-white/10 hover:bg-white/20 text-white' 
+                    : 'bg-white/5 text-white/30 cursor-not-allowed'
+                }`}
+              >
+                <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronLeft /></div>
+                <span className="hidden sm:inline">Précédent</span>
+              </button>
 
-            {/* Center - Mark Complete Button (simplified on mobile) */}
-            <div className="flex-1 flex items-center justify-center">
-              {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' ? (
-                <button
-                  onClick={completeVideo}
-                  className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors text-sm"
-                >
-                  <div className="w-4 h-4"><Icons.Check /></div>
-                  <span>Terminé</span>
-                  <span className="hidden sm:inline text-green-400/60">+10 XP</span>
-                </button>
-              ) : isVideoCompleted(selectedModule, currentVideo?.id || '') ? (
-                <div className="flex items-center gap-2 text-green-400 text-sm">
-                  <div className="w-5 h-5"><Icons.Check /></div>
-                  <span className="hidden sm:inline">Leçon terminée</span>
-                  <span className="sm:hidden">✓</span>
-                </div>
-              ) : (
-                <span className="text-xs text-white/40 text-center">
-                  {selectedVideoIdx + 1} / {currentModule?.videos?.length || 0}
-                </span>
-              )}
+              {/* Center - Mark Complete Button (simplified on mobile) */}
+              <div className="flex-1 flex items-center justify-center">
+                {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' ? (
+                  <button
+                    onClick={completeVideo}
+                    className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors text-sm"
+                  >
+                    <div className="w-4 h-4"><Icons.Check /></div>
+                    <span>Terminé</span>
+                    <span className="hidden sm:inline text-green-400/60">+10 XP</span>
+                  </button>
+                ) : isVideoCompleted(selectedModule, currentVideo?.id || '') ? (
+                  <div className="flex items-center gap-2 text-green-400 text-sm">
+                    <div className="w-5 h-5"><Icons.Check /></div>
+                    <span className="hidden sm:inline">Leçon terminée</span>
+                    <span className="sm:hidden">✓</span>
+                  </div>
+                ) : currentVideo?.type === 'quiz' ? (
+                  <button
+                    onClick={startQuiz}
+                    className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium text-black text-sm"
+                    style={{ backgroundColor: currentModule.color }}
+                  >
+                    <span>📝</span>
+                    <span>Commencer le quiz</span>
+                  </button>
+                ) : (
+                  <span className="text-xs text-white/40 text-center">
+                    {selectedVideoIdx + 1} / {currentModule?.videos?.length || 0}
+                  </span>
+                )}
+              </div>
+
+              {/* Next */}
+              <button
+                onClick={goToNext}
+                disabled={!hasNext}
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
+                  hasNext 
+                    ? 'text-black' 
+                    : 'bg-white/5 text-white/30 cursor-not-allowed'
+                }`}
+                style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
+              >
+                <span className="hidden sm:inline">Suivant</span>
+                <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronRight /></div>
+              </button>
             </div>
-
-            {/* Next */}
-            <button
-              onClick={goToNext}
-              disabled={!hasNext}
-              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm ${
-                hasNext 
-                  ? 'text-black' 
-                  : 'bg-white/5 text-white/30 cursor-not-allowed'
-              }`}
-              style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
-            >
-              <span className="hidden sm:inline">Suivant</span>
-              <div className="w-4 h-4 sm:w-5 sm:h-5"><Icons.ChevronRight /></div>
-            </button>
           </div>
-        </div>
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
