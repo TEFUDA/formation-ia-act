@@ -1464,9 +1464,22 @@ function FormationPage() {
               )}
 
               {/* QUIZ VIEW */}
-              {viewMode === 'quiz' && currentQuiz && (
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  {!showQuizResult ? (
+              {viewMode === 'quiz' && (
+                <div className="flex-1 flex flex-col min-h-[400px] bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-2xl p-4 border border-purple-500/30">
+                  {/* Debug info - à supprimer après */}
+                  <div className="mb-4 p-2 bg-yellow-500/20 rounded text-yellow-300 text-xs">
+                    DEBUG: viewMode={viewMode} | moduleId={selectedModule} | quizExists={currentQuiz ? 'yes' : 'no'} | questionIdx={currentQuestionIdx}
+                  </div>
+                  
+                  {!currentQuiz ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-[#8B5CF6] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-white/60">Chargement du quiz...</p>
+                        <p className="text-red-400 text-sm mt-2">Quiz non trouvé pour module {selectedModule}</p>
+                      </div>
+                    </div>
+                  ) : !showQuizResult ? (
                     <>
                       {/* Quiz Header */}
                       <div className="flex-shrink-0 mb-3 bg-[#0A0A1B]/80 px-3 py-2 rounded-xl border border-white/10">
@@ -1491,7 +1504,7 @@ function FormationPage() {
                       </div>
 
                       {/* Question */}
-                      {currentQuestion && (
+                      {currentQuestion ? (
                         <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
                           <h2 className="text-sm sm:text-base font-semibold mb-4">{currentQuestion.question}</h2>
                           
@@ -1571,6 +1584,19 @@ function FormationPage() {
                               </button>
                             </motion.div>
                           )}
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10">
+                          <div className="text-center">
+                            <div className="text-5xl mb-4">❓</div>
+                            <p className="text-white/60">Question non trouvée</p>
+                            <button 
+                              onClick={() => setViewMode('lesson')}
+                              className="mt-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20"
+                            >
+                              Retour
+                            </button>
+                          </div>
                         </div>
                       )}
                     </>
