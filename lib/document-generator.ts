@@ -58,7 +58,6 @@ export const generatePolicyDocx = async (
         qrCodeImage = new ImageRun({
           data: Buffer.from(base64Data, 'base64'),
           transformation: { width: 80, height: 80 },
-          type: 'png',
         });
       }
     } catch (e) {
