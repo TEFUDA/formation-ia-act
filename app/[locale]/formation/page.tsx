@@ -7,13 +7,24 @@ import Link from 'next/link';
 import { MODULES, Module, Video } from '@/lib/formation/modules';
 import { getQuizByModuleId, calculateQuizScore } from '@/lib/formation/quizzes';
 
-// Import interactive components
+// Import interactive components (legacy)
 import ClassificationWizard from '@/components/formation/ClassificationWizard';
 import AuditSimulation from '@/components/formation/AuditSimulation';
 import SmartEmailEditor from '@/components/formation/SmartEmailEditor';
 import BrainstormingGrid from '@/components/formation/BrainstormingGrid';
 import LegalMentionsGenerator from '@/components/formation/LegalMentionsGenerator';
 import ActionPlanBuilder from '@/components/formation/ActionPlanBuilder';
+
+// Import new workshops
+import {
+  DiagnosticWorkshop,
+  InventoryWorkshop,
+  RegistryBuilder,
+  ClassificationWorkshop,
+  EmailGeneratorWorkshop,
+  PolicyGeneratorWorkshop,
+  ActionPlanWorkshop,
+} from '@/components/formation/workshops';
 
 // ============================================
 // GAMIFICATION CONFIG
@@ -757,87 +768,55 @@ function FormationContent() {
             {/* LESSON VIEW - Exercise */}
             {viewMode === 'lesson' && currentVideo?.type === 'exercise' && (
               <div className="flex-1 bg-white/5 rounded-2xl p-4 sm:p-6 overflow-auto border border-white/10">
-                {/* M1 - Diagnostic */}
+                {/* M1 - Diagnostic Workshop */}
                 {currentVideo.id === '1.2' && (
-                  <div className="text-center py-8">
-                    <div className="text-5xl mb-4">🔍</div>
-                    <h3 className="text-xl font-bold mb-2">Diagnostic Initial AI Act</h3>
-                    <p className="text-white/60 mb-6 max-w-md mx-auto">
-                      Téléchargez la checklist pour évaluer votre niveau de conformité actuel.
-                    </p>
-                    {currentVideo.exerciseFile && (
-                      <a
-                        href={`/resources/${currentVideo.exerciseFile}`}
-                        download
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black"
-                        style={{ backgroundColor: currentModule.color }}
-                      >
-                        <div className="w-5 h-5"><Icons.Download /></div>
-                        Télécharger la checklist
-                      </a>
-                    )}
-                    <button
-                      onClick={completeVideo}
-                      className="block mx-auto mt-4 text-sm text-white/40 hover:text-white/60"
-                    >
-                      Marquer comme terminé →
-                    </button>
-                  </div>
+                  <DiagnosticWorkshop 
+                    moduleColor={currentModule.color}
+                    onComplete={completeVideo}
+                  />
                 )}
 
-                {/* M2 - Brainstorming */}
+                {/* M2 - Inventory Workshop */}
                 {currentVideo.id === '2.2' && (
-                  <BrainstormingGrid 
+                  <InventoryWorkshop 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
                 )}
 
-                {/* M2 - Registre IA */}
+                {/* M2 - Registry Builder */}
                 {currentVideo.id === '2.4' && (
-                  <div className="text-center py-8">
-                    <div className="text-5xl mb-4">📋</div>
-                    <h3 className="text-xl font-bold mb-2">Registre des Systèmes IA</h3>
-                    <p className="text-white/60 mb-6 max-w-md mx-auto">
-                      Téléchargez le template Excel pour créer votre registre des systèmes IA.
-                    </p>
-                    {currentVideo.exerciseFile && (
-                      <a
-                        href={`/resources/${currentVideo.exerciseFile}`}
-                        download
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-black"
-                        style={{ backgroundColor: currentModule.color }}
-                      >
-                        <div className="w-5 h-5"><Icons.Download /></div>
-                        Télécharger le registre
-                      </a>
-                    )}
-                    <button
-                      onClick={completeVideo}
-                      className="block mx-auto mt-4 text-sm text-white/40 hover:text-white/60"
-                    >
-                      Marquer comme terminé →
-                    </button>
-                  </div>
+                  <RegistryBuilder 
+                    moduleColor={currentModule.color}
+                    onComplete={completeVideo}
+                  />
                 )}
 
-                {/* M3 - Classification Wizard */}
+                {/* M3 - Classification Workshop */}
                 {currentVideo.id === '3.2' && (
-                  <ClassificationWizard 
+                  <ClassificationWorkshop 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
                 )}
 
-                {/* M4 - Smart Email Editor */}
+                {/* M4 - Email Generator Workshop */}
                 {currentVideo.id === '4.2' && (
-                  <SmartEmailEditor 
+                  <EmailGeneratorWorkshop 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
                 )}
 
-                {/* M5 - Legal Mentions Generator */}
+                {/* M5 - Policy Generator Workshop */}
+                {currentVideo.id === '5.2' && (
+                  <PolicyGeneratorWorkshop 
+                    moduleColor={currentModule.color}
+                    onComplete={completeVideo}
+                  />
+                )}
+
+                {/* M5 - Legal Mentions Generator (legacy) */}
                 {currentVideo.id === '5.4' && (
                   <LegalMentionsGenerator 
                     moduleColor={currentModule.color}
@@ -845,20 +824,23 @@ function FormationContent() {
                   />
                 )}
 
-                {/* M7 - Action Plan Builder */}
+                {/* M7 - Action Plan Workshop */}
                 {currentVideo.id === '7.2' && (
-                  <ActionPlanBuilder 
+                  <ActionPlanWorkshop 
                     moduleColor={currentModule.color}
                     onComplete={completeVideo}
                   />
                 )}
 
                 {/* Fallback for other exercises */}
-                {!['1.2', '2.2', '2.4', '3.2', '4.2', '5.4', '7.2'].includes(currentVideo.id) && 
+                {!['1.2', '2.2', '2.4', '3.2', '4.2', '5.2', '5.4', '7.2'].includes(currentVideo.id) && 
                  currentVideo.exerciseFile && (
                   <div className="text-center py-8">
                     <div className="text-5xl mb-4">📝</div>
                     <h3 className="text-xl font-bold mb-2">{currentVideo.title}</h3>
+                    <p className="text-white/60 mb-6 max-w-md mx-auto">
+                      {currentVideo.description}
+                    </p>
                     <a
                       href={`/resources/${currentVideo.exerciseFile}`}
                       download
