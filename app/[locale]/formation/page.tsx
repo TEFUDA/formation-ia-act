@@ -1,20 +1,48 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { MODULES, Module, Video, calculateModuleProgress, getNextContent } from '@/lib/formation/modules';
+import { MODULES, Module, Video } from '@/lib/formation/modules';
 import { QUIZZES, getQuizByModuleId, calculateQuizScore, Quiz, QuizQuestion } from '@/lib/formation/quizzes';
 
 // Import interactive components
 import ClassificationWizard from '@/components/formation/ClassificationWizard';
 import AuditSimulation from '@/components/formation/AuditSimulation';
-import LegalMentionsGenerator from '@/components/formation/LegalMentionsGenerator';
 import SmartEmailEditor from '@/components/formation/SmartEmailEditor';
 import BrainstormingGrid from '@/components/formation/BrainstormingGrid';
 import CertificateGenerator from '@/components/formation/CertificateGenerator';
 import ActionPlanBuilder from '@/components/formation/ActionPlanBuilder';
+
+// ============================================
+// GAMIFICATION CONFIG
+// ============================================
+const LEVELS = [
+  { level: 1, name: 'Novice', minXP: 0, badge: '🌱', color: '#6B7280', nextXP: 500 },
+  { level: 2, name: 'Initié', minXP: 500, badge: '🔵', color: '#3B82F6', nextXP: 1500 },
+  { level: 3, name: 'Praticien', minXP: 1500, badge: '🟣', color: '#8B5CF6', nextXP: 3000 },
+  { level: 4, name: 'Expert', minXP: 3000, badge: '🟠', color: '#F59E0B', nextXP: 5000 },
+  { level: 5, name: 'Maître AI Act', minXP: 5000, badge: '👑', color: '#FFD700', nextXP: 10000 },
+];
+
+const BADGES = [
+  { id: 'first-lesson', name: 'Premier Pas', icon: '👣', description: 'Terminer sa première leçon', xpRequired: 10 },
+  { id: 'module-complete', name: 'Module Maîtrisé', icon: '📚', description: 'Terminer un module complet', condition: 'moduleComplete' },
+  { id: 'quiz-master', name: 'Quiz Master', icon: '🧠', description: 'Obtenir 100% à un quiz', condition: 'perfectQuiz' },
+  { id: 'streak-3', name: 'En Forme', icon: '🔥', description: '3 jours consécutifs', condition: 'streak3' },
+  { id: 'streak-7', name: 'Déterminé', icon: '💪', description: '7 jours consécutifs', condition: 'streak7' },
+  { id: 'speed-learner', name: 'Speed Learner', icon: '⚡', description: '5 leçons en une journée', condition: 'speedLearner' },
+  { id: 'note-taker', name: 'Scribe', icon: '✍️', description: 'Prendre 10 notes', condition: 'noteTaker' },
+  { id: 'halfway', name: 'Mi-Parcours', icon: '🏃', description: '50% de la formation', condition: 'halfway' },
+  { id: 'graduate', name: 'Diplômé', icon: '🎓', description: 'Terminer la formation', condition: 'complete' },
+];
+
+const DAILY_GOALS = [
+  { id: 'lessons', target: 3, label: 'Leçons', icon: '📖', xpBonus: 50 },
+  { id: 'minutes', target: 30, label: 'Minutes', icon: '⏱️', xpBonus: 30 },
+  { id: 'quiz', target: 1, label: 'Quiz', icon: '📝', xpBonus: 40 },
+];
 
 // ============================================
 // ICONS
@@ -35,16 +63,24 @@ const Icons = {
   Lock: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
   Download: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
   FileText: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
-  HelpCircle: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-  RotateCcw: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>,
-  Trophy: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>,
   Target: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+  Bookmark: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
+  BookmarkFilled: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
+  Edit: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  Volume: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+  Maximize: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
+  Settings: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  Fire: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M12 2c-1.5 2-3 3.5-3 6 0 1.5.5 2.5 1.5 3.5-1-.5-2-2-2-3.5 0 0-2.5 3-2.5 6.5 0 4 3 7 6 7s6-3 6-7c0-2-1-4-2.5-5.5 0 1.5-.5 2.5-1.5 3-.5-2-2-4-2-9z"/></svg>,
+  Star: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  Trophy: () => <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>,
+  Keyboard: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="18" y2="8"/><line x1="8" y1="12" x2="8" y2="12"/><line x1="12" y1="12" x2="12" y2="12"/><line x1="16" y1="12" x2="16" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/></svg>,
+  Focus: () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>,
 };
 
 // ============================================
 // TYPES
 // ============================================
-type ViewMode = 'modules' | 'lesson' | 'quiz';
+type ViewMode = 'lesson' | 'quiz';
 
 interface UserProgress {
   completedVideos: string[];
@@ -52,101 +88,550 @@ interface UserProgress {
   currentModule: number;
   currentVideo: string;
   totalXP: number;
+  streak: number;
+  lastActiveDate: string;
+  lessonsToday: number;
+  minutesToday: number;
+  quizzesToday: number;
+  unlockedBadges: string[];
+  notes: Record<string, string>;
+  bookmarks: string[];
 }
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+const getCurrentLevel = (xp: number) => {
+  return LEVELS.reduce((acc, level) => (xp >= level.minXP ? level : acc), LEVELS[0]);
+};
+
+const getXPToNextLevel = (xp: number) => {
+  const current = getCurrentLevel(xp);
+  const progress = ((xp - current.minXP) / (current.nextXP - current.minXP)) * 100;
+  return { progress: Math.min(progress, 100), remaining: current.nextXP - xp };
+};
 
 // ============================================
 // COMPONENTS
 // ============================================
 
-const NeuralBackground = () => (
-  <div className="fixed inset-0 pointer-events-none overflow-hidden">
-    <div className="absolute inset-0 bg-[#030014]" />
-    <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[#8B5CF6]/5 blur-[120px]" />
-    <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#00F5FF]/5 blur-[150px]" />
-    <div className="absolute top-[40%] left-[60%] w-[400px] h-[400px] rounded-full bg-[#00FF88]/3 blur-[100px]" />
-  </div>
-);
-
-const HoloCard = ({ children, glow = '#00F5FF', className = '', onClick }: { 
-  children: React.ReactNode; 
-  glow?: string; 
-  className?: string;
-  onClick?: () => void;
-}) => (
-  <div className={`relative group ${className}`} onClick={onClick}>
-    <div 
-      className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300" 
-      style={{ background: `linear-gradient(135deg, ${glow}40, transparent 50%, ${glow}40)` }} 
-    />
-    <div className="relative bg-[#0A0A1B]/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden h-full flex flex-col">
-      {children}
+// Animated XP Gain
+const XPGainAnimation = ({ amount, onComplete }: { amount: number; onComplete: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20, scale: 0.5 }}
+    animate={{ opacity: 1, y: -40, scale: 1 }}
+    exit={{ opacity: 0, y: -60 }}
+    onAnimationComplete={onComplete}
+    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] pointer-events-none"
+  >
+    <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold px-6 py-3 rounded-full shadow-2xl">
+      <div className="w-6 h-6"><Icons.Zap /></div>
+      <span className="text-xl">+{amount} XP</span>
     </div>
+  </motion.div>
+);
+
+// Level Up Animation
+const LevelUpAnimation = ({ level, onComplete }: { level: typeof LEVELS[0]; onComplete: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.5 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 1.5 }}
+    onAnimationComplete={() => setTimeout(onComplete, 2000)}
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl"
+  >
+    <div className="text-center">
+      <motion.div 
+        className="text-8xl mb-4"
+        animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 0.5 }}
+      >
+        {level.badge}
+      </motion.div>
+      <motion.h2 
+        className="text-4xl font-black mb-2"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        style={{ color: level.color }}
+      >
+        NIVEAU {level.level}
+      </motion.h2>
+      <motion.p 
+        className="text-2xl text-white font-bold"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        {level.name}
+      </motion.p>
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.7, type: "spring" }}
+        className="mt-6 inline-flex items-center gap-2 bg-white/10 px-6 py-3 rounded-full"
+      >
+        <Icons.Trophy />
+        <span>Nouveau titre débloqué !</span>
+      </motion.div>
+    </div>
+  </motion.div>
+);
+
+// Streak Badge
+const StreakBadge = ({ streak }: { streak: number }) => (
+  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+    streak > 0 ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-white/40'
+  }`}>
+    <div className={`w-4 h-4 ${streak > 0 ? 'text-orange-400' : ''}`}>
+      <Icons.Fire />
+    </div>
+    <span className="font-bold text-sm">{streak}</span>
+    <span className="text-xs opacity-60">jours</span>
   </div>
 );
 
-// Progress Ring Component
-const ProgressRing = ({ progress, size = 60, strokeWidth = 4, color }: { 
-  progress: number; 
-  size?: number; 
-  strokeWidth?: number;
-  color: string;
-}) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (progress / 100) * circumference;
+// Daily Goals Progress
+const DailyGoals = ({ progress }: { progress: UserProgress }) => {
+  const goals = [
+    { ...DAILY_GOALS[0], current: progress.lessonsToday },
+    { ...DAILY_GOALS[1], current: progress.minutesToday },
+    { ...DAILY_GOALS[2], current: progress.quizzesToday },
+  ];
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg className="transform -rotate-90" width={size} height={size}>
-        <circle
-          className="text-white/10"
-          strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-        <circle
-          className="transition-all duration-500"
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          stroke={color}
-          fill="transparent"
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white font-bold text-sm">{progress}%</span>
+    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <div className="w-4 h-4 text-[#00F5FF]"><Icons.Target /></div>
+          Objectifs du jour
+        </h3>
+        <span className="text-xs text-white/40">
+          {goals.filter(g => g.current >= g.target).length}/{goals.length} ✓
+        </span>
+      </div>
+      <div className="space-y-2">
+        {goals.map(goal => {
+          const completed = goal.current >= goal.target;
+          const percent = Math.min((goal.current / goal.target) * 100, 100);
+          return (
+            <div key={goal.id} className="flex items-center gap-3">
+              <span className="text-lg">{goal.icon}</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-white/60">{goal.label}</span>
+                  <span className={`text-xs font-medium ${completed ? 'text-green-400' : 'text-white/80'}`}>
+                    {goal.current}/{goal.target}
+                  </span>
+                </div>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    className={`h-full rounded-full ${completed ? 'bg-green-400' : 'bg-[#00F5FF]'}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+              {completed && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="text-green-400 text-xs"
+                >
+                  +{goal.xpBonus} XP
+                </motion.span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-// Video Type Badge
-const ContentBadge = ({ type, color }: { type: Video['type']; color: string }) => {
-  const config = {
-    video: { icon: '🎬', label: 'Vidéo' },
-    exercise: { icon: '✏️', label: 'Exercice' },
-    quiz: { icon: '📝', label: 'Quiz' },
-    scenario: { icon: '🎭', label: 'Scénario' },
+// Notes Panel
+const NotesPanel = ({ 
+  videoId, 
+  notes, 
+  onSave 
+}: { 
+  videoId: string; 
+  notes: Record<string, string>;
+  onSave: (videoId: string, note: string) => void;
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState(notes[videoId] || '');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setText(notes[videoId] || '');
+  }, [videoId, notes]);
+
+  const handleSave = () => {
+    onSave(videoId, text);
+    setIsEditing(false);
   };
 
-  const { icon, label } = config[type];
-
   return (
-    <span 
-      className="text-[10px] lg:text-xs px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full font-medium"
-      style={{ backgroundColor: `${color}20`, color }}
-    >
-      {icon} {label}
-    </span>
+    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <div className="w-4 h-4 text-[#8B5CF6]"><Icons.Edit /></div>
+          Mes notes
+        </h3>
+        {!isEditing && text && (
+          <button 
+            onClick={() => setIsEditing(true)}
+            className="text-xs text-[#8B5CF6] hover:underline"
+          >
+            Modifier
+          </button>
+        )}
+      </div>
+      
+      {isEditing || !text ? (
+        <div>
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Prenez des notes sur cette leçon..."
+            className="w-full h-24 bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-[#8B5CF6]/50"
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            {text && (
+              <button 
+                onClick={() => { setText(notes[videoId] || ''); setIsEditing(false); }}
+                className="px-3 py-1 text-xs text-white/60 hover:text-white"
+              >
+                Annuler
+              </button>
+            )}
+            <button 
+              onClick={handleSave}
+              className="px-3 py-1 text-xs bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED]"
+            >
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-white/70 whitespace-pre-wrap">{text}</p>
+      )}
+    </div>
   );
 };
+
+// Keyboard Shortcuts Modal
+const KeyboardShortcuts = ({ onClose }: { onClose: () => void }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
+    onClick={onClose}
+  >
+    <motion.div
+      initial={{ scale: 0.9 }}
+      animate={{ scale: 1 }}
+      className="bg-[#0A0A1B] border border-white/10 rounded-2xl p-6 max-w-md w-full"
+      onClick={e => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-bold flex items-center gap-2">
+          <div className="w-5 h-5 text-[#00F5FF]"><Icons.Keyboard /></div>
+          Raccourcis clavier
+        </h3>
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white">
+          <Icons.X />
+        </button>
+      </div>
+      
+      <div className="space-y-3">
+        {[
+          { key: 'Espace', action: 'Lecture / Pause' },
+          { key: 'N', action: 'Leçon suivante' },
+          { key: 'P', action: 'Leçon précédente' },
+          { key: 'M', action: 'Marquer comme terminé' },
+          { key: 'B', action: 'Ajouter aux favoris' },
+          { key: 'F', action: 'Mode Focus' },
+          { key: '?', action: 'Afficher les raccourcis' },
+          { key: 'Échap', action: 'Fermer le modal' },
+        ].map(shortcut => (
+          <div key={shortcut.key} className="flex items-center justify-between">
+            <span className="text-white/60 text-sm">{shortcut.action}</span>
+            <kbd className="px-3 py-1 bg-white/10 rounded-lg text-sm font-mono">{shortcut.key}</kbd>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  </motion.div>
+);
+
+// Premium Video Player
+const VideoPlayer = ({ 
+  video, 
+  module, 
+  isPlaying, 
+  onPlayPause,
+  onComplete,
+  isCompleted 
+}: { 
+  video: Video;
+  module: Module;
+  isPlaying: boolean;
+  onPlayPause: () => void;
+  onComplete: () => void;
+  isCompleted: boolean;
+}) => {
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(80);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+
+  // Simulate video progress
+  useEffect(() => {
+    if (isPlaying && progress < 100) {
+      const interval = setInterval(() => {
+        setProgress(p => {
+          if (p >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return p + 0.5;
+        });
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, progress]);
+
+  return (
+    <div className="relative bg-black rounded-2xl overflow-hidden group">
+      {/* Video Area */}
+      <div className="aspect-video bg-gradient-to-br from-gray-900 to-black flex items-center justify-center relative">
+        {/* Placeholder for actual video */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <motion.button
+              onClick={onPlayPause}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-all"
+              style={{ backgroundColor: module.color }}
+            >
+              <div className="w-8 h-8 text-black ml-1">
+                {isPlaying ? <Icons.Pause /> : <Icons.Play />}
+              </div>
+            </motion.button>
+            <p className="text-white/60 text-sm">{video.title}</p>
+          </div>
+        </div>
+
+        {/* Completed Overlay */}
+        {isCompleted && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1.5 rounded-full text-sm">
+            <div className="w-4 h-4"><Icons.Check /></div>
+            Terminé
+          </div>
+        )}
+
+        {/* Module Badge */}
+        <div 
+          className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-sm font-medium"
+          style={{ backgroundColor: `${module.color}20`, color: module.color }}
+        >
+          {module.icon} {module.code}
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Progress Bar */}
+        <div className="mb-3">
+          <div className="h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer">
+            <motion.div 
+              className="h-full rounded-full"
+              style={{ backgroundColor: module.color, width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Controls Row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Play/Pause */}
+            <button 
+              onClick={onPlayPause}
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <div className="w-5 h-5 text-white">
+                {isPlaying ? <Icons.Pause /> : <Icons.Play />}
+              </div>
+            </button>
+
+            {/* Volume */}
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 text-white/60"><Icons.Volume /></div>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={volume}
+                onChange={(e) => setVolume(parseInt(e.target.value))}
+                className="w-20 h-1 accent-white"
+              />
+            </div>
+
+            {/* Time */}
+            <span className="text-white/60 text-sm">
+              {video.duration || '10:00'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Speed */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                className="px-3 py-1 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors"
+              >
+                {playbackSpeed}x
+              </button>
+              {showSpeedMenu && (
+                <div className="absolute bottom-full right-0 mb-2 bg-[#1a1a2e] rounded-lg overflow-hidden shadow-xl">
+                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map(speed => (
+                    <button
+                      key={speed}
+                      onClick={() => { setPlaybackSpeed(speed); setShowSpeedMenu(false); }}
+                      className={`block w-full px-4 py-2 text-sm text-left hover:bg-white/10 ${
+                        playbackSpeed === speed ? 'text-[#00F5FF]' : 'text-white'
+                      }`}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Fullscreen */}
+            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <div className="w-5 h-5 text-white"><Icons.Maximize /></div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Complete Button - Shows when progress > 80% */}
+      {progress > 80 && !isCompleted && (
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={onComplete}
+          className="absolute bottom-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full font-bold text-black flex items-center gap-2"
+          style={{ backgroundColor: module.color }}
+        >
+          <div className="w-5 h-5"><Icons.Check /></div>
+          Marquer comme terminé (+10 XP)
+        </motion.button>
+      )}
+    </div>
+  );
+};
+
+// Level Progress Header
+const LevelHeader = ({ xp, streak }: { xp: number; streak: number }) => {
+  const level = getCurrentLevel(xp);
+  const { progress, remaining } = getXPToNextLevel(xp);
+
+  return (
+    <div className="flex items-center gap-4 bg-white/5 rounded-xl p-3 border border-white/10">
+      {/* Level Badge */}
+      <div 
+        className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+        style={{ background: `linear-gradient(135deg, ${level.color}40, ${level.color}10)` }}
+      >
+        {level.badge}
+      </div>
+
+      {/* Level Info */}
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="font-bold" style={{ color: level.color }}>Niveau {level.level}</span>
+          <span className="text-white/60 text-sm">•</span>
+          <span className="text-white/80 text-sm">{level.name}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full rounded-full"
+              style={{ backgroundColor: level.color, width: `${progress}%` }}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-xs text-white/40">{remaining} XP</span>
+        </div>
+      </div>
+
+      {/* XP & Streak */}
+      <div className="flex items-center gap-3">
+        <div className="text-center">
+          <div className="flex items-center gap-1 text-yellow-400">
+            <div className="w-5 h-5"><Icons.Zap /></div>
+            <span className="font-bold text-lg">{xp}</span>
+          </div>
+          <span className="text-[10px] text-white/40">XP TOTAL</span>
+        </div>
+        <div className="w-px h-8 bg-white/10" />
+        <StreakBadge streak={streak} />
+      </div>
+    </div>
+  );
+};
+
+// Navigation Buttons
+const NavigationButtons = ({
+  onPrev,
+  onNext,
+  hasPrev,
+  hasNext,
+  moduleColor
+}: {
+  onPrev: () => void;
+  onNext: () => void;
+  hasPrev: boolean;
+  hasNext: boolean;
+  moduleColor: string;
+}) => (
+  <div className="flex items-center gap-3">
+    <button
+      onClick={onPrev}
+      disabled={!hasPrev}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+        hasPrev 
+          ? 'bg-white/10 hover:bg-white/20 text-white' 
+          : 'bg-white/5 text-white/30 cursor-not-allowed'
+      }`}
+    >
+      <div className="w-4 h-4"><Icons.ChevronLeft /></div>
+      Précédent
+    </button>
+    <button
+      onClick={onNext}
+      disabled={!hasNext}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+        hasNext 
+          ? 'text-black' 
+          : 'bg-white/5 text-white/30 cursor-not-allowed'
+      }`}
+      style={{ backgroundColor: hasNext ? moduleColor : undefined }}
+    >
+      Suivant
+      <div className="w-4 h-4"><Icons.ChevronRight /></div>
+    </button>
+  </div>
+);
 
 // ============================================
 // MAIN COMPONENT
@@ -155,15 +640,19 @@ export default function FormationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State
-  const [viewMode, setViewMode] = useState<ViewMode>('modules');
+  // Core State
+  const [viewMode, setViewMode] = useState<ViewMode>('lesson');
   const [selectedModule, setSelectedModule] = useState<number>(0);
   const [selectedVideoIdx, setSelectedVideoIdx] = useState<number>(0);
-  const [expandedModules, setExpandedModules] = useState<number[]>([0]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showRightPanel, setShowRightPanel] = useState(true);
+
+  // Gamification State
+  const [xpAnimation, setXpAnimation] = useState<number | null>(null);
+  const [levelUpAnimation, setLevelUpAnimation] = useState<typeof LEVELS[0] | null>(null);
 
   // Quiz State
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
@@ -171,15 +660,22 @@ export default function FormationPage() {
   const [showQuizResult, setShowQuizResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [quizAttempts, setQuizAttempts] = useState<Record<number, number>>({});
 
-  // User Progress (persisted in localStorage)
+  // User Progress
   const [progress, setProgress] = useState<UserProgress>({
     completedVideos: [],
     quizScores: {},
     currentModule: 0,
     currentVideo: '0.1',
     totalXP: 0,
+    streak: 0,
+    lastActiveDate: new Date().toISOString().split('T')[0],
+    lessonsToday: 0,
+    minutesToday: 0,
+    quizzesToday: 0,
+    unlockedBadges: [],
+    notes: {},
+    bookmarks: [],
   });
 
   // Load progress from localStorage
@@ -187,7 +683,24 @@ export default function FormationPage() {
     const saved = localStorage.getItem('formationProgress');
     if (saved) {
       try {
-        setProgress(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        // Update streak
+        const today = new Date().toISOString().split('T')[0];
+        const lastActive = parsed.lastActiveDate;
+        
+        if (lastActive !== today) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
+          
+          parsed.streak = lastActive === yesterdayStr ? parsed.streak + 1 : 1;
+          parsed.lastActiveDate = today;
+          parsed.lessonsToday = 0;
+          parsed.minutesToday = 0;
+          parsed.quizzesToday = 0;
+        }
+        
+        setProgress(parsed);
       } catch (e) {
         console.error('Error loading progress:', e);
       }
@@ -195,824 +708,502 @@ export default function FormationPage() {
 
     // Check URL params
     const moduleParam = searchParams.get('module');
-    const videoParam = searchParams.get('video');
-    const quizParam = searchParams.get('quiz');
-
     if (moduleParam) {
-      const moduleId = parseInt(moduleParam);
-      setSelectedModule(moduleId);
-      setExpandedModules([moduleId]);
-      
-      if (quizParam === 'true') {
-        setViewMode('quiz');
-      } else if (videoParam) {
-        setSelectedVideoIdx(parseInt(videoParam));
-        setViewMode('lesson');
-      }
+      setSelectedModule(parseInt(moduleParam));
     }
   }, [searchParams]);
 
-  // Save progress to localStorage
+  // Save progress
   useEffect(() => {
     localStorage.setItem('formationProgress', JSON.stringify(progress));
   }, [progress]);
 
-  // Current module and video
-  const currentModule = MODULES[selectedModule];
-  const currentVideo = currentModule?.videos[selectedVideoIdx];
-  const currentQuiz = getQuizByModuleId(selectedModule);
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-  // Calculate overall progress
+      switch (e.key.toLowerCase()) {
+        case ' ':
+          e.preventDefault();
+          setIsPlaying(p => !p);
+          break;
+        case 'n':
+          goToNext();
+          break;
+        case 'p':
+          goToPrev();
+          break;
+        case 'm':
+          if (!isVideoCompleted(selectedModule, currentVideo?.id || '')) {
+            completeVideo();
+          }
+          break;
+        case 'b':
+          toggleBookmark();
+          break;
+        case 'f':
+          setFocusMode(f => !f);
+          break;
+        case '?':
+          setShowShortcuts(true);
+          break;
+        case 'escape':
+          setShowShortcuts(false);
+          setFocusMode(false);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedModule, selectedVideoIdx]);
+
+  // Current module and video
+  const currentModule = MODULES[selectedModule] || MODULES[0];
+  const currentVideo = currentModule?.videos[selectedVideoIdx];
+
+  // Progress calculations
   const overallProgress = useMemo(() => {
-    const totalVideos = MODULES.reduce((sum, m) => sum + m.videos.length, 0);
+    const totalVideos = MODULES.reduce((acc, m) => acc + m.videos.length, 0);
     return Math.round((progress.completedVideos.length / totalVideos) * 100);
   }, [progress.completedVideos]);
 
-  // Module progress calculation
   const getModuleProgress = (moduleId: number) => {
-    const module = MODULES[moduleId];
+    const module = MODULES.find(m => m.id === moduleId);
     if (!module) return 0;
-    
     const moduleVideoIds = module.videos.map(v => `${moduleId}-${v.id}`);
     const completed = moduleVideoIds.filter(id => progress.completedVideos.includes(id)).length;
-    return Math.round((completed / module.videos.length) * 100);
+    return module.videos.length > 0 ? Math.round((completed / module.videos.length) * 100) : 0;
   };
 
-  // Is module unlocked?
   const isModuleUnlocked = (moduleId: number) => {
     if (moduleId === 0) return true;
-    const prevModule = MODULES[moduleId - 1];
-    if (!prevModule) return false;
-    
     const prevQuizScore = progress.quizScores[moduleId - 1];
-    const prevQuiz = getQuizByModuleId(moduleId - 1);
-    
-    return prevQuizScore !== undefined && prevQuiz && prevQuizScore >= prevQuiz.passingScore;
+    return prevQuizScore !== undefined && prevQuizScore >= 70;
   };
 
-  // Is video completed?
   const isVideoCompleted = (moduleId: number, videoId: string) => {
     return progress.completedVideos.includes(`${moduleId}-${videoId}`);
   };
 
-  // Mark video as completed
+  // Add XP with animation
+  const addXP = (amount: number) => {
+    const prevLevel = getCurrentLevel(progress.totalXP);
+    const newXP = progress.totalXP + amount;
+    const newLevel = getCurrentLevel(newXP);
+
+    setXpAnimation(amount);
+    
+    setProgress(p => ({ ...p, totalXP: newXP }));
+
+    if (newLevel.level > prevLevel.level) {
+      setTimeout(() => setLevelUpAnimation(newLevel), 1000);
+    }
+  };
+
+  // Complete video
   const completeVideo = () => {
-    const videoFullId = `${selectedModule}-${currentVideo.id}`;
-    
-    if (!progress.completedVideos.includes(videoFullId)) {
-      const newProgress = {
-        ...progress,
-        completedVideos: [...progress.completedVideos, videoFullId],
-        totalXP: progress.totalXP + 10,
-      };
-      setProgress(newProgress);
-    }
+    const videoId = `${selectedModule}-${currentVideo.id}`;
+    if (progress.completedVideos.includes(videoId)) return;
 
-    // Check if this was the last video before quiz
-    const isLastBeforeQuiz = selectedVideoIdx === currentModule.videos.length - 2 && 
-                             currentModule.videos[selectedVideoIdx + 1].type === 'quiz';
-    
-    if (isLastBeforeQuiz) {
-      setViewMode('quiz');
-      setCurrentQuestionIdx(0);
-      setQuizAnswers({});
-      setShowQuizResult(false);
-    } else if (selectedVideoIdx < currentModule.videos.length - 1) {
-      const nextVideo = currentModule.videos[selectedVideoIdx + 1];
-      if (nextVideo.type === 'quiz') {
-        setViewMode('quiz');
-        setCurrentQuestionIdx(0);
-        setQuizAnswers({});
-        setShowQuizResult(false);
-      } else {
-        setSelectedVideoIdx(selectedVideoIdx + 1);
-      }
-    }
+    const xpGain = 10;
+    addXP(xpGain);
+
+    setProgress(p => ({
+      ...p,
+      completedVideos: [...p.completedVideos, videoId],
+      lessonsToday: p.lessonsToday + 1,
+    }));
   };
 
-  // Handle quiz answer
-  const handleQuizAnswer = (questionId: string, answerId: string) => {
-    if (showFeedback) return;
-    
-    setSelectedAnswer(answerId);
-    setQuizAnswers({ ...quizAnswers, [questionId]: answerId });
-    setShowFeedback(true);
-  };
-
-  // Go to next question
-  const nextQuestion = () => {
-    if (!currentQuiz) return;
-
-    setShowFeedback(false);
-    setSelectedAnswer(null);
-
-    if (currentQuestionIdx < currentQuiz.questions.length - 1) {
-      setCurrentQuestionIdx(currentQuestionIdx + 1);
-    } else {
-      const result = calculateQuizScore(currentQuiz, quizAnswers);
-      
-      const newAttempts = { ...quizAttempts, [selectedModule]: (quizAttempts[selectedModule] || 0) + 1 };
-      setQuizAttempts(newAttempts);
-      
-      if (result.passed) {
-        const quizVideoId = `${selectedModule}-${currentModule.videos.find(v => v.type === 'quiz')?.id}`;
-        const newProgress = {
-          ...progress,
-          completedVideos: progress.completedVideos.includes(quizVideoId) 
-            ? progress.completedVideos 
-            : [...progress.completedVideos, quizVideoId],
-          quizScores: { ...progress.quizScores, [selectedModule]: result.score },
-          totalXP: progress.totalXP + currentModule.xp,
-        };
-        setProgress(newProgress);
-        setShowCelebration(true);
-      }
-      
-      setShowQuizResult(true);
-    }
-  };
-
-  // Retry quiz
-  const retryQuiz = () => {
-    setCurrentQuestionIdx(0);
-    setQuizAnswers({});
-    setShowQuizResult(false);
-    setShowFeedback(false);
-    setSelectedAnswer(null);
-  };
-
-  // Go to next module
-  const goToNextModule = () => {
-    if (selectedModule < MODULES.length - 1) {
-      const nextModuleId = selectedModule + 1;
-      setSelectedModule(nextModuleId);
+  // Navigation
+  const goToNext = () => {
+    if (selectedVideoIdx < currentModule.videos.length - 1) {
+      setSelectedVideoIdx(selectedVideoIdx + 1);
+    } else if (selectedModule < MODULES.length - 1 && isModuleUnlocked(selectedModule + 1)) {
+      setSelectedModule(selectedModule + 1);
       setSelectedVideoIdx(0);
-      setExpandedModules([...expandedModules, nextModuleId]);
-      setViewMode('lesson');
-      setShowCelebration(false);
-    } else {
-      router.push('/formation/complete');
     }
   };
 
-  // Toggle module expansion
-  const toggleModule = (moduleId: number) => {
-    if (expandedModules.includes(moduleId)) {
-      setExpandedModules(expandedModules.filter(id => id !== moduleId));
-    } else {
-      setExpandedModules([...expandedModules, moduleId]);
+  const goToPrev = () => {
+    if (selectedVideoIdx > 0) {
+      setSelectedVideoIdx(selectedVideoIdx - 1);
+    } else if (selectedModule > 0) {
+      setSelectedModule(selectedModule - 1);
+      const prevModule = MODULES[selectedModule - 1];
+      setSelectedVideoIdx(prevModule.videos.length - 1);
     }
   };
 
-  // Select a video
-  const selectVideo = (moduleId: number, videoIdx: number) => {
-    const module = MODULES[moduleId];
-    const video = module.videos[videoIdx];
-    
-    if (!isModuleUnlocked(moduleId)) return;
-    
-    setSelectedModule(moduleId);
-    setSelectedVideoIdx(videoIdx);
-    
-    if (video.type === 'quiz') {
-      setViewMode('quiz');
-      setCurrentQuestionIdx(0);
-      setQuizAnswers({});
-      setShowQuizResult(false);
-      setShowFeedback(false);
-    } else {
-      setViewMode('lesson');
-    }
-    
-    setMobileMenuOpen(false);
+  // Bookmark
+  const toggleBookmark = () => {
+    const videoId = `${selectedModule}-${currentVideo?.id}`;
+    setProgress(p => ({
+      ...p,
+      bookmarks: p.bookmarks.includes(videoId)
+        ? p.bookmarks.filter(b => b !== videoId)
+        : [...p.bookmarks, videoId]
+    }));
   };
 
-  // Current question for quiz
-  const currentQuestion = currentQuiz?.questions[currentQuestionIdx];
+  // Save note
+  const saveNote = (videoId: string, note: string) => {
+    setProgress(p => ({
+      ...p,
+      notes: { ...p.notes, [videoId]: note }
+    }));
+    // Bonus XP for first note
+    if (!progress.notes[videoId] && note.trim()) {
+      addXP(5);
+    }
+  };
+
+  const isBookmarked = progress.bookmarks.includes(`${selectedModule}-${currentVideo?.id}`);
+  const hasPrev = selectedVideoIdx > 0 || selectedModule > 0;
+  const hasNext = selectedVideoIdx < currentModule.videos.length - 1 || 
+    (selectedModule < MODULES.length - 1 && isModuleUnlocked(selectedModule + 1));
 
   return (
-    <div className="h-[100dvh] bg-[#030014] text-white flex overflow-hidden">
-      <NeuralBackground />
+    <div className={`min-h-screen bg-[#030014] text-white ${focusMode ? 'overflow-hidden' : ''}`}>
+      {/* Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-[#030014]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full opacity-30 blur-[120px]" style={{ background: currentModule.color }} />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#00F5FF]/10 blur-[150px]" />
+      </div>
+
+      {/* XP Animation */}
+      <AnimatePresence>
+        {xpAnimation && (
+          <XPGainAnimation amount={xpAnimation} onComplete={() => setXpAnimation(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Level Up Animation */}
+      <AnimatePresence>
+        {levelUpAnimation && (
+          <LevelUpAnimation level={levelUpAnimation} onComplete={() => setLevelUpAnimation(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Keyboard Shortcuts Modal */}
+      <AnimatePresence>
+        {showShortcuts && <KeyboardShortcuts onClose={() => setShowShortcuts(false)} />}
+      </AnimatePresence>
 
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0A0A1B]/95 backdrop-blur-xl border-b border-white/10">
-        <div className="flex items-center justify-between px-3 py-2">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0A0A1B]/95 backdrop-blur-xl border-b border-white/5">
+        <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center"
+            onClick={() => setMobileMenuOpen(true)}
+            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center"
           >
-            <div className="w-5 h-5 text-white">{mobileMenuOpen ? <Icons.X /> : <Icons.Menu />}</div>
+            <div className="w-5 h-5 text-white"><Icons.Menu /></div>
           </button>
           
           <div className="flex items-center gap-2">
-            <span className="text-lg">{currentModule?.icon}</span>
-            <span className="font-semibold text-xs truncate max-w-[120px]">{currentModule?.title}</span>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 text-yellow-400"><Icons.Zap /></div>
-            <span className="text-yellow-400 font-bold text-xs">{progress.totalXP}</span>
+            <div className="w-5 h-5 text-yellow-400"><Icons.Zap /></div>
+            <span className="text-yellow-400 font-bold">{progress.totalXP}</span>
           </div>
         </div>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 z-40 bg-black/80"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed inset-0 lg:static lg:inset-auto z-50
-        w-full lg:w-72 bg-[#0A0A1B]/98 backdrop-blur-xl border-r border-white/10
-        transform transition-transform duration-300
-        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        pt-12 lg:pt-0 flex flex-col h-[100dvh]
-      `}>
-        {/* Sidebar Header */}
-        <div className="p-3 border-b border-white/10 flex-shrink-0">
-          <Link href="/dashboard" className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00F5FF] to-[#8B5CF6] flex items-center justify-center">
-              <div className="w-4 h-4 text-white"><Icons.Home /></div>
-            </div>
-            <div>
-              <p className="font-bold text-xs">Formation AI Act</p>
-              <p className="text-white/50 text-[10px]">8 modules • 8h</p>
-            </div>
-          </Link>
-          
-          {/* Overall Progress */}
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-white/60 text-[10px]">Progression</span>
-              <span className="text-white font-bold text-xs">{overallProgress}%</span>
-            </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <motion.div 
-                className="h-full bg-gradient-to-r from-[#00F5FF] to-[#8B5CF6] rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${overallProgress}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 text-yellow-400"><Icons.Zap /></div>
-                <span className="text-yellow-400 font-bold text-[10px]">{progress.totalXP} XP</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Modules List */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1 overscroll-contain">
-          {MODULES.map((module) => {
-            const isExpanded = expandedModules.includes(module.id);
-            const isUnlocked = isModuleUnlocked(module.id);
-            const moduleProgress = getModuleProgress(module.id);
-            const isCompleted = moduleProgress === 100;
-
-            return (
-              <div key={module.id} className="rounded-lg overflow-hidden">
-                {/* Module Header */}
-                <button
-                  onClick={() => isUnlocked && toggleModule(module.id)}
-                  className={`w-full p-2 flex items-center gap-2 transition-all ${
-                    isUnlocked 
-                      ? 'hover:bg-white/5 cursor-pointer' 
-                      : 'opacity-50 cursor-not-allowed'
-                  } ${selectedModule === module.id ? 'bg-white/5' : ''}`}
-                >
-                  <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: isUnlocked ? `${module.color}20` : 'rgba(255,255,255,0.05)' }}
-                  >
-                    {isUnlocked ? (
-                      isCompleted ? (
-                        <div className="w-4 h-4" style={{ color: module.color }}><Icons.Check /></div>
-                      ) : (
-                        <span className="text-base">{module.icon}</span>
-                      )
-                    ) : (
-                      <div className="w-4 h-4 text-white/30"><Icons.Lock /></div>
-                    )}
+      {/* Main Layout */}
+      <div className={`flex h-screen ${focusMode ? '' : 'lg:pl-[340px]'}`}>
+        {/* Sidebar - Only when not in focus mode */}
+        {!focusMode && (
+          <aside className={`
+            fixed inset-y-0 left-0 z-50 w-80 lg:w-[340px]
+            bg-gradient-to-b from-[#0A0A1B] to-[#050510]
+            border-r border-white/5
+            transform transition-transform duration-300
+            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            flex flex-col
+          `}>
+            {/* Sidebar content - Same as FormationSidebar */}
+            <div className="p-4 border-b border-white/5">
+              <Link href="/dashboard" className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00F5FF] via-[#8B5CF6] to-[#FF6B6B] p-0.5">
+                  <div className="w-full h-full rounded-[10px] bg-[#0A0A1B] flex items-center justify-center">
+                    <div className="w-5 h-5 text-white"><Icons.Home /></div>
                   </div>
-
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-white/40 text-[10px] font-mono">{module.code}</span>
-                      {isCompleted && (
-                        <span className="text-[9px] px-1 rounded bg-green-500/20 text-green-400">✓</span>
-                      )}
-                    </div>
-                    <p className="font-medium text-xs truncate">{module.title}</p>
-                  </div>
-
-                  {isUnlocked && (
-                    <div className={`w-4 h-4 text-white/40 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-                      <Icons.ChevronDown />
-                    </div>
-                  )}
-                </button>
-
-                {/* Videos List */}
-                <AnimatePresence>
-                  {isExpanded && isUnlocked && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pl-3 pr-1 pb-1 space-y-0.5">
-                        {module.videos.map((video, idx) => {
-                          const isActive = selectedModule === module.id && selectedVideoIdx === idx;
-                          const isComplete = isVideoCompleted(module.id, video.id);
-
-                          return (
-                            <button
-                              key={video.id}
-                              onClick={() => selectVideo(module.id, idx)}
-                              className={`w-full p-1.5 rounded-md flex items-center gap-2 text-left transition-all ${
-                                isActive ? 'bg-white/10' : 'hover:bg-white/5'
-                              }`}
-                            >
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                isComplete ? 'bg-green-500/20' : 'bg-white/5'
-                              }`}>
-                                {isComplete ? (
-                                  <div className="w-2.5 h-2.5 text-green-400"><Icons.Check /></div>
-                                ) : (
-                                  <span className="text-white/40 text-[9px]">{idx + 1}</span>
-                                )}
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <p className={`text-[10px] truncate ${isActive ? 'text-white' : 'text-white/70'}`}>
-                                  {video.title}
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-[100dvh] pt-12 lg:pt-0 overflow-hidden">
-        <AnimatePresence mode="wait">
-          {/* LESSON VIEW */}
-          {viewMode === 'lesson' && currentVideo && (
-            <motion.div
-              key="lesson"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col overflow-hidden"
-            >
-              {/* Header - Compact */}
-              <div className="flex-shrink-0 px-3 lg:px-6 py-2 bg-[#0A0A1B]/80 backdrop-blur-xl border-b border-white/5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span 
-                    className="text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
-                  >
-                    {currentModule.icon} {currentModule.code}
-                  </span>
-                  <ContentBadge type={currentVideo.type} color={currentModule.color} />
                 </div>
-                <h1 className="text-sm lg:text-lg font-bold text-white leading-tight truncate">{currentVideo.title}</h1>
-              </div>
-
-              {/* Content Area */}
-              <div className="flex-1 p-3 lg:p-4 overflow-hidden flex flex-col">
-                {/* Video Player */}
-                {currentVideo.type === 'video' && (
-                  <HoloCard glow={currentModule.color} className="flex-1 min-h-0">
-                    <div className="flex-1 bg-black/50 relative flex items-center justify-center">
-                      <button 
-                        onClick={() => setIsPlaying(!isPlaying)}
-                        className="w-16 h-16 lg:w-20 lg:h-20 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                        style={{ backgroundColor: currentModule.color }}
-                      >
-                        <div className="w-6 h-6 lg:w-8 lg:h-8 text-black ml-1">
-                          {isPlaying ? <Icons.Pause /> : <Icons.Play />}
-                        </div>
-                      </button>
-                    </div>
-                  </HoloCard>
-                )}
-
-                {/* Exercises */}
-                {currentVideo.type === 'exercise' && (
-                  <HoloCard glow={currentModule.color} className="flex-1 min-h-0">
-                    <div className="flex-1 overflow-y-auto p-3 lg:p-4 overscroll-contain">
-                      {/* M1 - Checklist */}
-                      {currentVideo.id === '1.2' && (
-                        <div className="text-center py-4">
-                          <div className="text-4xl lg:text-5xl mb-3">📋</div>
-                          <h3 className="text-base lg:text-lg font-bold mb-2">Checklist "Êtes-vous concerné ?"</h3>
-                          <p className="text-white/60 text-xs lg:text-sm mb-4 max-w-md mx-auto">
-                            Téléchargez le fichier Excel pour déterminer si votre entreprise est concernée.
-                          </p>
-                          {currentVideo.exerciseFile && (
-                            <a
-                              href={`/resources/${currentVideo.exerciseFile}`}
-                              download
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-black text-sm"
-                              style={{ backgroundColor: currentModule.color }}
-                            >
-                              <div className="w-4 h-4"><Icons.Download /></div>
-                              Télécharger
-                            </a>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* M2 - Brainstorming */}
-                      {currentVideo.id === '2.2' && (
-                        <BrainstormingGrid 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      )}
-                      
-                      {/* M2 - Registre */}
-                      {currentVideo.id === '2.4' && (
-                        <div className="text-center py-4">
-                          <div className="text-4xl lg:text-5xl mb-3">📊</div>
-                          <h3 className="text-base lg:text-lg font-bold mb-2">Template Registre IA</h3>
-                          <p className="text-white/60 text-xs lg:text-sm mb-4 max-w-md mx-auto">
-                            Téléchargez le template pour créer votre registre des systèmes IA.
-                          </p>
-                          {currentVideo.exerciseFile && (
-                            <a
-                              href={`/resources/${currentVideo.exerciseFile}`}
-                              download
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-black text-sm"
-                              style={{ backgroundColor: currentModule.color }}
-                            >
-                              <div className="w-4 h-4"><Icons.Download /></div>
-                              Télécharger
-                            </a>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* M3 - Classification */}
-                      {currentVideo.id === '3.2' && (
-                        <ClassificationWizard 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      )}
-                      
-                      {/* M4 - Email */}
-                      {currentVideo.id === '4.2' && (
-                        <SmartEmailEditor 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      )}
-                      
-                      {/* M5 - Mentions légales */}
-                      {currentVideo.id === '5.4' && (
-                        <LegalMentionsGenerator 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      )}
-                      
-                      {/* M7 - Plan 90 jours */}
-                      {currentVideo.id === '7.2' && (
-                        <ActionPlanBuilder 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      )}
-                      
-                      {/* Fallback */}
-                      {!['1.2', '2.2', '2.4', '3.2', '4.2', '5.4', '7.2'].includes(currentVideo.id) && 
-                       currentVideo.exerciseFile && (
-                        <div className="text-center py-4">
-                          <div className="text-4xl lg:text-5xl mb-3">📝</div>
-                          <h3 className="text-base lg:text-lg font-bold mb-2">Exercice Pratique</h3>
-                          <a
-                            href={`/resources/${currentVideo.exerciseFile}`}
-                            download
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-black text-sm"
-                            style={{ backgroundColor: currentModule.color }}
-                          >
-                            <div className="w-4 h-4"><Icons.Download /></div>
-                            Télécharger
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </HoloCard>
-                )}
-
-                {/* Scenario */}
-                {currentVideo.type === 'scenario' && (
-                  <HoloCard glow={currentModule.color} className="flex-1 min-h-0">
-                    <div className="flex-1 overflow-y-auto p-3 lg:p-4 overscroll-contain">
-                      {currentModule.id === 6 ? (
-                        <AuditSimulation 
-                          moduleColor={currentModule.color}
-                          onComplete={() => completeVideo()}
-                        />
-                      ) : (
-                        <div className="text-center py-8">
-                          <div className="text-5xl mb-4">🎭</div>
-                          <h3 className="text-lg font-bold mb-2">Scénario Interactif</h3>
-                          <button
-                            onClick={() => completeVideo()}
-                            className="px-6 py-3 rounded-xl font-semibold text-black"
-                            style={{ backgroundColor: currentModule.color }}
-                          >
-                            Lancer
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </HoloCard>
-                )}
-              </div>
-
-              {/* Bottom Navigation */}
-              <div className="flex-shrink-0 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 p-2 lg:p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <button
-                    onClick={() => selectedVideoIdx > 0 && setSelectedVideoIdx(selectedVideoIdx - 1)}
-                    disabled={selectedVideoIdx === 0}
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg bg-white/10 text-white text-xs lg:text-sm disabled:opacity-30"
-                  >
-                    <div className="w-4 h-4"><Icons.ChevronLeft /></div>
-                    <span className="hidden sm:inline">Précédent</span>
-                  </button>
-                  
-                  <button
-                    onClick={completeVideo}
-                    className="flex-1 max-w-xs px-4 py-2 lg:py-3 rounded-xl font-bold text-black text-xs lg:text-sm"
-                    style={{ backgroundColor: currentModule.color }}
-                  >
-                    {selectedVideoIdx === currentModule.videos.length - 1 || 
-                     currentModule.videos[selectedVideoIdx + 1]?.type === 'quiz' ? (
-                      <span className="flex items-center justify-center gap-1">
-                        <div className="w-4 h-4"><Icons.Award /></div>
-                        Quiz
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-1">
-                        Suivant
-                        <div className="w-4 h-4"><Icons.ChevronRight /></div>
-                      </span>
-                    )}
-                  </button>
+                <div>
+                  <p className="font-bold text-white">Formation AI Act</p>
+                  <p className="text-white/50 text-xs">{MODULES.length} modules • 8h</p>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </Link>
 
-          {/* QUIZ VIEW */}
-          {viewMode === 'quiz' && currentQuiz && (
-            <motion.div
-              key="quiz"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col overflow-hidden p-3 lg:p-4"
-            >
-              {!showQuizResult ? (
-                <>
-                  {/* Quiz Header */}
-                  <div className="flex-shrink-0 mb-3 bg-[#0A0A1B]/80 px-3 py-2 rounded-xl border border-white/10">
-                    <div className="flex items-center justify-between mb-1">
-                      <span 
-                        className="text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
+              {/* Level Header */}
+              <LevelHeader xp={progress.totalXP} streak={progress.streak} />
+            </div>
+
+            {/* Modules List */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {MODULES.map((module) => {
+                const moduleProgress = getModuleProgress(module.id);
+                const isUnlocked = isModuleUnlocked(module.id);
+                const isSelected = selectedModule === module.id;
+                const isCompleted = moduleProgress === 100;
+
+                return (
+                  <button
+                    key={module.id}
+                    onClick={() => {
+                      if (isUnlocked) {
+                        setSelectedModule(module.id);
+                        setSelectedVideoIdx(0);
+                        setMobileMenuOpen(false);
+                      }
+                    }}
+                    disabled={!isUnlocked}
+                    className={`
+                      w-full p-3 rounded-xl text-left transition-all
+                      ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
+                      ${!isUnlocked && 'opacity-50 cursor-not-allowed'}
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: `${module.color}20` }}
                       >
-                        {currentModule.icon} Quiz
-                      </span>
-                      <span className="text-white/60 text-xs">
-                        {currentQuestionIdx + 1} / {currentQuiz.questions.length}
-                      </span>
-                    </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: currentModule.color }}
-                        animate={{ width: `${((currentQuestionIdx + 1) / currentQuiz.questions.length) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Question */}
-                  {currentQuestion && (
-                    <HoloCard glow={currentModule.color} className="flex-1 min-h-0">
-                      <div className="flex-1 overflow-y-auto p-3 lg:p-4 overscroll-contain">
-                        <h2 className="text-sm lg:text-base font-semibold mb-4">{currentQuestion.question}</h2>
-                        
-                        <div className="space-y-2">
-                          {currentQuestion.options.map((option, idx) => {
-                            const isSelected = selectedAnswer === option.id;
-                            const isCorrect = option.isCorrect;
-                            const showResult = showFeedback;
-
-                            return (
-                              <button
-                                key={option.id}
-                                onClick={() => handleQuizAnswer(currentQuestion.id, option.id)}
-                                disabled={showFeedback}
-                                className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 text-xs lg:text-sm ${
-                                  showResult
-                                    ? isCorrect
-                                      ? 'bg-green-500/20 border-2 border-green-500'
-                                      : isSelected
-                                        ? 'bg-red-500/20 border-2 border-red-500'
-                                        : 'bg-white/5 border-2 border-transparent'
-                                    : isSelected
-                                      ? 'bg-white/10 border-2'
-                                      : 'bg-white/5 border-2 border-transparent hover:bg-white/10'
-                                }`}
-                                style={isSelected && !showResult ? { borderColor: currentModule.color } : {}}
-                              >
-                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
-                                  showResult
-                                    ? isCorrect
-                                      ? 'bg-green-500 text-white'
-                                      : isSelected
-                                        ? 'bg-red-500 text-white'
-                                        : 'bg-white/10 text-white/60'
-                                    : isSelected
-                                      ? 'text-black'
-                                      : 'bg-white/10 text-white/60'
-                                }`} style={isSelected && !showResult ? { backgroundColor: currentModule.color } : {}}>
-                                  {String.fromCharCode(65 + idx)}
-                                </span>
-                                <span className="flex-1">{option.text}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Feedback */}
-                        {showFeedback && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-4"
-                          >
-                            <div 
-                              className="p-3 rounded-xl text-xs lg:text-sm"
-                              style={{ 
-                                backgroundColor: currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
-                                  ? 'rgba(34, 197, 94, 0.1)' 
-                                  : 'rgba(239, 68, 68, 0.1)'
-                              }}
-                            >
-                              <p className="font-medium">
-                                {currentQuestion.options.find(o => o.id === selectedAnswer)?.isCorrect 
-                                  ? '✅ Bonne réponse !' 
-                                  : '❌ Mauvaise réponse'}
-                              </p>
-                            </div>
-
-                            <button
-                              onClick={nextQuestion}
-                              className="w-full mt-3 py-3 rounded-xl font-bold text-black text-sm"
-                              style={{ backgroundColor: currentModule.color }}
-                            >
-                              {currentQuestionIdx < currentQuiz.questions.length - 1 
-                                ? 'Question suivante' 
-                                : 'Voir les résultats'}
-                            </button>
-                          </motion.div>
+                        {isCompleted ? (
+                          <div className="w-5 h-5" style={{ color: module.color }}><Icons.Check /></div>
+                        ) : !isUnlocked ? (
+                          <div className="w-5 h-5 text-white/30"><Icons.Lock /></div>
+                        ) : (
+                          <span className="text-lg">{module.icon}</span>
                         )}
                       </div>
-                    </HoloCard>
-                  )}
-                </>
-              ) : (
-                /* Quiz Results */
-                <HoloCard 
-                  glow={calculateQuizScore(currentQuiz, quizAnswers).passed ? '#00FF88' : '#FF4444'}
-                  className="flex-1 min-h-0"
-                >
-                  <div className="flex-1 overflow-y-auto p-4 lg:p-6 text-center overscroll-contain">
-                    {(() => {
-                      const result = calculateQuizScore(currentQuiz, quizAnswers);
-                      const passed = result.passed;
-
-                      return (
-                        <>
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className={`w-16 h-16 lg:w-20 lg:h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                              passed ? 'bg-green-500' : 'bg-red-500'
-                            }`}
-                          >
-                            {passed ? (
-                              <div className="w-8 h-8 lg:w-10 lg:h-10 text-white"><Icons.Trophy /></div>
-                            ) : (
-                              <div className="w-8 h-8 lg:w-10 lg:h-10 text-white"><Icons.X /></div>
-                            )}
-                          </motion.div>
-
-                          <h2 className="text-xl lg:text-2xl font-bold mb-2">
-                            {passed ? 'Bravo ! 🎉' : 'Pas encore...'}
-                          </h2>
-                          
-                          <div className="flex justify-center gap-6 my-4">
-                            <div className="text-center">
-                              <div className={`text-3xl lg:text-4xl font-bold ${passed ? 'text-green-400' : 'text-red-400'}`}>
-                                {result.score}%
-                              </div>
-                              <p className="text-white/40 text-xs">Votre score</p>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-3xl lg:text-4xl font-bold text-white/40">
-                                {currentQuiz.passingScore}%
-                              </div>
-                              <p className="text-white/40 text-xs">Requis</p>
-                            </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{module.title}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full transition-all"
+                              style={{ width: `${moduleProgress}%`, backgroundColor: module.color }}
+                            />
                           </div>
+                          <span className="text-xs text-white/40">{moduleProgress}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        )}
 
-                          <div className="flex gap-2 mt-4">
-                            {!passed && (
-                              <button
-                                onClick={retryQuiz}
-                                className="flex-1 py-3 rounded-xl bg-white/10 font-semibold text-sm"
-                              >
-                                Réessayer
-                              </button>
-                            )}
-                            {passed && (
-                              <button
-                                onClick={goToNextModule}
-                                className="flex-1 py-3 rounded-xl font-bold text-black text-sm"
-                                style={{ backgroundColor: currentModule.color }}
-                              >
-                                {selectedModule < MODULES.length - 1 ? 'Module suivant' : 'Terminer'}
-                              </button>
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </HoloCard>
-              )}
-            </motion.div>
+        {/* Mobile Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="lg:hidden fixed inset-0 bg-black/60 z-40"
+              onClick={() => setMobileMenuOpen(false)}
+            />
           )}
         </AnimatePresence>
-      </main>
 
-      {/* Celebration Overlay */}
-      <AnimatePresence>
-        {showCelebration && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
-            onClick={() => setShowCelebration(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="text-center"
-            >
-              <div className="text-6xl lg:text-8xl mb-4">🎉</div>
-              <h2 className="text-2xl lg:text-3xl font-bold mb-2">Module validé !</h2>
-              <p className="text-white/60 mb-4">+{currentModule.xp} XP</p>
-              <button
-                onClick={goToNextModule}
-                className="px-6 py-3 rounded-xl font-bold text-black"
-                style={{ backgroundColor: currentModule.color }}
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col pt-16 lg:pt-0 h-screen overflow-hidden">
+          {/* Top Bar */}
+          <div className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A1B]/50 backdrop-blur-xl">
+            <div className="flex items-center gap-4">
+              <span 
+                className="px-3 py-1.5 rounded-full text-sm font-medium"
+                style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
               >
-                Continuer
+                {currentModule.icon} {currentModule.code}
+              </span>
+              <h1 className="text-lg font-bold">{currentVideo?.title}</h1>
+              
+              {/* Bookmark */}
+              <button 
+                onClick={toggleBookmark}
+                className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white transition-colors"
+              >
+                {isBookmarked ? (
+                  <div className="w-5 h-5 text-yellow-400"><Icons.BookmarkFilled /></div>
+                ) : (
+                  <div className="w-5 h-5"><Icons.Bookmark /></div>
+                )}
               </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Focus Mode */}
+              <button 
+                onClick={() => setFocusMode(f => !f)}
+                className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 transition-colors ${
+                  focusMode ? 'bg-[#8B5CF6] text-white' : 'bg-white/5 text-white/60 hover:text-white'
+                }`}
+              >
+                <div className="w-4 h-4"><Icons.Focus /></div>
+                Focus
+              </button>
+
+              {/* Shortcuts */}
+              <button 
+                onClick={() => setShowShortcuts(true)}
+                className="px-3 py-1.5 bg-white/5 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-2"
+              >
+                <div className="w-4 h-4"><Icons.Keyboard /></div>
+                <kbd className="text-xs">?</kbd>
+              </button>
+
+              {/* XP Badge */}
+              <div className="flex items-center gap-2 bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-lg">
+                <div className="w-4 h-4"><Icons.Zap /></div>
+                <span className="font-bold">{progress.totalXP}</span>
+              </div>
+
+              <StreakBadge streak={progress.streak} />
+            </div>
+          </div>
+
+          {/* Content Area */}
+          <div className={`flex-1 flex overflow-hidden ${focusMode ? 'p-0' : 'p-4 lg:p-6'}`}>
+            {/* Video/Content Section */}
+            <div className={`flex-1 flex flex-col ${showRightPanel && !focusMode ? 'lg:pr-80' : ''}`}>
+              {currentVideo?.type === 'video' && (
+                <VideoPlayer
+                  video={currentVideo}
+                  module={currentModule}
+                  isPlaying={isPlaying}
+                  onPlayPause={() => setIsPlaying(!isPlaying)}
+                  onComplete={completeVideo}
+                  isCompleted={isVideoCompleted(selectedModule, currentVideo.id)}
+                />
+              )}
+
+              {currentVideo?.type === 'exercise' && (
+                <div className="flex-1 bg-white/5 rounded-2xl p-6 overflow-auto">
+                  {currentVideo.id === '2.2' && (
+                    <BrainstormingGrid 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+                  {currentVideo.id === '3.2' && (
+                    <ClassificationWizard 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+                  {currentVideo.id === '4.2' && (
+                    <SmartEmailEditor 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+                  {currentVideo.id === '6.2' && (
+                    <AuditSimulation 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+                  {currentVideo.id === '7.2' && (
+                    <ActionPlanBuilder 
+                      moduleColor={currentModule.color}
+                      onComplete={completeVideo}
+                    />
+                  )}
+                </div>
+              )}
+
+              {currentVideo?.type === 'quiz' && (
+                <div className="flex-1 bg-white/5 rounded-2xl p-6 overflow-auto">
+                  <div className="text-center py-8">
+                    <div className="text-5xl mb-4">📝</div>
+                    <h3 className="text-xl font-bold mb-2">Quiz - {currentModule.title}</h3>
+                    <p className="text-white/60 mb-6">Testez vos connaissances pour débloquer le module suivant</p>
+                    <button
+                      onClick={() => setViewMode('quiz')}
+                      className="px-6 py-3 rounded-xl font-bold text-black"
+                      style={{ backgroundColor: currentModule.color }}
+                    >
+                      Commencer le quiz
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between mt-4">
+                <NavigationButtons
+                  onPrev={goToPrev}
+                  onNext={goToNext}
+                  hasPrev={hasPrev}
+                  hasNext={hasNext}
+                  moduleColor={currentModule.color}
+                />
+
+                {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                  <button
+                    onClick={completeVideo}
+                    className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors flex items-center gap-2"
+                  >
+                    <div className="w-4 h-4"><Icons.Check /></div>
+                    Marquer terminé
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Right Panel - Notes & Daily Goals */}
+            {showRightPanel && !focusMode && (
+              <aside className="hidden lg:block fixed right-0 top-0 bottom-0 w-80 bg-[#0A0A1B]/95 border-l border-white/5 p-4 pt-20 overflow-y-auto">
+                <div className="space-y-4">
+                  {/* Daily Goals */}
+                  <DailyGoals progress={progress} />
+
+                  {/* Notes */}
+                  <NotesPanel
+                    videoId={`${selectedModule}-${currentVideo?.id}`}
+                    notes={progress.notes}
+                    onSave={saveNote}
+                  />
+
+                  {/* Resources */}
+                  {currentVideo?.exerciseFile && (
+                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                      <h3 className="font-semibold text-sm flex items-center gap-2 mb-3">
+                        <div className="w-4 h-4 text-[#00FF88]"><Icons.Download /></div>
+                        Ressources
+                      </h3>
+                      <a
+                        href={`/resources/${currentVideo.exerciseFile}`}
+                        download
+                        className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-[#00FF88]/10 flex items-center justify-center">
+                          <div className="w-5 h-5 text-[#00FF88]"><Icons.FileText /></div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{currentVideo.exerciseFile}</p>
+                          <p className="text-xs text-white/40">Télécharger</p>
+                        </div>
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Keyboard hint */}
+                  <div className="text-center text-xs text-white/30 mt-4">
+                    Appuyez sur <kbd className="px-2 py-0.5 bg-white/10 rounded mx-1">?</kbd> pour les raccourcis
+                  </div>
+                </div>
+              </aside>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
