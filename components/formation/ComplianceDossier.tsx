@@ -25,7 +25,6 @@ interface DocumentStatus {
 // DOCUMENT DEFINITIONS
 // ============================================
 const DOCUMENTS_CONFIG: Omit<DocumentStatus, 'isComplete' | 'completionPercent' | 'data'>[] = [
-  // Essential Documents (Required by AI Act)
   {
     id: 'registry',
     name: 'Registre des systèmes IA',
@@ -70,8 +69,6 @@ const DOCUMENTS_CONFIG: Omit<DocumentStatus, 'isComplete' | 'completionPercent' 
     exportFormat: 'pdf',
     aiActRef: 'Auto-évaluation',
   },
-  
-  // Recommended Documents
   {
     id: 'inventory',
     name: 'Inventaire des systèmes IA',
@@ -104,8 +101,6 @@ const DOCUMENTS_CONFIG: Omit<DocumentStatus, 'isComplete' | 'completionPercent' 
     exportFormat: 'docx',
     aiActRef: 'Article 26',
   },
-  
-  // Optional Documents
   {
     id: 'company_profile',
     name: 'Profil entreprise',
@@ -134,20 +129,34 @@ export default function ComplianceDossier({
   const [companyName, setCompanyName] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const [exportType, setExportType] = useState<'zip' | 'pdf'>('zip');
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<DocumentStatus | null>(null);
+  const [certificateCode, setCertificateCode] = useState('');
 
-  // Load all document statuses
+  const getCertificateUrl = () => {
+    const code = certificateCode || `CERT-${Date.now().toString(36).toUpperCase()}`;
+    return `https://formation-ia-act.fr/verify/${code}`;
+  };
+
   useEffect(() => {
     loadDocumentStatuses();
     
-    // Load company name
     const savedProfile = localStorage.getItem('workshop_company_profile');
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
         setCompanyName(profile.name || profile.companyName || '');
       } catch (e) {}
+    }
+
+    const savedCode = localStorage.getItem('compliance_certificate_code');
+    if (savedCode) {
+      setCertificateCode(savedCode);
+    } else {
+      const newCode = `CERT-${Date.now().toString(36).toUpperCase()}`;
+      setCertificateCode(newCode);
+      localStorage.setItem('compliance_certificate_code', newCode);
     }
   }, []);
 
@@ -162,7 +171,6 @@ export default function ComplianceDossier({
         try {
           data = JSON.parse(savedData);
           
-          // Calculate completion based on document type
           switch (config.id) {
             case 'registry':
             case 'inventory':
@@ -171,37 +179,31 @@ export default function ComplianceDossier({
               isComplete = filledRows.length >= 1;
               completionPercent = rows.length > 0 ? Math.min(100, Math.round((filledRows.length / Math.max(rows.length, 1)) * 100)) : 0;
               break;
-              
             case 'action_plan':
               const actions = data.rows || [];
               const doneActions = actions.filter((a: any) => a.status === 'done');
               isComplete = actions.length > 0;
               completionPercent = actions.length > 0 ? Math.round((doneActions.length / actions.length) * 100) : 0;
               break;
-              
             case 'policy':
               const sections = Object.keys(data).filter(k => k.startsWith('section_'));
               isComplete = sections.length >= 3;
               completionPercent = Math.min(100, Math.round((sections.length / 7) * 100));
               break;
-              
             case 'diagnostic':
               isComplete = data.completed || data.score !== undefined;
               completionPercent = isComplete ? 100 : 0;
               break;
-              
             case 'classification':
               const results = data.results || data;
               isComplete = Array.isArray(results) ? results.length > 0 : Object.keys(results).length > 0;
               completionPercent = isComplete ? 100 : 0;
               break;
-              
             case 'vendor_emails':
               const emails = data.emails || data;
               isComplete = Array.isArray(emails) ? emails.length > 0 : false;
               completionPercent = isComplete ? 100 : 0;
               break;
-              
             default:
               isComplete = !!data;
               completionPercent = isComplete ? 100 : 0;
@@ -211,42 +213,34 @@ export default function ComplianceDossier({
         }
       }
 
-      return {
-        ...config,
-        isComplete,
-        completionPercent,
-        data,
-      };
+      return { ...config, isComplete, completionPercent, data };
     });
 
     setDocuments(statuses);
   };
 
-  // Calculate overall progress
   const essentialDocs = documents.filter(d => d.category === 'essential');
   const completedEssential = essentialDocs.filter(d => d.isComplete).length;
   const overallProgress = essentialDocs.length > 0 
     ? Math.round((completedEssential / essentialDocs.length) * 100) 
     : 0;
 
-  // Export single document
   const exportDocument = async (doc: DocumentStatus) => {
     if (!doc.data) return;
 
     try {
       const XLSX = await import('xlsx');
-      const wb = XLSX.utils.book_new();
 
       switch (doc.id) {
         case 'registry':
         case 'inventory': {
           const rows = doc.data.rows || [];
+          const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.json_to_sheet(rows);
           XLSX.utils.book_append_sheet(wb, ws, doc.name.substring(0, 31));
           XLSX.writeFile(wb, `${doc.id}-${companyName || 'entreprise'}.xlsx`);
           break;
         }
-        
         case 'action_plan': {
           const rows = doc.data.rows || [];
           const exportData = rows.map((row: any) => ({
@@ -258,67 +252,50 @@ export default function ComplianceDossier({
             'Responsable': row.owner,
             'Semaine début': row.startWeek,
             'Semaine fin': row.endWeek,
-            'Réf. AI Act': row.aiActRef,
-            'Notes': row.notes,
           }));
+          const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.json_to_sheet(exportData);
           XLSX.utils.book_append_sheet(wb, ws, 'Plan Action');
           XLSX.writeFile(wb, `plan-action-${companyName || 'entreprise'}.xlsx`);
           break;
         }
-        
         case 'classification': {
           const results = doc.data.results || doc.data;
           const exportData = Object.entries(results).map(([systemId, result]: [string, any]) => ({
             'Système': result.systemName || systemId,
             'Niveau de risque': result.riskLevel,
-            'Classification': result.classification,
             'Raisons': Array.isArray(result.reasons) ? result.reasons.join(', ') : '',
-            'Obligations': Array.isArray(result.obligations) ? result.obligations.join(', ') : '',
           }));
+          const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.json_to_sheet(exportData);
           XLSX.utils.book_append_sheet(wb, ws, 'Classification');
           XLSX.writeFile(wb, `classification-ia-${companyName || 'entreprise'}.xlsx`);
           break;
         }
-        
         case 'policy': {
-          // Export as formatted text (simulating Word)
-          let content = `POLITIQUE D'UTILISATION DE L'INTELLIGENCE ARTIFICIELLE\n`;
-          content += `${companyName || '[Nom de l\'entreprise]'}\n`;
-          content += `Date: ${new Date().toLocaleDateString('fr-FR')}\n\n`;
-          content += `═══════════════════════════════════════════════════════════\n\n`;
-          
-          Object.entries(doc.data).forEach(([key, value]) => {
-            if (key.startsWith('section_')) {
-              content += `${key.replace('section_', '').toUpperCase()}\n`;
-              content += `${'-'.repeat(40)}\n`;
-              content += `${value}\n\n`;
-            }
-          });
-          
-          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `politique-ia-${companyName || 'entreprise'}.txt`;
-          a.click();
-          URL.revokeObjectURL(url);
+          try {
+            const { generatePolicyDocx, downloadBlob } = await import('@/lib/document-generator');
+            const blob = await generatePolicyDocx(doc.data, companyName, getCertificateUrl());
+            downloadBlob(blob, `politique-ia-${companyName || 'entreprise'}.docx`);
+          } catch (e) {
+            console.error('Word export failed:', e);
+            let content = `POLITIQUE D'UTILISATION DE L'INTELLIGENCE ARTIFICIELLE\n`;
+            content += `${companyName || '[Nom de l\'entreprise]'}\n\n`;
+            Object.entries(doc.data).forEach(([key, value]) => {
+              if (key.startsWith('section_')) {
+                content += `${key.replace('section_', '').toUpperCase()}\n${value}\n\n`;
+              }
+            });
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `politique-ia-${companyName || 'entreprise'}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }
           break;
         }
-        
-        case 'diagnostic': {
-          const content = JSON.stringify(doc.data, null, 2);
-          const blob = new Blob([content], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `diagnostic-ia-${companyName || 'entreprise'}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-          break;
-        }
-        
         default: {
           const content = JSON.stringify(doc.data, null, 2);
           const blob = new Blob([content], { type: 'application/json' });
@@ -336,10 +313,10 @@ export default function ComplianceDossier({
     }
   };
 
-  // Export complete dossier as ZIP
-  const exportCompleteDossier = async () => {
+  const exportCompleteDossierZip = async () => {
     setIsExporting(true);
     setExportProgress(0);
+    setExportType('zip');
     setShowExportModal(true);
 
     try {
@@ -350,30 +327,17 @@ export default function ComplianceDossier({
       const folder = zip.folder(`dossier-conformite-ia-act-${companyName || 'entreprise'}`);
       if (!folder) throw new Error('Could not create folder');
 
-      // Add README
       const readme = `# DOSSIER DE CONFORMITÉ AI ACT
-      
+
 Entreprise: ${companyName || '[À compléter]'}
-Date de génération: ${new Date().toLocaleDateString('fr-FR')}
-Généré via: formation-ia-act.fr
-
-## Contenu du dossier
-
-Ce dossier contient tous les documents nécessaires pour démontrer 
-votre conformité au Règlement Européen sur l'Intelligence Artificielle (AI Act).
+Date: ${new Date().toLocaleDateString('fr-FR')}
+Code de vérification: ${certificateCode}
+URL: ${getCertificateUrl()}
 
 ## Documents inclus
+${documents.filter(d => d.isComplete).map(d => `- ${d.icon} ${d.name}`).join('\n')}
 
-${documents.filter(d => d.isComplete).map(d => `- ${d.icon} ${d.name} (${d.exportFormat.toUpperCase()})`).join('\n')}
-
-## Utilisation
-
-Ces documents sont prêts à être présentés en cas de contrôle.
-Ils peuvent être modifiés selon vos besoins.
-
-## Articles AI Act référencés
-
-${documents.filter(d => d.aiActRef && d.isComplete).map(d => `- ${d.name}: ${d.aiActRef}`).join('\n')}
+## Progression: ${overallProgress}%
 
 ---
 Formation AI Act - https://formation-ia-act.fr
@@ -381,10 +345,9 @@ Formation AI Act - https://formation-ia-act.fr
       folder.file('README.md', readme);
       setExportProgress(10);
 
-      // Export each completed document
       const completedDocs = documents.filter(d => d.isComplete && d.data);
       let progress = 10;
-      const progressPerDoc = 80 / Math.max(completedDocs.length, 1);
+      const progressPerDoc = 70 / Math.max(completedDocs.length, 1);
 
       for (const doc of completedDocs) {
         try {
@@ -399,122 +362,107 @@ Formation AI Act - https://formation-ia-act.fr
               folder.file(`${doc.id}.xlsx`, xlsxData);
               break;
             }
-            
             case 'action_plan': {
               const rows = doc.data.rows || [];
               const exportData = rows.map((row: any) => ({
-                'ID': row.id,
-                'Action': row.title,
-                'Catégorie': row.category,
-                'Priorité': row.priority,
-                'Statut': row.status,
-                'Responsable': row.owner,
-                'Semaine début': row.startWeek,
-                'Semaine fin': row.endWeek,
+                'ID': row.id, 'Action': row.title, 'Statut': row.status,
+                'Semaine début': row.startWeek, 'Semaine fin': row.endWeek,
               }));
               const wb = XLSX.utils.book_new();
               const ws = XLSX.utils.json_to_sheet(exportData);
-              XLSX.utils.book_append_sheet(wb, ws, 'Plan Action');
+              XLSX.utils.book_append_sheet(wb, ws, 'Plan');
               const xlsxData = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-              folder.file('plan-action-90-jours.xlsx', xlsxData);
+              folder.file('plan-action.xlsx', xlsxData);
               break;
             }
-            
             case 'policy': {
-              let content = `POLITIQUE D'UTILISATION DE L'INTELLIGENCE ARTIFICIELLE\n\n`;
-              content += `Entreprise: ${companyName || '[À compléter]'}\n`;
-              content += `Date: ${new Date().toLocaleDateString('fr-FR')}\n\n`;
-              content += `${'='.repeat(60)}\n\n`;
-              
-              Object.entries(doc.data).forEach(([key, value]) => {
-                if (key.startsWith('section_')) {
-                  const sectionName = key.replace('section_', '').replace(/_/g, ' ').toUpperCase();
-                  content += `## ${sectionName}\n\n`;
-                  content += `${value}\n\n`;
-                }
-              });
-              
-              folder.file('politique-ia-interne.md', content);
+              try {
+                const { generatePolicyDocx } = await import('@/lib/document-generator');
+                const blob = await generatePolicyDocx(doc.data, companyName, getCertificateUrl());
+                const arrayBuffer = await blob.arrayBuffer();
+                folder.file('politique-ia.docx', arrayBuffer);
+              } catch (e) {
+                let content = `# POLITIQUE IA\n\n${companyName}\n\n`;
+                Object.entries(doc.data).forEach(([k, v]) => {
+                  if (k.startsWith('section_')) content += `## ${k}\n${v}\n\n`;
+                });
+                folder.file('politique-ia.md', content);
+              }
               break;
             }
-            
             case 'classification': {
               const results = doc.data.results || doc.data;
-              const exportData = Object.entries(results).map(([systemId, result]: [string, any]) => ({
-                'Système': result.systemName || systemId,
-                'Niveau': result.riskLevel,
-                'Raisons': Array.isArray(result.reasons) ? result.reasons.join('; ') : '',
+              const exportData = Object.entries(results).map(([id, r]: [string, any]) => ({
+                'Système': r.systemName || id, 'Niveau': r.riskLevel,
               }));
               const wb = XLSX.utils.book_new();
               const ws = XLSX.utils.json_to_sheet(exportData);
               XLSX.utils.book_append_sheet(wb, ws, 'Classification');
               const xlsxData = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-              folder.file('classification-risques.xlsx', xlsxData);
+              folder.file('classification.xlsx', xlsxData);
               break;
             }
-            
-            case 'diagnostic': {
-              const content = JSON.stringify(doc.data, null, 2);
-              folder.file('diagnostic-initial.json', content);
-              break;
-            }
-            
-            case 'vendor_emails': {
-              const emails = doc.data.emails || doc.data;
-              let content = `HISTORIQUE DES EMAILS FOURNISSEURS\n\n`;
-              content += `Date: ${new Date().toLocaleDateString('fr-FR')}\n\n`;
-              
-              if (Array.isArray(emails)) {
-                emails.forEach((email: any, idx: number) => {
-                  content += `${'='.repeat(60)}\n`;
-                  content += `EMAIL ${idx + 1}\n`;
-                  content += `Fournisseur: ${email.vendor || 'N/A'}\n`;
-                  content += `Sujet: ${email.subject || 'N/A'}\n`;
-                  content += `Date: ${email.date || 'N/A'}\n`;
-                  content += `Statut: ${email.status || 'N/A'}\n\n`;
-                  content += `${email.body || ''}\n\n`;
-                });
-              }
-              
-              folder.file('emails-fournisseurs.txt', content);
-              break;
-            }
-            
-            default: {
-              const content = JSON.stringify(doc.data, null, 2);
-              folder.file(`${doc.id}.json`, content);
-            }
+            default:
+              folder.file(`${doc.id}.json`, JSON.stringify(doc.data, null, 2));
           }
         } catch (e) {
           console.error(`Error exporting ${doc.id}:`, e);
         }
-
         progress += progressPerDoc;
         setExportProgress(Math.round(progress));
       }
 
-      // Generate ZIP
+      setExportProgress(85);
+      try {
+        const { generateComplianceDossierPDF } = await import('@/lib/document-generator');
+        const pdfBlob = await generateComplianceDossierPDF(documents, companyName, getCertificateUrl());
+        const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+        folder.file('SYNTHESE-CONFORMITE.pdf', pdfArrayBuffer);
+      } catch (e) {
+        console.error('PDF failed:', e);
+      }
+
       setExportProgress(95);
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       
-      // Download
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `dossier-conformite-ia-act-${companyName || 'entreprise'}-${new Date().toISOString().split('T')[0]}.zip`;
+      a.download = `dossier-conformite-${companyName || 'entreprise'}-${new Date().toISOString().split('T')[0]}.zip`;
       a.click();
       URL.revokeObjectURL(url);
 
       setExportProgress(100);
     } catch (error) {
       console.error('Export error:', error);
-      alert('Erreur lors de l\'export du dossier');
+      alert('Erreur lors de l\'export');
     } finally {
       setIsExporting(false);
     }
   };
 
-  // Get status color
+  const exportAsPDF = async () => {
+    setIsExporting(true);
+    setExportProgress(0);
+    setExportType('pdf');
+    setShowExportModal(true);
+
+    try {
+      setExportProgress(30);
+      const { generateComplianceDossierPDF, downloadBlob } = await import('@/lib/document-generator');
+      setExportProgress(60);
+      const pdfBlob = await generateComplianceDossierPDF(documents, companyName, getCertificateUrl());
+      setExportProgress(90);
+      downloadBlob(pdfBlob, `synthese-conformite-${companyName || 'entreprise'}.pdf`);
+      setExportProgress(100);
+    } catch (error) {
+      console.error('PDF error:', error);
+      alert('Erreur PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const getStatusColor = (doc: DocumentStatus) => {
     if (!doc.isComplete) return '#6B7280';
     if (doc.completionPercent >= 100) return '#22C55E';
@@ -522,15 +470,12 @@ Formation AI Act - https://formation-ia-act.fr
     return '#F97316';
   };
 
-  // Render document card
   const renderDocumentCard = (doc: DocumentStatus) => (
     <motion.div
       key={doc.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white/5 rounded-xl border p-4 cursor-pointer transition-all hover:bg-white/10 ${
-        doc.isComplete ? 'border-white/20' : 'border-white/10'
-      }`}
+      className={`bg-white/5 rounded-xl border p-4 cursor-pointer transition-all hover:bg-white/10 ${doc.isComplete ? 'border-white/20' : 'border-white/10'}`}
       onClick={() => setSelectedDoc(doc)}
     >
       <div className="flex items-start gap-3">
@@ -539,36 +484,20 @@ Formation AI Act - https://formation-ia-act.fr
           <div className="flex items-center gap-2">
             <h3 className="font-medium truncate">{doc.name}</h3>
             {doc.aiActRef && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/60 whitespace-nowrap">
-                {doc.aiActRef}
-              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/60">{doc.aiActRef}</span>
             )}
           </div>
           <p className="text-xs text-white/50 mt-1 line-clamp-2">{doc.description}</p>
-          
-          {/* Progress bar */}
           <div className="mt-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-white/40">
-                {doc.isComplete ? 'Complété' : 'Non commencé'}
-              </span>
-              <span className="text-xs font-medium" style={{ color: getStatusColor(doc) }}>
-                {doc.completionPercent}%
-              </span>
+              <span className="text-[10px] text-white/40">{doc.isComplete ? 'Complété' : 'Non commencé'}</span>
+              <span className="text-xs font-medium" style={{ color: getStatusColor(doc) }}>{doc.completionPercent}%</span>
             </div>
             <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${doc.completionPercent}%`,
-                  backgroundColor: getStatusColor(doc),
-                }}
-              />
+              <div className="h-full rounded-full transition-all" style={{ width: `${doc.completionPercent}%`, backgroundColor: getStatusColor(doc) }} />
             </div>
           </div>
         </div>
-        
-        {/* Status indicator */}
         <div className="flex-shrink-0">
           {doc.isComplete ? (
             <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -593,9 +522,7 @@ Formation AI Act - https://formation-ia-act.fr
             <span className="text-4xl">📁</span>
             Dossier de Conformité AI Act
           </h1>
-          <p className="text-white/60">
-            Tous vos documents de conformité en un seul endroit, prêts pour l'audit
-          </p>
+          <p className="text-white/60">Tous vos documents prêts pour l'audit</p>
         </div>
 
         {/* Company Name */}
@@ -612,114 +539,89 @@ Formation AI Act - https://formation-ia-act.fr
                 className="w-full bg-transparent border-b border-white/20 pb-1 focus:border-[#00F5FF] focus:outline-none text-lg"
               />
             </div>
+            <div className="text-right">
+              <label className="text-xs text-white/40 block mb-1">Code vérification</label>
+              <span className="text-sm font-mono text-[#00F5FF]">{certificateCode}</span>
+            </div>
           </div>
         </div>
 
-        {/* Progress Overview */}
+        {/* Progress */}
         <div className="mb-8 p-6 rounded-2xl border border-white/10" style={{ backgroundColor: `${moduleColor}10` }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold">Progression globale</h2>
-              <p className="text-white/60 text-sm">Documents essentiels complétés</p>
+              <p className="text-white/60 text-sm">Documents essentiels</p>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold" style={{ color: moduleColor }}>
-                {overallProgress}%
-              </div>
-              <div className="text-sm text-white/60">
-                {completedEssential}/{essentialDocs.length} essentiels
-              </div>
+              <div className="text-4xl font-bold" style={{ color: moduleColor }}>{overallProgress}%</div>
+              <div className="text-sm text-white/60">{completedEssential}/{essentialDocs.length}</div>
             </div>
           </div>
-          
           <div className="h-3 bg-white/10 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${overallProgress}%` }}
-              transition={{ duration: 1, ease: 'easeOut' }}
               className="h-full rounded-full"
               style={{ backgroundColor: moduleColor }}
             />
           </div>
-
           {overallProgress >= 100 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/30 flex items-center gap-2"
-            >
+            <div className="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/30 flex items-center gap-2">
               <span className="text-2xl">🎉</span>
-              <span className="text-green-400 font-medium">
-                Félicitations ! Tous vos documents essentiels sont prêts pour l'audit.
-              </span>
-            </motion.div>
+              <span className="text-green-400 font-medium">Tous vos documents sont prêts !</span>
+            </div>
           )}
         </div>
 
-        {/* Download All Button */}
-        <div className="mb-8">
+        {/* Download Buttons */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={exportCompleteDossier}
+            onClick={exportCompleteDossierZip}
             disabled={isExporting || completedEssential === 0}
-            className="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all disabled:opacity-50"
+            className="py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 disabled:opacity-50"
             style={{ backgroundColor: moduleColor, color: '#000' }}
           >
-            {isExporting ? (
-              <>
-                <div className="animate-spin">⏳</div>
-                Préparation du dossier...
-              </>
-            ) : (
-              <>
-                <span className="text-2xl">📦</span>
-                Télécharger le dossier complet (.zip)
-              </>
-            )}
+            {isExporting && exportType === 'zip' ? '⏳ Préparation...' : '📦 Télécharger le dossier (.zip)'}
           </button>
-          <p className="text-center text-xs text-white/40 mt-2">
-            Inclut tous les documents complétés • Prêt pour présentation en cas d'audit
-          </p>
+          <button
+            onClick={exportAsPDF}
+            disabled={isExporting || completedEssential === 0}
+            className="py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 disabled:opacity-50 bg-white/10 hover:bg-white/20"
+          >
+            {isExporting && exportType === 'pdf' ? '⏳ Génération...' : '📄 Synthèse PDF + QR Code'}
+          </button>
         </div>
+
+        <p className="text-center text-xs text-white/40 mb-8">🔐 Chaque document inclut un QR code de vérification</p>
 
         {/* Essential Documents */}
         <div className="mb-8">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <span>🔴</span> Documents Essentiels
-            <span className="text-xs font-normal text-white/40 ml-2">Requis par l'AI Act</span>
+            <span className="text-xs font-normal text-white/40 ml-2">Requis AI Act</span>
           </h2>
-          <div className="grid gap-3">
-            {documents.filter(d => d.category === 'essential').map(renderDocumentCard)}
-          </div>
+          <div className="grid gap-3">{documents.filter(d => d.category === 'essential').map(renderDocumentCard)}</div>
         </div>
 
-        {/* Recommended Documents */}
+        {/* Recommended */}
         <div className="mb-8">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <span>🟡</span> Documents Recommandés
-          </h2>
-          <div className="grid gap-3">
-            {documents.filter(d => d.category === 'recommended').map(renderDocumentCard)}
-          </div>
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><span>🟡</span> Recommandés</h2>
+          <div className="grid gap-3">{documents.filter(d => d.category === 'recommended').map(renderDocumentCard)}</div>
         </div>
 
-        {/* Optional Documents */}
+        {/* Optional */}
         <div className="mb-8">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <span>🟢</span> Documents Optionnels
-          </h2>
-          <div className="grid gap-3">
-            {documents.filter(d => d.category === 'optional').map(renderDocumentCard)}
-          </div>
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><span>🟢</span> Optionnels</h2>
+          <div className="grid gap-3">{documents.filter(d => d.category === 'optional').map(renderDocumentCard)}</div>
         </div>
 
-        {/* Footer */}
         <div className="text-center text-white/40 text-sm">
           <p>Généré via formation-ia-act.fr</p>
-          <p className="text-xs mt-1">Ces documents constituent une base solide pour votre conformité AI Act</p>
         </div>
       </div>
 
-      {/* Document Detail Modal */}
+      {/* Detail Modal */}
       <AnimatePresence>
         {selectedDoc && (
           <motion.div
@@ -730,9 +632,9 @@ Formation AI Act - https://formation-ia-act.fr
             onClick={() => setSelectedDoc(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
               className="bg-[#1a1a2e] rounded-2xl p-6 max-w-lg w-full border border-white/10"
               onClick={(e) => e.stopPropagation()}
             >
@@ -742,53 +644,41 @@ Formation AI Act - https://formation-ia-act.fr
                   <h3 className="text-xl font-bold">{selectedDoc.name}</h3>
                   <p className="text-white/60 text-sm mt-1">{selectedDoc.description}</p>
                   {selectedDoc.aiActRef && (
-                    <span className="inline-block mt-2 text-xs px-2 py-1 rounded bg-white/10">
-                      📋 {selectedDoc.aiActRef}
-                    </span>
+                    <span className="inline-block mt-2 text-xs px-2 py-1 rounded bg-white/10">📋 {selectedDoc.aiActRef}</span>
                   )}
                 </div>
               </div>
 
-              {/* Status */}
+              <div className="mb-4 flex items-center gap-2">
+                <span className="text-xs text-white/40">Format :</span>
+                <span className="text-xs px-2 py-1 rounded bg-white/10 font-mono">.{selectedDoc.exportFormat}</span>
+                {selectedDoc.exportFormat === 'docx' && <span className="text-xs text-green-400">✨ Word + QR</span>}
+              </div>
+
               <div className="mb-6 p-4 rounded-xl bg-white/5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-white/60">Statut</span>
                   <span className="font-medium" style={{ color: getStatusColor(selectedDoc) }}>
-                    {selectedDoc.isComplete ? `${selectedDoc.completionPercent}% complété` : 'Non commencé'}
+                    {selectedDoc.isComplete ? `${selectedDoc.completionPercent}%` : 'Non commencé'}
                   </span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${selectedDoc.completionPercent}%`,
-                      backgroundColor: getStatusColor(selectedDoc),
-                    }}
-                  />
+                  <div className="h-full rounded-full" style={{ width: `${selectedDoc.completionPercent}%`, backgroundColor: getStatusColor(selectedDoc) }} />
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3">
                 {selectedDoc.isComplete ? (
                   <>
                     <button
-                      onClick={() => {
-                        exportDocument(selectedDoc);
-                        setSelectedDoc(null);
-                      }}
+                      onClick={() => { exportDocument(selectedDoc); setSelectedDoc(null); }}
                       className="flex-1 py-3 rounded-xl font-bold text-black"
                       style={{ backgroundColor: moduleColor }}
                     >
                       📥 Télécharger
                     </button>
                     <button
-                      onClick={() => {
-                        if (onNavigateToWorkshop) {
-                          onNavigateToWorkshop(selectedDoc.workshopId);
-                        }
-                        setSelectedDoc(null);
-                      }}
+                      onClick={() => { onNavigateToWorkshop?.(selectedDoc.workshopId); setSelectedDoc(null); }}
                       className="flex-1 py-3 rounded-xl font-medium bg-white/10 hover:bg-white/20"
                     >
                       ✏️ Modifier
@@ -796,12 +686,7 @@ Formation AI Act - https://formation-ia-act.fr
                   </>
                 ) : (
                   <button
-                    onClick={() => {
-                      if (onNavigateToWorkshop) {
-                        onNavigateToWorkshop(selectedDoc.workshopId);
-                      }
-                      setSelectedDoc(null);
-                    }}
+                    onClick={() => { onNavigateToWorkshop?.(selectedDoc.workshopId); setSelectedDoc(null); }}
                     className="flex-1 py-3 rounded-xl font-bold text-black"
                     style={{ backgroundColor: moduleColor }}
                   >
@@ -809,19 +694,13 @@ Formation AI Act - https://formation-ia-act.fr
                   </button>
                 )}
               </div>
-
-              <button
-                onClick={() => setSelectedDoc(null)}
-                className="w-full mt-3 py-2 text-white/40 hover:text-white text-sm"
-              >
-                Fermer
-              </button>
+              <button onClick={() => setSelectedDoc(null)} className="w-full mt-3 py-2 text-white/40 hover:text-white text-sm">Fermer</button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Export Progress Modal */}
+      {/* Export Modal */}
       <AnimatePresence>
         {showExportModal && (
           <motion.div
@@ -831,40 +710,32 @@ Formation AI Act - https://formation-ia-act.fr
             className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
               className="bg-[#1a1a2e] rounded-2xl p-8 max-w-md w-full border border-white/10 text-center"
             >
               {exportProgress < 100 ? (
                 <>
-                  <div className="text-5xl mb-4 animate-bounce">📦</div>
-                  <h3 className="text-xl font-bold mb-2">Préparation du dossier...</h3>
-                  <p className="text-white/60 text-sm mb-6">
-                    Compilation de vos documents de conformité
-                  </p>
+                  <div className="text-5xl mb-4 animate-bounce">{exportType === 'pdf' ? '📄' : '📦'}</div>
+                  <h3 className="text-xl font-bold mb-2">
+                    {exportType === 'pdf' ? 'Génération PDF...' : 'Préparation du dossier...'}
+                  </h3>
+                  <p className="text-white/60 text-sm mb-6">Création avec QR code de vérification</p>
                   <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-2">
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: moduleColor }}
-                      animate={{ width: `${exportProgress}%` }}
-                    />
+                    <motion.div className="h-full rounded-full" style={{ backgroundColor: moduleColor }} animate={{ width: `${exportProgress}%` }} />
                   </div>
                   <p className="text-sm text-white/40">{exportProgress}%</p>
                 </>
               ) : (
                 <>
                   <div className="text-5xl mb-4">✅</div>
-                  <h3 className="text-xl font-bold mb-2">Dossier téléchargé !</h3>
-                  <p className="text-white/60 text-sm mb-6">
-                    Votre dossier de conformité AI Act est prêt.
-                    Conservez-le précieusement pour vos audits.
-                  </p>
-                  <button
-                    onClick={() => setShowExportModal(false)}
-                    className="px-6 py-3 rounded-xl font-bold text-black"
-                    style={{ backgroundColor: moduleColor }}
-                  >
+                  <h3 className="text-xl font-bold mb-2">{exportType === 'pdf' ? 'PDF généré !' : 'Dossier téléchargé !'}</h3>
+                  <div className="mb-6 p-3 bg-white/5 rounded-lg">
+                    <p className="text-xs text-white/60 mb-2">🔐 Code de vérification :</p>
+                    <p className="font-mono text-sm text-[#00F5FF]">{certificateCode}</p>
+                  </div>
+                  <button onClick={() => setShowExportModal(false)} className="px-6 py-3 rounded-xl font-bold text-black w-full" style={{ backgroundColor: moduleColor }}>
                     Parfait !
                   </button>
                 </>
