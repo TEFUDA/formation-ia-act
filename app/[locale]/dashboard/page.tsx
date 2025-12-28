@@ -961,49 +961,104 @@ function FormationPage() {
                 const isCompleted = moduleProgress === 100;
 
                 return (
-                  <button
-                    key={module.id}
-                    onClick={() => {
-                      if (isUnlocked) {
-                        setSelectedModule(module.id);
-                        setSelectedVideoIdx(0);
-                        setMobileMenuOpen(false);
-                      }
-                    }}
-                    disabled={!isUnlocked}
-                    className={`
-                      w-full p-3 rounded-xl text-left transition-all
-                      ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
-                      ${!isUnlocked && 'opacity-50 cursor-not-allowed'}
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${module.color}20` }}
-                      >
-                        {isCompleted ? (
-                          <div className="w-5 h-5" style={{ color: module.color }}><Icons.Check /></div>
-                        ) : !isUnlocked ? (
-                          <div className="w-5 h-5 text-white/30"><Icons.Lock /></div>
-                        ) : (
-                          <span className="text-lg">{module.icon}</span>
+                  <div key={module.id} className="rounded-xl overflow-hidden">
+                    {/* Module Header */}
+                    <button
+                      onClick={() => {
+                        if (isUnlocked) {
+                          if (isSelected) {
+                            // Toggle collapse
+                          } else {
+                            setSelectedModule(module.id);
+                            setSelectedVideoIdx(0);
+                          }
+                          setMobileMenuOpen(false);
+                        }
+                      }}
+                      disabled={!isUnlocked}
+                      className={`
+                        w-full p-3 text-left transition-all
+                        ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
+                        ${!isUnlocked && 'opacity-50 cursor-not-allowed'}
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: `${module.color}20` }}
+                        >
+                          {isCompleted ? (
+                            <div className="w-5 h-5" style={{ color: module.color }}><Icons.Check /></div>
+                          ) : !isUnlocked ? (
+                            <div className="w-5 h-5 text-white/30"><Icons.Lock /></div>
+                          ) : (
+                            <span className="text-lg">{module.icon}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{module.title}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{ width: `${moduleProgress}%`, backgroundColor: module.color }}
+                              />
+                            </div>
+                            <span className="text-xs text-white/40">{moduleProgress}%</span>
+                          </div>
+                        </div>
+                        {isUnlocked && (
+                          <div className={`w-4 h-4 text-white/40 transition-transform ${isSelected ? 'rotate-180' : ''}`}>
+                            <Icons.ChevronDown />
+                          </div>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{module.title}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full rounded-full transition-all"
-                              style={{ width: `${moduleProgress}%`, backgroundColor: module.color }}
-                            />
-                          </div>
-                          <span className="text-xs text-white/40">{moduleProgress}%</span>
-                        </div>
+                    </button>
+
+                    {/* Videos List - Show when selected */}
+                    {isSelected && isUnlocked && (
+                      <div className="bg-white/5 px-3 pb-2 space-y-1">
+                        {module.videos.map((video, idx) => {
+                          const isActive = selectedVideoIdx === idx;
+                          const isComplete = isVideoCompleted(module.id, video.id);
+                          const isQuiz = video.type === 'quiz';
+                          
+                          return (
+                            <button
+                              key={video.id}
+                              onClick={() => {
+                                setSelectedVideoIdx(idx);
+                                setMobileMenuOpen(false);
+                              }}
+                              className={`
+                                w-full p-2 rounded-lg flex items-center gap-2 text-left transition-all
+                                ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}
+                              `}
+                            >
+                              <div className={`
+                                w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0
+                                ${isComplete ? 'bg-green-500/20' : 'bg-white/5'}
+                              `}>
+                                {isComplete ? (
+                                  <div className="w-3 h-3 text-green-400"><Icons.Check /></div>
+                                ) : isQuiz ? (
+                                  <span className="text-[10px]">📝</span>
+                                ) : (
+                                  <span className="text-[10px] text-white/40">{idx + 1}</span>
+                                )}
+                              </div>
+                              <span className={`text-xs truncate ${isActive ? 'text-white' : 'text-white/60'}`}>
+                                {video.title}
+                              </span>
+                              {isActive && (
+                                <div className="w-1.5 h-1.5 rounded-full ml-auto" style={{ backgroundColor: module.color }} />
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
-                    </div>
-                  </button>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -1028,6 +1083,31 @@ function FormationPage() {
           {/* Top Bar */}
           <div className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0A0A1B]/50 backdrop-blur-xl">
             <div className="flex items-center gap-4">
+              {/* Navigation Arrows */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={goToPrev}
+                  disabled={!hasPrev}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    hasPrev ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 text-white/20 cursor-not-allowed'
+                  }`}
+                  title="Précédent (P)"
+                >
+                  <div className="w-4 h-4"><Icons.ChevronLeft /></div>
+                </button>
+                <button
+                  onClick={goToNext}
+                  disabled={!hasNext}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    hasNext ? 'text-black' : 'bg-white/5 text-white/20 cursor-not-allowed'
+                  }`}
+                  style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
+                  title="Suivant (N)"
+                >
+                  <div className="w-4 h-4"><Icons.ChevronRight /></div>
+                </button>
+              </div>
+
               <span 
                 className="px-3 py-1.5 rounded-full text-sm font-medium"
                 style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
@@ -1215,6 +1295,70 @@ function FormationPage() {
             )}
           </div>
         </main>
+
+        {/* Fixed Bottom Navigation Bar */}
+        <div className={`fixed bottom-0 left-0 right-0 z-40 bg-[#0A0A1B]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 ${focusMode ? '' : 'lg:left-[340px]'}`}>
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+            {/* Previous */}
+            <button
+              onClick={goToPrev}
+              disabled={!hasPrev}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                hasPrev 
+                  ? 'bg-white/10 hover:bg-white/20 text-white' 
+                  : 'bg-white/5 text-white/30 cursor-not-allowed'
+              }`}
+            >
+              <div className="w-5 h-5"><Icons.ChevronLeft /></div>
+              <span className="hidden sm:inline">Précédent</span>
+            </button>
+
+            {/* Center - Progress indicator */}
+            <div className="flex-1 flex items-center justify-center gap-3">
+              <div className="text-center">
+                <p className="text-xs text-white/40">
+                  Leçon {selectedVideoIdx + 1} / {currentModule.videos.length}
+                </p>
+                <p className="text-sm font-medium text-white/80 truncate max-w-[200px]">
+                  {currentVideo?.title}
+                </p>
+              </div>
+              
+              {/* Mark Complete Button */}
+              {!isVideoCompleted(selectedModule, currentVideo?.id || '') && currentVideo?.type !== 'quiz' && (
+                <button
+                  onClick={completeVideo}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                >
+                  <div className="w-4 h-4"><Icons.Check /></div>
+                  <span className="hidden sm:inline">Terminé</span>
+                </button>
+              )}
+              
+              {isVideoCompleted(selectedModule, currentVideo?.id || '') && (
+                <span className="flex items-center gap-1 text-green-400 text-sm">
+                  <div className="w-4 h-4"><Icons.Check /></div>
+                  ✓
+                </span>
+              )}
+            </div>
+
+            {/* Next */}
+            <button
+              onClick={goToNext}
+              disabled={!hasNext}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                hasNext 
+                  ? 'text-black' 
+                  : 'bg-white/5 text-white/30 cursor-not-allowed'
+              }`}
+              style={{ backgroundColor: hasNext ? currentModule.color : undefined }}
+            >
+              <span className="hidden sm:inline">Suivant</span>
+              <div className="w-5 h-5"><Icons.ChevronRight /></div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
