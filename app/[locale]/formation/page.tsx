@@ -162,6 +162,17 @@ const DailyGoals = ({ progress }: { progress: UserProgress }) => {
 };
 
 // Video Player Component (Placeholder)
+// Helper function to convert YouTube URLs to embed format
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  const longMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+  if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`;
+  if (url.includes('youtube.com/embed/')) return url;
+  return null;
+};
+
 const VideoPlayer = ({ video, module, isPlaying, onPlayPause, onComplete, isCompleted }: {
   video: Video;
   module: Module;
@@ -169,55 +180,79 @@ const VideoPlayer = ({ video, module, isPlaying, onPlayPause, onComplete, isComp
   onPlayPause: () => void;
   onComplete: () => void;
   isCompleted: boolean;
-}) => (
-  <div className="flex-1 bg-white/5 rounded-2xl overflow-hidden border border-white/10 flex flex-col">
-    {/* Video Area */}
-    <div className="flex-1 bg-gradient-to-br from-black/50 to-black/30 relative flex items-center justify-center min-h-[200px]">
-      <div className="text-center">
-        <button
-          onClick={onPlayPause}
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all hover:scale-110 mb-4"
-          style={{ backgroundColor: module.color }}
-        >
-          <div className="w-6 h-6 sm:w-8 sm:h-8 text-black ml-1">
-            {isPlaying ? <Icons.Pause /> : <Icons.Play />}
+}) => {
+  const embedUrl = video.videoUrl ? getYouTubeEmbedUrl(video.videoUrl) : null;
+  
+  return (
+    <div className="flex-1 bg-white/5 rounded-2xl overflow-hidden border border-white/10 flex flex-col">
+      {/* Video Area */}
+      <div className="flex-1 bg-gradient-to-br from-black/50 to-black/30 relative flex items-center justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
+        {embedUrl ? (
+          <iframe
+            src={`${embedUrl}?rel=0&modestbranding=1`}
+            title={video.title}
+            className="absolute inset-0 w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <div className="text-center">
+            <button
+              onClick={onPlayPause}
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all hover:scale-110 mb-4"
+              style={{ backgroundColor: module.color }}
+            >
+              <div className="w-6 h-6 sm:w-8 sm:h-8 text-black ml-1">
+                {isPlaying ? <Icons.Pause /> : <Icons.Play />}
+              </div>
+            </button>
+            <p className="text-white/40 text-sm">🎬 Vidéo en cours de production</p>
+            <p className="text-white/20 text-xs mt-1">{video.duration}</p>
           </div>
-        </button>
-        <p className="text-white/40 text-sm">Vidéo placeholder</p>
-        <p className="text-white/20 text-xs mt-1">{video.duration}</p>
+        )}
+        
+        {/* Progress bar - only show for placeholder */}
+        {!embedUrl && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+            <div 
+              className="h-full transition-all"
+              style={{ 
+                width: isCompleted ? '100%' : '0%',
+                backgroundColor: module.color 
+              }}
+            />
+          </div>
+        )}
       </div>
       
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
-        <div 
-          className="h-full transition-all"
-          style={{ 
-            width: isCompleted ? '100%' : '0%',
-            backgroundColor: module.color 
-          }}
-        />
+      {/* Controls */}
+      <div className="p-3 bg-black/30 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="text-sm text-white/60">{video.duration}</div>
+          {embedUrl && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
+              ▶ YouTube
+            </span>
+          )}
+        </div>
+        {!isCompleted && (
+          <button
+            onClick={onComplete}
+            className="text-xs px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            Marquer comme vu ✓
+          </button>
+        )}
+        {isCompleted && (
+          <span className="text-xs text-green-400 flex items-center gap-1">
+            <div className="w-3 h-3"><Icons.Check /></div> Complété
+          </span>
+        )}
       </div>
     </div>
-    
-    {/* Controls */}
-    <div className="p-3 bg-black/30 flex items-center justify-between">
-      <div className="text-sm text-white/60">{video.duration}</div>
-      {!isCompleted && (
-        <button
-          onClick={onComplete}
-          className="text-xs px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-        >
-          Marquer comme vu ✓
-        </button>
-      )}
-      {isCompleted && (
-        <span className="text-xs text-green-400 flex items-center gap-1">
-          <div className="w-3 h-3"><Icons.Check /></div> Complété
-        </span>
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 // ============================================
 // MAIN COMPONENT
