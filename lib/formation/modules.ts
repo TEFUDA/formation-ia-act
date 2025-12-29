@@ -43,7 +43,8 @@ export const MODULES: Module[] = [
         title: 'Bienvenue dans la formation',
         description: 'Présentation du parcours et des objectifs',
         type: 'video',
-        duration: '5 min'
+        duration: '5 min',
+        videoUrl: 'https://youtu.be/peVKlanza20'
       },
       {
         id: '0.2',
